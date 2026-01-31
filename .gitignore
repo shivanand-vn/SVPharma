@@ -8,3 +8,11 @@ client/node_modules/
 client/dist/
 client/build/
 server/node_modules/
+docs/
+*.js
+!server.js
+!seed-developer.js
+!client/**/*.js
+!server/**/*.js
+# Keep essential scripts but ignore transient ones? Actually, users usually want root scripts ignored unless specified.
+# Let's just follow the user's specific request for docs first.
