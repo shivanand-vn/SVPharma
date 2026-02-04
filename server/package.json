@@ -13,7 +13,7 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.3",
-    "cloudinary": "^1.41.3",
+    "cloudinary": "^2.9.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
@@ -23,7 +23,7 @@
     "mongoose": "^9.1.4",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
-    "multer-storage-cloudinary": "^4.0.0",
+    "multer-storage-cloudinary": "^2.2.1",
     "qrcode": "^1.5.4",
     "sib-api-v3-sdk": "^8.5.0"
   },
