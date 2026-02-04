@@ -360,7 +360,7 @@ const AnalyticsView = ({ data }: { data: any }) => {
                 <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50">
                     <h3 className="text-lg font-bold text-gray-800 mb-6">Sales Trend (Last 7 Days)</h3>
                     <div className="h-80 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                             <LineChart data={data.salesTrends}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                                 <XAxis dataKey="date" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
@@ -379,7 +379,7 @@ const AnalyticsView = ({ data }: { data: any }) => {
                 <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50">
                     <h3 className="text-lg font-bold text-gray-800 mb-6">Top 5 Customers by Spend</h3>
                     <div className="h-80 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                             <BarChart data={data.topCustomers} layout="vertical">
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
                                 <XAxis type="number" hide />
@@ -398,7 +398,7 @@ const AnalyticsView = ({ data }: { data: any }) => {
                 <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50">
                     <h3 className="text-lg font-bold text-gray-800 mb-6">Best Selling Products</h3>
                     <div className="h-80 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                             <BarChart data={data.bestSellingProducts}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                                 <XAxis dataKey="name" stroke="#6B7280" fontSize={10} tickLine={false} axisLine={false} />
@@ -416,7 +416,7 @@ const AnalyticsView = ({ data }: { data: any }) => {
                 <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50">
                     <h3 className="text-lg font-bold text-gray-800 mb-6">Sales by Category</h3>
                     <div className="h-80 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                             <PieChart>
                                 <Pie
                                     data={data.salesByCategory}
