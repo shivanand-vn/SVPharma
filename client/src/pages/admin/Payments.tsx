@@ -3,7 +3,7 @@ import api from '../../utils/api';
 import {
     FaCheck,
     FaTimes,
-    FaExternalLinkAlt,
+    //FaExternalLinkAlt,
     FaExclamationTriangle,
     FaMoneyBillWave,
     FaUniversity,
@@ -33,6 +33,8 @@ interface Payment {
     paymentMethod?: string;
     adminComment?: string;
     createdAt: string;
+    rejectionReason?: string;
+
 }
 
 const AdminPayments = () => {
@@ -363,8 +365,8 @@ const AdminPayments = () => {
                                             <td className="px-6 py-6 whitespace-nowrap">
                                                 <div className="flex flex-col gap-1.5">
                                                     <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border w-fit ${payment.status === 'approved' ? 'bg-green-100 text-green-700 border-green-200 shadow-sm shadow-green-100' :
-                                                            payment.status === 'rejected' ? 'bg-red-100 text-red-700 border-red-200 shadow-sm shadow-red-100' :
-                                                                'bg-amber-100 text-amber-700 border-amber-200 shadow-sm shadow-amber-100'
+                                                        payment.status === 'rejected' ? 'bg-red-100 text-red-700 border-red-200 shadow-sm shadow-red-100' :
+                                                            'bg-amber-100 text-amber-700 border-amber-200 shadow-sm shadow-amber-100'
                                                         }`}>
                                                         {payment.status}
                                                     </span>
