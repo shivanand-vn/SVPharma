@@ -10,7 +10,7 @@ import {
     FaPills,
 } from 'react-icons/fa';
 import Logo from '../assets/Logo.png';
-import api from '../utils/api';
+//import api from '../utils/api';
 import Footer from '../components/Footer';
 
 const Home = () => {
