@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         const initAuth = async () => {
-            const storedUser = localStorage.getItem('user');
+            const storedUser = sessionStorage.getItem('user');
             if (storedUser) {
                 const parsedUser = JSON.parse(storedUser);
                 setUser(parsedUser);
@@ -49,6 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         const enrichedUser = { ...parsedUser, ...profile };
                         setUser(enrichedUser);
                         localStorage.setItem('user', JSON.stringify(enrichedUser));
+                        sessionStorage.setItem('user', JSON.stringify(enrichedUser));
                     } catch (error) {
                         console.error('Failed to auto-fetch profile:', error);
                         // If token is invalid, logout
@@ -80,18 +81,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
 
         setUser(finalUser);
-        localStorage.setItem('user', JSON.stringify(finalUser));
+        sessionStorage.setItem('user', JSON.stringify(finalUser));
         return finalUser;
     };
 
     const updateUser = (userData: User) => {
         setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
+        sessionStorage.setItem('user', JSON.stringify(userData));
     };
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+        localStorage.removeItem('user'); // Also clear localStorage just in case of transition
     };
 
     return (

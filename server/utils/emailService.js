@@ -39,51 +39,63 @@ const sendOTPEmail = async (email, otp, purpose = 'Customer Deletion') => {
         const transporter = createTransporter();
 
         const mailOptions = {
-            from: `"Shree Veerabhadreshwar Pharma" <${process.env.EMAIL_USER}>`,
+            from: `"Shree Veerabhadreshwara Pharma" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: `OTP for ${purpose} - Shree Veerabhadreshwar Pharma`,
+            subject: `OTP for ${purpose} - Shree Veerabhadreshwara Pharma`,
             html: `
                 <!DOCTYPE html>
                 <html>
                 <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                        .header { background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-                        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-                        .otp-box { background: white; border: 3px solid #0d9488; border-radius: 10px; padding: 20px; text-align: center; margin: 20px 0; }
-                        .otp-code { font-size: 36px; font-weight: bold; color: #0d9488; letter-spacing: 8px; }
-                        .warning { background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; border-radius: 5px; }
-                        .footer { text-align: center; color: #6b7280; font-size: 12px; margin-top: 20px; }
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #334155; background-color: #f8fafc; margin: 0; padding: 0; }
+                        .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 40px; }
+                        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 40px; }
+                        .brand-header { padding: 30px 40px; text-align: left; background: #ffffff; border-bottom: 1px solid #f1f5f9; }
+                        .brand-name { font-size: 20px; font-weight: 800; color: #0d9488; margin: 0; display: inline-block; vertical-align: middle; }
+                        .logo { height: 40px; vertical-align: middle; margin-right: 12px; }
+                        .header { background: #334155; color: white; padding: 40px; text-align: center; }
+                        .header h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.025em; }
+                        .content { padding: 40px; }
+                        .otp-box { background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 12px; padding: 30px; text-align: center; margin: 30px 0; }
+                        .otp-code { font-size: 42px; font-weight: 800; color: #334155; letter-spacing: 12px; font-family: monospace; }
+                        .notice { background: #fff7ed; border-left: 4px solid #f97316; padding: 20px; margin: 30px 0; border-radius: 8px; font-size: 14px; }
+                        .footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 0 20px; }
+                        .divider { height: 1px; background: #e2e8f0; margin: 30px 100px; }
                     </style>
                 </head>
                 <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1>🔐 OTP Verification</h1>
-                        </div>
-                        <div class="content">
-                            <h2>Hello Admin,</h2>
-                            <p>You have requested to perform a <strong>${purpose}</strong> action. Please use the OTP below to verify this action:</p>
-                            
-                            <div class="otp-box">
-                                <p style="margin: 0; color: #6b7280; font-size: 14px;">Your OTP Code</p>
-                                <div class="otp-code">${otp}</div>
-                                <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 12px;">Valid for 5 minutes</p>
+                    <div class="wrapper">
+                        <div class="container">
+                            <div class="brand-header">
+                                <img src="${process.env.LOGO_URL || 'https://svpharma.in/logo.png'}" alt="Logo" class="logo">
+                                <span class="brand-name">Shree Veerabhadreshwara Pharma</span>
                             </div>
-
-                            <div class="warning">
-                                <strong>⚠️ Security Notice:</strong>
-                                <p style="margin: 5px 0 0 0;">If you did not request this OTP, please ignore this email. Do not share this code with anyone.</p>
+                            <div class="header">
+                                <h1>🔐 OTP Verification</h1>
                             </div>
+                            <div class="content">
+                                <p style="font-size: 16px; margin-top: 0;">Hello,</p>
+                                <p>You have requested an OTP for <strong>${purpose}</strong>. Please use the verification code below:</p>
+                                
+                                <div class="otp-box">
+                                    <p style="margin: 0 0 10px 0; color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Your Secure Code</p>
+                                    <div class="otp-code">${otp}</div>
+                                    <p style="margin: 15px 0 0 0; color: #94a3b8; font-size: 12px;">This code will expire in 5 minutes.</p>
+                                </div>
 
-                            <p>This OTP will expire in <strong>5 minutes</strong>.</p>
-                            
-                            <p style="margin-top: 30px;">Best regards,<br><strong>Shree Veerabhadreshwar Pharma Team</strong></p>
+                                <div class="notice">
+                                    <strong>⚠️ Security Notice:</strong>
+                                    <p style="margin: 5px 0 0 0; color: #7c2d12;">If you did not request this OTP, please ignore this email and secure your account.</p>
+                                </div>
+
+                                <p style="margin-bottom: 0;">Best regards,<br><strong>SV Pharma Team</strong></p>
+                            </div>
                         </div>
+                        <div class="divider"></div>
                         <div class="footer">
-                            <p>This is an automated email. Please do not reply to this message.</p>
-                            <p>&copy; 2025 Shree Veerabhadreshwar Pharma. All rights reserved.</p>
+                            <p style="margin-bottom: 5px;">&copy; 2026 Shree Veerabhadreshwara Pharma. All rights reserved.</p>
+                            <p style="margin-top: 0; font-weight: 600; color: #64748b;">This is a system-generated email. Please do not reply to this email.</p>
                         </div>
                     </div>
                 </body>
@@ -95,10 +107,7 @@ const sendOTPEmail = async (email, otp, purpose = 'Customer Deletion') => {
         console.log('OTP Email sent:', info.messageId);
         return { success: true, messageId: info.messageId };
     } catch (error) {
-        const errorLog = `${new Date().toISOString()} - CRITICAL: Error sending OTP email: ${error.message}\n${error.stack}\n${error.response ? 'Response: ' + JSON.stringify(error.response) : ''}\n\n`;
-        fs.appendFileSync(path.join(__dirname, '..', 'debug_email.log'), errorLog);
         console.error('CRITICAL: Error sending OTP email:', error);
-        if (error.response) console.error('Error Response:', error.response);
         throw error;
     }
 };
@@ -110,50 +119,58 @@ const sendUsernameEmail = async (email, username) => {
         const transporter = createTransporter();
 
         const mailOptions = {
-            from: `"Shree Veerabhadreshwar Pharma" <${process.env.EMAIL_USER}>`,
+            from: `"Shree Veerabhadreshwara Pharma" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: 'Username Recovery - Shree Veerabhadreshwar Pharma',
+            subject: 'Username Recovery - Shree Veerabhadreshwara Pharma',
             html: `
                 <!DOCTYPE html>
                 <html>
                 <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                        .header { background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-                        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-                        .username-box { background: white; border-left: 4px solid #0d9488; padding: 20px; margin: 20px 0; border-radius: 5px; }
-                        .username { font-size: 24px; font-weight: bold; color: #0d9488; }
-                        .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 5px; }
-                        .footer { text-align: center; color: #6b7280; font-size: 12px; margin-top: 20px; }
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #334155; background-color: #f8fafc; margin: 0; padding: 0; }
+                        .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 40px; }
+                        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 40px; }
+                        .brand-header { padding: 30px 40px; text-align: left; background: #ffffff; border-bottom: 1px solid #f1f5f9; }
+                        .brand-name { font-size: 20px; font-weight: 800; color: #14b8a6; margin: 0; display: inline-block; vertical-align: middle; }
+                        .logo { height: 40px; vertical-align: middle; margin-right: 12px; }
+                        .header { background: #64748b; color: white; padding: 40px; text-align: center; }
+                        .header h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.025em; }
+                        .content { padding: 40px; }
+                        .value-box { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 5px solid #64748b; border-radius: 8px; padding: 25px; margin: 30px 0; }
+                        .value { font-size: 24px; font-weight: 800; color: #334155; }
+                        .footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 0 20px; }
+                        .divider { height: 1px; background: #e2e8f0; margin: 30px 100px; }
                     </style>
                 </head>
                 <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1 style="margin: 0;">🔑 Username Recovery</h1>
-                        </div>
-                        <div class="content">
-                            <p>Hello,</p>
-                            <p>You requested to recover your username for Shree Veerabhadreshwar Pharma.</p>
-                            
-                            <div class="username-box">
-                                <p style="margin: 0; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Your Username</p>
-                                <p class="username">${username}</p>
+                    <div class="wrapper">
+                        <div class="container">
+                            <div class="brand-header">
+                                <img src="${process.env.LOGO_URL || 'https://svpharma.in/logo.png'}" alt="Logo" class="logo">
+                                <span class="brand-name">Shree Veerabhadreshwara Pharma</span>
                             </div>
-
-                            <div class="warning">
-                                <strong>⚠️ Security Notice:</strong>
-                                <p style="margin: 5px 0 0 0;">If you did not request this, please ignore this email. Never share your username or password with anyone.</p>
+                            <div class="header">
+                                <h1>🔑 Username Recovery</h1>
                             </div>
+                            <div class="content">
+                                <p style="font-size: 16px; margin-top: 0;">Hello,</p>
+                                <p>We received a request to recover your username for your account at Shree Veerabhadreshwara Pharma.</p>
+                                
+                                <div class="value-box">
+                                    <p style="margin: 0 0 5px 0; color: #94a3b8; font-size: 12px; font-weight: 600; text-transform: uppercase;">Your Registered Username</p>
+                                    <div class="value">${username}</div>
+                                </div>
 
-                            <p>You can now use this username to log in to your account.</p>
-                            
-                            <p style="margin-top: 30px;">Best regards,<br><strong>Shree Veerabhadreshwar Pharma Team</strong></p>
+                                <p>You can now use this username to log in to our portal. If you did not request this, please ignore this email.</p>
+                                
+                                <p style="margin-bottom: 0;">Best regards,<br><strong>SV Pharma Team</strong></p>
+                            </div>
                         </div>
+                        <div class="divider"></div>
                         <div class="footer">
-                            <p>This is an automated email. Please do not reply to this message.</p>
-                            <p>&copy; 2025 Shree Veerabhadreshwar Pharma. All rights reserved.</p>
+                            <p style="margin-bottom: 5px;">&copy; 2026 Shree Veerabhadreshwara Pharma. All rights reserved.</p>
+                            <p style="margin-top: 0; font-weight: 600; color: #64748b;">This is a system-generated email. Please do not reply to this email.</p>
                         </div>
                     </div>
                 </body>
@@ -165,10 +182,7 @@ const sendUsernameEmail = async (email, username) => {
         console.log('Username recovery email sent:', info.messageId);
         return { success: true, messageId: info.messageId };
     } catch (error) {
-        const errorLog = `${new Date().toISOString()} - CRITICAL: Error sending username recovery email: ${error.message}\n${error.stack}\n${error.response ? 'Response: ' + JSON.stringify(error.response) : ''}\n\n`;
-        fs.appendFileSync(path.join(__dirname, '..', 'debug_email.log'), errorLog);
         console.error('CRITICAL: Error sending username recovery email:', error);
-        if (error.response) console.error('Error Response:', error.response);
         throw error;
     }
 };
@@ -180,51 +194,59 @@ const sendPasswordResetOTP = async (email, otp) => {
         const transporter = createTransporter();
 
         const mailOptions = {
-            from: `"Shree Veerabhadreshwar Pharma" <${process.env.EMAIL_USER}>`,
+            from: `"Shree Veerabhadreshwara Pharma" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: 'Password Reset OTP - Shree Veerabhadreshwar Pharma',
+            subject: 'Password Reset OTP - Shree Veerabhadreshwara Pharma',
             html: `
                 <!DOCTYPE html>
                 <html>
                 <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                        .header { background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-                        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-                        .otp-box { background: white; border: 3px solid #0d9488; border-radius: 10px; padding: 20px; text-align: center; margin: 20px 0; }
-                        .otp-code { font-size: 36px; font-weight: bold; color: #0d9488; letter-spacing: 8px; }
-                        .warning { background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; border-radius: 5px; }
-                        .footer { text-align: center; color: #6b7280; font-size: 12px; margin-top: 20px; }
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #334155; background-color: #f8fafc; margin: 0; padding: 0; }
+                        .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 40px; }
+                        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 40px; }
+                        .brand-header { padding: 30px 40px; text-align: left; background: #ffffff; border-bottom: 1px solid #f1f5f9; }
+                        .brand-name { font-size: 20px; font-weight: 800; color: #0d9488; margin: 0; display: inline-block; vertical-align: middle; }
+                        .logo { height: 40px; vertical-align: middle; margin-right: 12px; }
+                        .header { background: #334155; color: white; padding: 40px; text-align: center; }
+                        .header h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.025em; }
+                        .content { padding: 40px; }
+                        .otp-box { background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 12px; padding: 30px; text-align: center; margin: 30px 0; }
+                        .otp-code { font-size: 42px; font-weight: 800; color: #334155; letter-spacing: 12px; font-family: monospace; }
+                        .footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 0 20px; }
+                        .divider { height: 1px; background: #e2e8f0; margin: 30px 100px; }
                     </style>
                 </head>
                 <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1 style="margin: 0;">🔐 Password Reset</h1>
-                        </div>
-                        <div class="content">
-                            <p>Hello,</p>
-                            <p>You requested to reset your password for Shree Veerabhadreshwar Pharma.</p>
-                            
-                            <div class="otp-box">
-                                <p style="margin: 0; color: #6b7280; font-size: 14px;">Your OTP Code</p>
-                                <div class="otp-code">${otp}</div>
-                                <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 12px;">Valid for 5 minutes</p>
+                    <div class="wrapper">
+                        <div class="container">
+                            <div class="brand-header">
+                                <img src="${process.env.LOGO_URL || 'https://svpharma.in/logo.png'}" alt="Logo" class="logo">
+                                <span class="brand-name">Shree Veerabhadreshwara Pharma</span>
                             </div>
-
-                            <div class="warning">
-                                <strong>⚠️ Security Notice:</strong>
-                                <p style="margin: 5px 0 0 0;">If you did not request this password reset, please ignore this email. Do not share this OTP with anyone.</p>
+                            <div class="header">
+                                <h1>🔐 Password Reset</h1>
                             </div>
+                            <div class="content">
+                                <p style="font-size: 16px; margin-top: 0;">Hello,</p>
+                                <p>You requested a password reset for your Shree Veerabhadreshwara Pharma account. Please use the following code:</p>
+                                
+                                <div class="otp-box">
+                                    <p style="margin: 0 0 10px 0; color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase;">Password Reset OTP</p>
+                                    <div class="otp-code">${otp}</div>
+                                    <p style="margin: 15px 0 0 0; color: #94a3b8; font-size: 12px;">Valid for 5 minutes.</p>
+                                </div>
 
-                            <p>This OTP will expire in <strong>5 minutes</strong>.</p>
-                            
-                            <p style="margin-top: 30px;">Best regards,<br><strong>Shree Veerabhadreshwar Pharma Team</strong></p>
+                                <p>If you did not request this, please secure your account. Do not share this OTP with anyone.</p>
+                                
+                                <p style="margin-bottom: 0;">Best regards,<br><strong>SV Pharma Team</strong></p>
+                            </div>
                         </div>
+                        <div class="divider"></div>
                         <div class="footer">
-                            <p>This is an automated email. Please do not reply to this message.</p>
-                            <p>&copy; 2025 Shree Veerabhadreshwar Pharma. All rights reserved.</p>
+                            <p style="margin-bottom: 5px;">&copy; 2026 Shree Veerabhadreshwara Pharma. All rights reserved.</p>
+                            <p style="margin-top: 0; font-weight: 600; color: #64748b;">This is a system-generated email. Please do not reply to this email.</p>
                         </div>
                     </div>
                 </body>
@@ -236,10 +258,7 @@ const sendPasswordResetOTP = async (email, otp) => {
         console.log('Password reset OTP email sent:', info.messageId);
         return { success: true, messageId: info.messageId };
     } catch (error) {
-        const errorLog = `${new Date().toISOString()} - CRITICAL: Error sending password reset OTP: ${error.message}\n${error.stack}\n${error.response ? 'Response: ' + JSON.stringify(error.response) : ''}\n\n`;
-        fs.appendFileSync(path.join(__dirname, '..', 'debug_email.log'), errorLog);
         console.error('CRITICAL: Error sending password reset OTP:', error);
-        if (error.response) console.error('Error Response:', error.response);
         throw error;
     }
 };
@@ -250,35 +269,58 @@ const sendUpiChangeOTP = async (email, otp) => {
         const transporter = createTransporter();
 
         const mailOptions = {
-            from: `"Shree Veerabhadreshwar Pharma" <${process.env.EMAIL_USER}>`,
+            from: `"Shree Veerabhadreshwara Pharma" <${process.env.EMAIL_USER}>`,
             to: email,
             subject: 'Verify UPI ID Change - SVPharma Admin',
             html: `
                 <!DOCTYPE html>
                 <html>
                 <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                        .header { background: #000; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
-                        .content { padding: 30px; background: #f9f9f9; border: 1px solid #ddd; }
-                        .otp-box { background: #fff; border: 2px dashed #000; padding: 15px; text-align: center; margin: 20px 0; font-size: 24px; font-weight: bold; letter-spacing: 5px; }
-                        .warning { color: #d9534f; margin-top: 20px; font-size: 13px; }
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #334155; background-color: #f8fafc; margin: 0; padding: 0; }
+                        .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 40px; }
+                        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 40px; }
+                        .brand-header { padding: 30px 40px; text-align: left; background: #ffffff; border-bottom: 1px solid #f1f5f9; }
+                        .brand-name { font-size: 20px; font-weight: 800; color: #0d9488; margin: 0; display: inline-block; vertical-align: middle; }
+                        .logo { height: 40px; vertical-align: middle; margin-right: 12px; }
+                        .header { background: #334155; color: white; padding: 40px; text-align: center; }
+                        .header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+                        .content { padding: 40px; }
+                        .otp-box { background: #fff5f5; border: 2px dashed #ef4444; border-radius: 12px; padding: 30px; text-align: center; margin: 30px 0; }
+                        .otp-code { font-size: 42px; font-weight: 800; color: #b91c1c; letter-spacing: 12px; font-family: monospace; }
+                        .footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 0 20px; }
+                        .divider { height: 1px; background: #e2e8f0; margin: 30px 100px; }
                     </style>
                 </head>
                 <body>
-                    <div class="container">
-                        <div class="header">
-                            <h2>Admin Security Verification</h2>
+                    <div class="wrapper">
+                        <div class="container">
+                            <div class="brand-header">
+                                <img src="${process.env.LOGO_URL || 'https://svpharma.in/logo.png'}" alt="Logo" class="logo">
+                                <span class="brand-name">Shree Veerabhadreshwara Pharma</span>
+                            </div>
+                            <div class="header">
+                                <h1>🛠️ Security Verification</h1>
+                            </div>
+                            <div class="content">
+                                <p style="font-size: 16px; margin-top: 0;">Hello Admin,</p>
+                                <p>A request was made to update the <strong>Payment UPI ID</strong>. For security reasons, please verify this action using the code below:</p>
+                                
+                                <div class="otp-box">
+                                    <p style="margin: 0 0 10px 0; color: #b91c1c; font-size: 13px; font-weight: 700; text-transform: uppercase;">Action Authorization Code</p>
+                                    <div class="otp-code">${otp}</div>
+                                </div>
+
+                                <p style="color: #ef4444; font-weight: 600;">⚠️ Important: If you did not initiate this change, access your Admin Dashboard immediately to secure your account.</p>
+                                
+                                <p style="margin-bottom: 0;">Best regards,<br><strong>System Security</strong></p>
+                            </div>
                         </div>
-                        <div class="content">
-                            <p>Hello Admin,</p>
-                            <p>You requested to change the UPI ID for receiving payments.</p>
-                            <p>Please use the following OTP to verify this action:</p>
-                            
-                            <div class="otp-box">${otp}</div>
-                            
-                            <p class="warning">If you did not request this change, please check your admin account security immediately.</p>
+                        <div class="divider"></div>
+                        <div class="footer">
+                            <p style="margin-bottom: 5px;">&copy; 2026 Shree Veerabhadreshwara Pharma. All rights reserved.</p>
+                            <p style="margin-top: 0; font-weight: 600; color: #64748b;">This is a system-generated email. Please do not reply to this email.</p>
                         </div>
                     </div>
                 </body>
@@ -295,48 +337,75 @@ const sendUpiChangeOTP = async (email, otp) => {
     }
 };
 
-
-
 // Send Payment Status Email
 const sendPaymentStatusEmail = async (email, amount, status, reason = '') => {
     try {
         const transporter = createTransporter();
         const isApproved = status === 'approved';
-        const color = isApproved ? '#0d9488' : '#ef4444';
-        const title = isApproved ? 'Payment Approved' : 'Payment Rejected';
+        const brandColor = isApproved ? '#10b981' : '#ef4444';
+        const title = isApproved ? '✅ Payment Approved' : '❌ Payment Rejected';
 
         const mailOptions = {
-            from: `"Shree Veerabhadreshwar Pharma" <${process.env.EMAIL_USER}>`,
+            from: `"Shree Veerabhadreshwara Pharma" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: `${title} - SVPharma`,
+            subject: `${isApproved ? 'Approved' : 'Rejected'}: Payment Status - SV Pharma`,
             html: `
                 <!DOCTYPE html>
                 <html>
                 <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                        .header { background: ${color}; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
-                        .content { padding: 30px; background: #f9f9f9; border: 1px solid #ddd; }
-                        .amount { font-size: 24px; font-weight: bold; margin: 10px 0; color: ${color}; }
-                        .footer { text-align: center; color: #6b7280; font-size: 12px; margin-top: 20px; }
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #334155; background-color: #f8fafc; margin: 0; padding: 0; }
+                        .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 40px; }
+                        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 40px; }
+                        .brand-header { padding: 30px 40px; text-align: left; background: #ffffff; border-bottom: 1px solid #f1f5f9; }
+                        .brand-name { font-size: 20px; font-weight: 800; color: #14b8a6; margin: 0; display: inline-block; vertical-align: middle; }
+                        .logo { height: 40px; vertical-align: middle; margin-right: 12px; }
+                        .header { background: ${brandColor}; color: white; padding: 40px; text-align: center; }
+                        .header h2 { margin: 0; font-size: 24px; font-weight: 700; }
+                        .content { padding: 40px; }
+                        .status-badge { display: inline-block; padding: 6px 16px; border-radius: 99px; font-weight: 800; font-size: 14px; text-transform: uppercase; margin-bottom: 20px; ${isApproved ? 'background: #dcfce7; color: #15803d;' : 'background: #fee2e2; color: #b91c1c;'} }
+                        .amount-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; text-align: center; margin: 30px 0; }
+                        .amount { font-size: 32px; font-weight: 800; color: ${brandColor}; }
+                        .footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 0 20px; }
+                        .divider { height: 1px; background: #e2e8f0; margin: 30px 100px; }
                     </style>
                 </head>
                 <body>
-                    <div class="container">
-                        <div class="header">
-                            <h2>${title}</h2>
+                    <div class="wrapper">
+                        <div class="container">
+                            <div class="brand-header">
+                                <img src="${process.env.LOGO_URL || 'https://svpharma.in/logo.png'}" alt="Logo" class="logo">
+                                <span class="brand-name">Shree Veerabhadreshwara Pharma</span>
+                            </div>
+                            <div class="header">
+                                <h2>${title}</h2>
+                            </div>
+                            <div class="content">
+                                <p style="font-size: 16px; margin-top: 0;">Hello,</p>
+                                <div class="status-badge">${status}</div>
+                                <p>We have processed your payment request. Here are the details:</p>
+                                
+                                <div class="amount-card">
+                                    <p style="margin: 0 0 10px 0; color: #94a3b8; font-size: 13px; font-weight: 600; text-transform: uppercase;">Payment Amount</p>
+                                    <div class="amount">₹${amount}</div>
+                                </div>
+
+                                ${!isApproved ? `
+                                <div style="background: #fff5f5; border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                                    <p style="margin: 0; color: #991b1b; font-weight: 600;">Rejection Reason:</p>
+                                    <p style="margin: 5px 0 0 0; color: #b91c1c;">${reason || 'The proof provided was invalid or incomplete.'}</p>
+                                </div>` : '<p style="font-weight: 600; color: #0d9488;">Success! Your due balance has been updated instantly.</p>'}
+                                
+                                <p>Thank you for your continued trust in our services.</p>
+                                
+                                <p style="margin-bottom: 0;">Best regards,<br><strong>Accounts Team</strong></p>
+                            </div>
                         </div>
-                        <div class="content">
-                            <p>Hello,</p>
-                            <p>Your payment request of <span class="amount">₹${amount}</span> has been <strong>${status}</strong>.</p>
-                            
-                            ${!isApproved ? `<p><strong>Reason:</strong> ${reason}</p>` : '<p>Your due amount has been updated.</p>'}
-                            
-                            <p>Thank you for your business!</p>
-                        </div>
+                        <div class="divider"></div>
                         <div class="footer">
-                            <p>&copy; 2026 Shree Veerabhadreshwar Pharma</p>
+                            <p style="margin-bottom: 5px;">&copy; 2026 Shree Veerabhadreshwara Pharma. All rights reserved.</p>
+                            <p style="margin-top: 0; font-weight: 600; color: #64748b;">This is a system-generated email. Please do not reply to this email.</p>
                         </div>
                     </div>
                 </body>
@@ -349,7 +418,6 @@ const sendPaymentStatusEmail = async (email, amount, status, reason = '') => {
         return { success: true };
     } catch (error) {
         console.error('Error sending payment status email:', error);
-        // Don't throw, just log error so main flow continues
         return { success: false, error: error.message };
     }
 };

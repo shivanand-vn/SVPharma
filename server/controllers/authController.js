@@ -153,10 +153,14 @@ const forgotUsername = asyncHandler(async (req, res) => {
         throw new Error('Invalid email format');
     }
 
-    // Search for customer with this email
-    const customer = await Customer.findOne({ email: email.trim().toLowerCase() });
+    // Search for user with this email (Customer first, then Admin)
+    let user = await Customer.findOne({ email: email.trim().toLowerCase() });
 
-    if (!customer) {
+    if (!user) {
+        user = await Admin.findOne({ email: email.trim().toLowerCase() });
+    }
+
+    if (!user) {
         // Email doesn't exist - return 404 with clear message
         console.log(`Username recovery attempted for non-existent email: ${email}`);
         res.status(404);
@@ -165,8 +169,8 @@ const forgotUsername = asyncHandler(async (req, res) => {
 
     // Email exists - send username
     try {
-        await sendUsernameEmail(customer.email, customer.username);
-        console.log(`Username recovery email sent to: ${customer.email}`);
+        await sendUsernameEmail(user.email, user.username);
+        console.log(`Username recovery email sent to: ${user.email}`);
 
         res.status(200).json({
             message: 'Username has been sent to your registered email.'
@@ -196,10 +200,14 @@ const forgotPassword = asyncHandler(async (req, res) => {
         throw new Error('Invalid email format');
     }
 
-    // Check if customer exists
-    const customer = await Customer.findOne({ email: email.trim().toLowerCase() });
+    // Check if user exists (Customer or Admin)
+    let user = await Customer.findOne({ email: email.trim().toLowerCase() });
 
-    if (!customer) {
+    if (!user) {
+        user = await Admin.findOne({ email: email.trim().toLowerCase() });
+    }
+
+    if (!user) {
         res.status(404);
         throw new Error('No account found with this email address.');
     }
@@ -212,7 +220,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedOTP = await bcrypt.hash(otp, salt);
 
-    // Set expiry time (5 minutes from now)
+    // Set expiry time (10 minutes from now)
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     // Delete any existing OTPs for this email
@@ -228,8 +236,8 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
     // Send OTP email
     try {
-        await sendPasswordResetOTP(customer.email, otp);
-        console.log(`Password reset OTP sent to: ${customer.email}`);
+        await sendPasswordResetOTP(user.email, otp);
+        console.log(`Password reset OTP sent to: ${user.email}`);
 
         res.status(200).json({
             message: 'OTP has been sent to your registered email.'
@@ -283,6 +291,9 @@ const verifyOTP = asyncHandler(async (req, res) => {
         throw new Error('Invalid OTP');
     }
 
+    // Delete OTP immediately after successful verification
+    await OTP.deleteOne({ _id: otpRecord._id });
+
     res.status(200).json({
         message: 'OTP verified successfully'
     });
@@ -332,30 +343,43 @@ const resetPassword = asyncHandler(async (req, res) => {
         throw new Error('Invalid OTP');
     }
 
-    // Find customer
-    const customer = await Customer.findOne({ email: email.trim().toLowerCase() });
+    // Find user (Customer or Admin)
+    let targetUser = await Customer.findOne({ email: email.trim().toLowerCase() });
+    let isCustomer = true;
 
-    if (!customer) {
-        res.status(404);
-        throw new Error('Customer not found');
+    if (!targetUser) {
+        targetUser = await Admin.findOne({ email: email.trim().toLowerCase() });
+        isCustomer = false;
     }
 
-    // Hash the new password manually (instead of relying on pre-save middleware)
+    if (!targetUser) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    // Hash the new password manually
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    // Update password directly without triggering full document validation
-    await Customer.findOneAndUpdate(
-        { email: email.trim().toLowerCase() },
-        { password: hashedPassword },
-        { runValidators: false } // Skip validation to avoid address field errors
-    );
+    // Update password directly
+    if (isCustomer) {
+        await Customer.findOneAndUpdate(
+            { email: email.trim().toLowerCase() },
+            { password: hashedPassword },
+            { runValidators: false }
+        );
+    } else {
+        await Admin.findOneAndUpdate(
+            { email: email.trim().toLowerCase() },
+            { password: hashedPassword },
+            { runValidators: false }
+        );
+    }
 
-    // Mark OTP as used
-    otpRecord.used = true;
-    await otpRecord.save();
+    // Delete OTP immediately after successful password reset
+    await OTP.deleteOne({ _id: otpRecord._id });
 
-    console.log(`Password reset successful for: ${customer.email}`);
+    console.log(`Password reset successful for: ${targetUser.email}`);
 
     res.status(200).json({
         message: 'Password reset successfully. You can now login with your new password.'

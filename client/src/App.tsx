@@ -31,7 +31,7 @@ const PrivateRoute = ({ children, role }: { children: React.ReactNode, role: str
   }
 
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
   if (user.role !== role && role !== 'any') {

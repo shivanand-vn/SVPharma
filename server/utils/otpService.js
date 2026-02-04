@@ -10,7 +10,9 @@ const generateOTP = () => {
 
 // Store OTP with expiration (5 minutes)
 const storeOTP = (identifier, otp) => {
-    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+    // Delete any existing OTPs for this email
     otpStore.set(identifier, { otp, expiresAt });
 
     // Auto-cleanup after expiration

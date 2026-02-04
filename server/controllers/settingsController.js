@@ -104,7 +104,7 @@ const requestUpiChange = asyncHandler(async (req, res) => {
 
     const OTP = require('../models/OTP');
 
-    // expiry 5 mins
+    // expiry 10 mins
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     // Delete existing OTPs for this purpose/admin email
@@ -157,9 +157,8 @@ const verifyUpiUpdate = asyncHandler(async (req, res) => {
         throw new Error('Invalid OTP');
     }
 
-    // Mark used
-    otpRecord.used = true;
-    await otpRecord.save();
+    // Delete OTP immediately after successful verification
+    await OTP.deleteOne({ _id: otpRecord._id });
 
     // Update UPI ID
     let settings = await SiteSettings.findOne();

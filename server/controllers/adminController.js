@@ -40,29 +40,68 @@ const genPassword = (name, phone) => {
 const getWelcomeEmailTemplate = (name, type, username, password) => {
     const displayNamePrefix = type === "Doctor" ? "Dr. " : "";
     return `
-      <div style="font-family:Arial, sans-serif; color:#333; background:#fafafa; padding:20px;">
-        <div style="text-align:center; margin-bottom:20px;">
-          <img src="${process.env.LOGO_URL}" alt="SV Pharma" style="height:70px; object-fit:contain;" />
-        </div>
-        <div style="background:#fff; border-radius:10px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-          <p>Hello <b>${displayNamePrefix}${name}</b>,</p>
-          <p>Your account has been created successfully at <b>Shree Veerabhadreshwara Pharma Online Service</b>.</p>
-          <div style="background:#f6f6f6; border-left:4px solid #00796b; padding:10px 15px; margin:15px 0;">
-            <p><b>Username:</b> ${username}</p>
-            <p><b>Password:</b> ${password}</p>
-          </div>
-          <p>Please keep this information private.</p>
-          <p>Thank you for joining us!</p>
-          <hr style="border:none; border-top:1px solid #ccc; margin:20px 0;" />
-          <p>
-            📱 <b>App Link:</b> <a href="${process.env.APP_LINK}" target="_blank">${process.env.APP_LINK}</a><br />
-            🌐 <b>Website:</b> <a href="${process.env.WEBSITE_LINK}" target="_blank">${process.env.WEBSITE_LINK}</a>
-          </p>
-          <p style="font-size:12px; color:#888; text-align:center; margin-top:30px;">
-            — Shree Veerabhadreshwara Pharma Support Team
-          </p>
-        </div>
-      </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #334155; background-color: #f8fafc; margin: 0; padding: 0; }
+                .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 40px; }
+                .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 40px; }
+                .brand-header { padding: 30px 40px; text-align: left; background: #ffffff; border-bottom: 1px solid #f1f5f9; }
+                .brand-name { font-size: 20px; font-weight: 800; color: #0d9488; margin: 0; display: inline-block; vertical-align: middle; }
+                .logo { height: 40px; vertical-align: middle; margin-right: 12px; }
+                .header { background: #0d9488; color: white; padding: 40px; text-align: center; }
+                .header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+                .content { padding: 40px; }
+                .account-box { background: #f0fdfa; border: 1px solid #ccfbf1; border-radius: 12px; padding: 25px; margin: 30px 0; }
+                .info-row { margin-bottom: 15px; }
+                .info-label { color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+                .info-value { font-size: 18px; font-weight: 700; color: #115e59; font-family: monospace; }
+                .footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 0 20px; }
+                .divider { height: 1px; background: #e2e8f0; margin: 30px 100px; }
+            </style>
+        </head>
+        <body>
+            <div class="wrapper">
+                <div class="container">
+                    <div class="brand-header">
+                        <img src="${process.env.LOGO_URL || 'https://svpharma.in/logo.png'}" alt="Logo" class="logo">
+                        <span class="brand-name">Shree Veerabhadreshwara Pharma</span>
+                    </div>
+                    <div class="header">
+                        <h1>🎊 Welcome to the Family</h1>
+                    </div>
+                    <div class="content">
+                        <p style="font-size: 16px; margin-top: 0;">Hello <strong>${displayNamePrefix}${name}</strong>,</p>
+                        <p>Your partner account has been successfully approved and created at <strong>Shree Veerabhadreshwara Pharma</strong>. You can now access your professional dashboard using the credentials below:</p>
+                        
+                        <div class="account-box">
+                            <div class="info-row">
+                                <div class="info-label">Your Username</div>
+                                <div class="info-value">${username}</div>
+                            </div>
+                            <div class="info-row" style="margin-bottom: 0;">
+                                <div class="info-label">Initial Password</div>
+                                <div class="info-value">${password}</div>
+                            </div>
+                        </div>
+
+                        <p style="font-size: 14px; color: #64748b;">Please keep this information confidential. You will be asked to change your password upon your first login for security purposes.</p>
+                        
+                        <div style="margin-top: 30px; text-align: center;">
+                            <a href="${process.env.APP_LINK || '#'}" style="display:inline-block; background: #0d9488; color: white; padding: 14px 30px; border-radius: 8px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.4);">Access Your Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="footer">
+                    <p style="margin-bottom: 5px;">&copy; 2026 Shree Veerabhadreshwara Pharma. All rights reserved.</p>
+                    <p style="margin-top: 0; font-weight: 600; color: #64748b;">This is a system-generated email. Please do not reply to this email.</p>
+                </div>
+            </div>
+        </body>
+        </html>
     `;
 };
 
@@ -177,16 +216,58 @@ const updateConnectionRequestStatus = asyncHandler(async (req, res) => {
                 email: request.email,
                 subject: 'Account Application Update - SV Pharma',
                 html: `
-                    <div style="font-family:Arial, sans-serif; color:#333; padding:20px;">
-                        <h2>Application Status Update</h2>
-                        <p>Hello ${request.name},</p>
-                        <p>We regret to inform you that your application for a partner account has been rejected.</p>
-                        <div style="background:#fff3f3; padding:15px; border-left:4px solid #d32f2f; margin:15px 0;">
-                            <p><b>Reason for Rejection:</b> ${rejectionReason || 'No specific reason provided.'}</p>
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <style>
+                            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #334155; background-color: #f8fafc; margin: 0; padding: 0; }
+                            .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 40px; }
+                            .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 40px; }
+                            .brand-header { padding: 30px 40px; text-align: left; background: #ffffff; border-bottom: 1px solid #f1f5f9; }
+                            .brand-name { font-size: 20px; font-weight: 800; color: #e11d48; margin: 0; display: inline-block; vertical-align: middle; }
+                            .logo { height: 40px; vertical-align: middle; margin-right: 12px; }
+                            .header { background: #ef4444; color: white; padding: 40px; text-align: center; }
+                            .header h2 { margin: 0; font-size: 24px; font-weight: 700; }
+                            .content { padding: 40px; }
+                            .reason-box { background: #fff1f2; border-left: 4px solid #ef4444; padding: 25px; margin: 30px 0; border-radius: 8px; }
+                            .footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 0 20px; }
+                            .divider { height: 1px; background: #e2e8f0; margin: 30px 100px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="wrapper">
+                            <div class="container">
+                                <div class="brand-header">
+                                    <img src="${process.env.LOGO_URL || 'https://svpharma.in/logo.png'}" alt="Logo" class="logo">
+                                    <span class="brand-name">Shree Veerabhadreshwara Pharma</span>
+                                </div>
+                                <div class="header">
+                                    <h2>Application Status Update</h2>
+                                </div>
+                                <div class="content">
+                                    <p style="font-size: 16px; margin-top: 0;">Hello <strong>${request.name}</strong>,</p>
+                                    <p>We have carefully reviewed your application for a partner account at <strong>Shree Veerabhadreshwara Pharma</strong>.</p>
+                                    <p>Regrettably, we are unable to approve your application at this time.</p>
+                                    
+                                    <div class="reason-box">
+                                        <p style="margin: 0; color: #9f1239; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; margin-bottom: 8px;">Rejection Reason</p>
+                                        <p style="margin: 0; color: #be123c;">${rejectionReason || 'Your application did not meet our current manual verification criteria.'}</p>
+                                    </div>
+
+                                    <p>If you believe this was an error or wish to provide additional documentation, please contact our administrative team.</p>
+                                    
+                                    <p style="margin-bottom: 0;">Best regards,<br><strong>Verification Team</strong></p>
+                                </div>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="footer">
+                                <p style="margin-bottom: 5px;">&copy; 2026 Shree Veerabhadreshwara Pharma. All rights reserved.</p>
+                                <p style="margin-top: 0; font-weight: 600; color: #64748b;">This is a system-generated email. Please do not reply to this email.</p>
+                            </div>
                         </div>
-                        <p>If you have any questions, please contact our support team.</p>
-                        <p>Best Regards,<br/>Shree Veerabhadreshwara Pharma</p>
-                    </div>
+                    </body>
+                    </html>
                 `
             });
         } catch (error) {
@@ -267,12 +348,70 @@ const addCustomer = asyncHandler(async (req, res) => {
                 email: admin.email,
                 subject: 'New Customer Registered',
                 html: `
-                    <h2>New Customer Registration</h2>
-                    <p>A new customer has been successfully added via manual registration.</p>
-                    <p><strong>Name:</strong> ${customer.name}</p>
-                    <p><strong>Phone:</strong> ${customer.phone}</p>
-                    <p><strong>Type:</strong> ${customer.type}</p>
-                    <p>Check the admin dashboard for full details.</p>
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <style>
+                            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #334155; background-color: #f8fafc; margin: 0; padding: 0; }
+                            .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 40px; }
+                            .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 40px; }
+                            .brand-header { padding: 30px 40px; text-align: left; background: #ffffff; border-bottom: 1px solid #f1f5f9; }
+                            .brand-name { font-size: 20px; font-weight: 800; color: #0d9488; margin: 0; display: inline-block; vertical-align: middle; }
+                            .logo { height: 40px; vertical-align: middle; margin-right: 12px; }
+                            .header { background: #334155; color: white; padding: 40px; text-align: center; }
+                            .header h2 { margin: 0; font-size: 24px; font-weight: 700; }
+                            .content { padding: 40px; }
+                            .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                            .info-table td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+                            .label { color: #64748b; font-weight: 700; width: 120px; text-transform: uppercase; font-size: 11px; }
+                            .value { color: #334155; font-weight: 500; }
+                            .footer { text-align: center; color: #94a3b8; font-size: 12px; padding: 0 20px; }
+                            .divider { height: 1px; background: #e2e8f0; margin: 30px 100px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="wrapper">
+                            <div class="container">
+                                <div class="brand-header">
+                                    <img src="${process.env.LOGO_URL || 'https://svpharma.in/logo.png'}" alt="Logo" class="logo">
+                                    <span class="brand-name">Shree Veerabhadreshwara Pharma</span>
+                                </div>
+                                <div class="header">
+                                    <h2>New Customer Registered</h2>
+                                </div>
+                                <div class="content">
+                                    <p style="font-size: 16px; margin-top: 0;">Hello Admin,</p>
+                                    <p>A new customer has been successfully added to the system via manual registration. Details are below:</p>
+                                    
+                                    <table class="info-table">
+                                        <tr>
+                                            <td class="label">Name</td>
+                                            <td class="value">${customer.name}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label">Phone</td>
+                                            <td class="value">${customer.phone}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label">Type</td>
+                                            <td class="value">${customer.type}</td>
+                                        </tr>
+                                    </table>
+
+                                    <p>Please check the admin dashboard for full verification and management.</p>
+                                    
+                                    <p style="margin-bottom: 0;">Best regards,<br><strong>System Monitor</strong></p>
+                                </div>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="footer">
+                                <p style="margin-bottom: 5px;">&copy; 2026 Shree Veerabhadreshwara Pharma. All rights reserved.</p>
+                                <p style="margin-top: 0; font-weight: 600; color: #64748b;">This is a system-generated email. Please do not reply to this email.</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
                 `
             });
         } catch (error) {

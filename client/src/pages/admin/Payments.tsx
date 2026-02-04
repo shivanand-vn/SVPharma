@@ -1,6 +1,20 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { FaCheck, FaTimes, FaExternalLinkAlt, FaExclamationTriangle, FaMoneyBillWave, FaUniversity } from 'react-icons/fa';
+import {
+    FaCheck,
+    FaTimes,
+    FaExternalLinkAlt,
+    FaExclamationTriangle,
+    FaMoneyBillWave,
+    FaUniversity,
+    FaDownload,
+    FaEye,
+    FaCalendarAlt,
+    FaUser,
+    FaFileInvoiceDollar,
+    FaArrowRight,
+    FaRegClock
+} from 'react-icons/fa';
 import { useNotification } from '../../context/NotificationContext';
 
 interface Payment {
@@ -267,97 +281,122 @@ const AdminPayments = () => {
             {loading ? (
                 <div className="text-center py-20 text-gray-400">Loading payments...</div>
             ) : (
-                <div className="bg-white rounded-3xl shadow-sm border border-teal-50 overflow-hidden">
+                <div className="bg-white rounded-[32px] shadow-sm border border-teal-50 overflow-hidden">
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full border-collapse">
-                            <thead className="bg-teal-50/50 border-b border-teal-100">
+                            <thead className="bg-slate-50 border-b border-slate-100">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-[10px] font-black text-teal-800 uppercase tracking-widest whitespace-nowrap">Date</th>
-                                    <th className="px-6 py-4 text-left text-[10px] font-black text-teal-800 uppercase tracking-widest whitespace-nowrap">Customer</th>
-                                    <th className="px-6 py-4 text-left text-[10px] font-black text-teal-800 uppercase tracking-widest whitespace-nowrap">Amount</th>
-                                    <th className="px-6 py-4 text-left text-[10px] font-black text-teal-800 uppercase tracking-widest whitespace-nowrap">Proof</th>
-                                    <th className="px-6 py-4 text-left text-[10px] font-black text-teal-800 uppercase tracking-widest whitespace-nowrap">Status</th>
-                                    <th className="px-6 py-4 text-right"></th>
+                                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Date & Time</th>
+                                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Customer Details</th>
+                                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Amount</th>
+                                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Proof of Payment</th>
+                                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Status</th>
+                                    <th className="px-6 py-5 text-right"></th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-slate-50">
                                 {payments.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-gray-400 text-sm">No payments found</td>
+                                        <td colSpan={6} className="px-6 py-20 text-center">
+                                            <div className="flex flex-col items-center gap-3 text-slate-300">
+                                                <FaRegClock size={48} className="opacity-20" />
+                                                <p className="text-sm font-bold">No payment records found</p>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ) : (
                                     payments.map((payment) => (
-                                        <tr key={payment._id} className="hover:bg-gray-50/50 transition-colors">
-                                            <td className="px-6 py-4 text-xs font-bold text-gray-600 whitespace-nowrap">
-                                                {new Date(payment.createdAt).toLocaleDateString()}
-                                                <div className="text-[10px] font-medium text-gray-400">{new Date(payment.createdAt).toLocaleTimeString()}</div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="text-sm font-bold text-gray-800">{payment.customer?.name || 'Unknown'}</div>
-                                                <div className="text-xs text-teal-600 font-medium">{payment.customer?.username}</div>
-                                                <div className="text-[10px] text-gray-400">{payment.customer?.phone}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className={`text-lg font-black ${payment.status === 'approved' ? 'text-green-600' : 'text-teal-700'}`}>
-                                                    ₹{payment.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        <tr key={payment._id} className="group hover:bg-teal-50/30 transition-all duration-300">
+                                            <td className="px-6 py-6 whitespace-nowrap">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-slate-100 rounded-xl text-slate-400 group-hover:bg-teal-100 group-hover:text-teal-600 transition-colors">
+                                                        <FaCalendarAlt size={14} />
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-sm font-black text-slate-700">{new Date(payment.createdAt).toLocaleDateString()}</div>
+                                                        <div className="text-[10px] font-bold text-slate-400 uppercase">{new Date(payment.createdAt).toLocaleTimeString()}</div>
+                                                    </div>
                                                 </div>
-                                                {payment.transactionId && <div className="text-[10px] bg-gray-100 inline-block px-1.5 py-0.5 rounded text-gray-500 font-mono mt-1">{payment.transactionId}</div>}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                            <td className="px-6 py-6">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-10 w-10 bg-teal-50 rounded-full flex items-center justify-center text-teal-600 font-black text-xs">
+                                                        {payment.customer?.name?.charAt(0) || '?'}
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-sm font-black text-slate-800 tracking-tight">{payment.customer?.name || 'Unknown'}</div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-[10px] text-teal-600 font-bold uppercase tracking-wider">{payment.customer?.username}</span>
+                                                            <span className="h-1 w-1 rounded-full bg-slate-200"></span>
+                                                            <span className="text-[10px] text-slate-400 font-medium">{payment.customer?.phone}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-6 whitespace-nowrap">
+                                                <div className="flex flex-col">
+                                                    <span className={`text-lg font-black tracking-tighter ${payment.status === 'approved' ? 'text-green-600' : 'text-slate-900'}`}>
+                                                        ₹{payment.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                                    </span>
+                                                    {payment.transactionId && (
+                                                        <span className="text-[9px] font-mono text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 w-fit mt-1">
+                                                            ID: {payment.transactionId}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-6 whitespace-nowrap">
                                                 {payment.proofUrl === 'offline_payment' || payment.paymentMethod === 'CASH' ? (
-                                                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-500 rounded-lg text-[10px] font-black uppercase tracking-wider border border-gray-200">
+                                                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-wider border border-slate-200">
                                                         <FaMoneyBillWave size={12} /> Cash Payment
                                                     </div>
                                                 ) : (
                                                     <button
                                                         onClick={() => openProof(payment)}
-                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors"
+                                                        className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-black hover:bg-indigo-600 hover:text-white transition-all group/proof shadow-sm hover:shadow-indigo-200"
                                                     >
-                                                        <FaExternalLinkAlt size={10} /> View Proof
+                                                        <FaEye size={12} className="group-hover/proof:scale-110 transition-transform" />
+                                                        Verify Proof
                                                     </button>
                                                 )}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex flex-col gap-1">
-                                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide border w-fit ${payment.status === 'approved' ? 'bg-green-100 text-green-700 border-green-200' :
-                                                        payment.status === 'rejected' ? 'bg-red-100 text-red-700 border-red-200' :
-                                                            'bg-yellow-100 text-yellow-700 border-yellow-200'
+                                            <td className="px-6 py-6 whitespace-nowrap">
+                                                <div className="flex flex-col gap-1.5">
+                                                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border w-fit ${payment.status === 'approved' ? 'bg-green-100 text-green-700 border-green-200 shadow-sm shadow-green-100' :
+                                                            payment.status === 'rejected' ? 'bg-red-100 text-red-700 border-red-200 shadow-sm shadow-red-100' :
+                                                                'bg-amber-100 text-amber-700 border-amber-200 shadow-sm shadow-amber-100'
                                                         }`}>
                                                         {payment.status}
                                                     </span>
                                                     {payment.status === 'rejected' && (
-                                                        <span className="text-[8px] text-red-400 font-bold max-w-[120px] truncate" title={payment.adminComment || payment.rejectionReason}>
-                                                            {payment.adminComment || payment.rejectionReason}
-                                                        </span>
+                                                        <p className="text-[10px] text-red-400 font-bold max-w-[150px] truncate italic" title={payment.adminComment || payment.rejectionReason}>
+                                                            "{payment.adminComment || payment.rejectionReason}"
+                                                        </p>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-right whitespace-nowrap">
+                                            <td className="px-6 py-6 text-right whitespace-nowrap">
                                                 {payment.status === 'pending' ? (
-                                                    <div className="flex justify-end gap-3">
+                                                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0">
                                                         <button
                                                             onClick={() => openApprove(payment)}
-                                                            className="flex items-center gap-2 pl-2 pr-4 py-1.5 bg-green-50 text-green-600 rounded-full hover:bg-green-600 hover:text-white transition-all shadow-sm hover:shadow-green-200 group/approve hover:scale-105 active:scale-95"
-                                                            title="Approve Payment"
+                                                            className="h-10 w-10 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 transition-all shadow-lg shadow-green-200 active:scale-95"
+                                                            title="Approve"
                                                         >
-                                                            <div className="h-6 w-6 rounded-full bg-white flex items-center justify-center shadow-inner group-hover/approve:bg-green-500 group-hover/approve:text-white transition-colors">
-                                                                <FaCheck size={10} className="group-hover/approve:animate-pulse" />
-                                                            </div>
-                                                            <span className="text-[10px] font-black uppercase tracking-wider">Approve</span>
+                                                            <FaCheck size={14} />
                                                         </button>
                                                         <button
                                                             onClick={() => openReject(payment)}
-                                                            className="flex items-center gap-2 pl-2 pr-4 py-1.5 bg-red-50 text-red-600 rounded-full hover:bg-red-600 hover:text-white transition-all shadow-sm hover:shadow-red-200 group/reject hover:scale-105 active:scale-95 hover:animate-shake"
-                                                            title="Reject Payment"
+                                                            className="h-10 w-10 flex items-center justify-center bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-200 active:scale-95"
+                                                            title="Reject"
                                                         >
-                                                            <div className="h-6 w-6 rounded-full bg-white flex items-center justify-center shadow-inner group-hover/reject:bg-red-500 group-hover/reject:text-white transition-colors">
-                                                                <FaTimes size={10} />
-                                                            </div>
-                                                            <span className="text-[10px] font-black uppercase tracking-wider">Reject</span>
+                                                            <FaTimes size={14} />
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest italic">No Actions</span>
+                                                    <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-300 border border-slate-100">
+                                                        <FaCheck size={12} className="opacity-50" />
+                                                    </div>
                                                 )}
                                             </td>
                                         </tr>
@@ -369,92 +408,213 @@ const AdminPayments = () => {
                 </div>
             )}
 
-            {/* Approve Dialog */}
+            {/* Premium Approve Dialog */}
             {showApproveDialog && selectedPayment && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-[32px] shadow-2xl max-w-sm w-full p-8 space-y-6">
-                        <div className="flex items-center gap-4 text-amber-600">
-                            <div className="p-3 bg-amber-50 rounded-2xl">
-                                <FaExclamationTriangle size={24} />
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[200] flex items-center justify-center p-4 animate-in fade-in zoom-in duration-300">
+                    <div className="bg-white rounded-[40px] shadow-2xl max-w-sm w-full overflow-hidden border border-slate-100">
+                        {/* Header with Background Gradient */}
+                        <div className="bg-gradient-to-br from-green-500 to-teal-600 p-8 text-center relative">
+                            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.2),transparent)] opacity-40"></div>
+                            <div className="h-20 w-20 bg-white/20 backdrop-blur-xl rounded-3xl mx-auto flex items-center justify-center text-white mb-4 shadow-xl border border-white/30">
+                                <FaCheck size={32} className="animate-bounce-short" />
                             </div>
-                            <h3 className="text-xl font-black text-gray-800 tracking-tight">Confirm Approval</h3>
+                            <h3 className="text-2xl font-black text-white tracking-tight">Approve Payment</h3>
                         </div>
-                        <p className="text-gray-600 text-sm leading-relaxed font-medium">
-                            Are you sure you want to approve this payment of <strong className="text-teal-700">₹{selectedPayment.amount.toLocaleString()}</strong>?
-                        </p>
-                        <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 flex gap-3">
-                            <div className="shrink-0 mt-1 h-2 w-2 rounded-full bg-amber-500"></div>
-                            <p className="text-xs text-amber-700 font-bold leading-relaxed">This will permanently reduce the customer's Due Amount.</p>
-                        </div>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setShowApproveDialog(false)}
-                                className="flex-1 py-4 text-sm font-black text-gray-400 hover:bg-gray-50 rounded-2xl transition-all"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleApprove}
-                                disabled={actionLoading}
-                                className="flex-2 py-4 bg-teal-600 text-white text-sm font-black rounded-2xl hover:bg-teal-700 shadow-lg shadow-teal-200 transition-all active:scale-95"
-                            >
-                                {actionLoading ? 'Approving...' : 'Confirm Approval'}
-                            </button>
+
+                        <div className="p-8 space-y-6">
+                            {/* Summary Card */}
+                            <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 space-y-4">
+                                <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                    <span>Payment Summary</span>
+                                    <FaFileInvoiceDollar size={14} className="text-slate-300" />
+                                </div>
+                                <div className="flex justify-between items-end">
+                                    <div className="space-y-1">
+                                        <p className="text-xs font-bold text-slate-500">{selectedPayment.customer?.name}</p>
+                                        <p className="text-2xl font-black text-slate-900 tracking-tighter">₹{selectedPayment.amount.toLocaleString()}</p>
+                                    </div>
+                                    <div className="h-8 w-8 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
+                                        <FaMoneyBillWave size={16} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4 p-4 bg-amber-50 rounded-2xl border border-amber-100 shadow-inner">
+                                <div className="p-2 bg-amber-100 rounded-xl text-amber-600">
+                                    <FaExclamationTriangle size={16} />
+                                </div>
+                                <p className="text-[11px] text-amber-800 font-black leading-relaxed">
+                                    CONFIRMATION: This action will permanently credit the amount and reduce the customer's due balance.
+                                </p>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => setShowApproveDialog(false)}
+                                    className="flex-1 py-4 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-slate-50 rounded-2xl transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleApprove}
+                                    disabled={actionLoading}
+                                    className="flex-[1.5] py-4 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-teal-600 shadow-xl shadow-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                >
+                                    {actionLoading ? (
+                                        <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    ) : (
+                                        <>Confirm Approval <FaArrowRight size={10} /></>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Reject Dialog */}
+            {/* Premium Reject Dialog */}
             {showRejectDialog && selectedPayment && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-[32px] shadow-2xl max-w-sm w-full p-8 space-y-6">
-                        <div className="flex items-center gap-4 text-red-600">
-                            <div className="p-3 bg-red-50 rounded-2xl">
-                                <FaTimes size={24} />
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[200] flex items-center justify-center p-4 animate-in fade-in zoom-in duration-300">
+                    <div className="bg-white rounded-[40px] shadow-2xl max-w-sm w-full overflow-hidden border border-slate-100">
+                        {/* Header with Background Gradient */}
+                        <div className="bg-gradient-to-br from-red-500 to-rose-600 p-8 text-center relative">
+                            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.2),transparent)] opacity-40"></div>
+                            <div className="h-20 w-20 bg-white/20 backdrop-blur-xl rounded-3xl mx-auto flex items-center justify-center text-white mb-4 shadow-xl border border-white/30">
+                                <FaTimes size={32} />
                             </div>
-                            <h3 className="text-xl font-black text-gray-800 tracking-tight">Reject Payment</h3>
+                            <h3 className="text-2xl font-black text-white tracking-tight">Reject Payment</h3>
                         </div>
-                        <textarea
-                            value={rejectReason}
-                            onChange={(e) => setRejectReason(e.target.value)}
-                            placeholder="e.g., Transaction ID invalid, blurred image..."
-                            className="w-full p-4 bg-gray-50 rounded-2xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500 text-sm h-32 font-medium"
-                        />
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setShowRejectDialog(false)}
-                                className="flex-1 py-4 text-sm font-black text-gray-400 hover:bg-gray-50 rounded-2xl transition-all"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleReject}
-                                disabled={actionLoading || !rejectReason}
-                                className="flex-1 py-4 bg-red-500 text-white text-sm font-black rounded-2xl hover:bg-red-600 shadow-lg shadow-red-200 transition-all active:scale-95 disabled:opacity-50"
-                            >
-                                {actionLoading ? 'Rejecting...' : 'Confirm Reject'}
-                            </button>
+
+                        <div className="p-8 space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reason for Rejection</label>
+                                <textarea
+                                    value={rejectReason}
+                                    onChange={(e) => setRejectReason(e.target.value)}
+                                    placeholder="e.g., Transaction ID invalid, blurred image..."
+                                    className="w-full p-5 bg-slate-50 rounded-[24px] border border-slate-100 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500 text-sm h-32 font-bold text-slate-700 placeholder:text-slate-300 shadow-inner"
+                                />
+                            </div>
+
+                            <p className="text-[10px] text-slate-400 font-bold leading-relaxed text-center px-4">
+                                Note: Recording a rejection will notify the customer via email with the provided reason.
+                            </p>
+
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => setShowRejectDialog(false)}
+                                    className="flex-1 py-4 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-slate-50 rounded-2xl transition-all"
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    onClick={handleReject}
+                                    disabled={actionLoading || !rejectReason}
+                                    className="flex-[1.5] py-4 bg-red-500 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-red-600 shadow-xl shadow-red-100 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {actionLoading ? (
+                                        <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    ) : (
+                                        <>Confirm Rejection</>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Proof Modal */}
+            {/* Premium Side-by-Side Proof Modal */}
             {showProofModal && selectedPayment && (
-                <div className="fixed inset-0 bg-black/90 z-[300] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setShowProofModal(false)}>
-                    <div className="relative max-w-3xl w-full max-h-[90vh] bg-transparent rounded-3xl overflow-hidden flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
-                        <img
-                            src={selectedPayment.proofUrl}
-                            alt="Payment Proof"
-                            className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border-4 border-white/10"
-                        />
-                        <button
-                            onClick={() => setShowProofModal(false)}
-                            className="absolute -top-4 -right-4 h-12 w-12 bg-white rounded-full flex items-center justify-center text-gray-800 shadow-2xl hover:scale-110 transition-transform z-10"
-                        >
-                            <FaTimes size={20} />
-                        </button>
+                <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[300] flex items-center justify-center p-4 animate-in fade-in duration-300">
+                    <div className="bg-slate-50 w-full max-w-5xl rounded-[40px] overflow-hidden flex flex-col md:flex-row shadow-3xl">
+                        {/* Image Side */}
+                        <div className="flex-[1.5] bg-slate-950 flex flex-col relative group">
+                            <div className="absolute top-6 left-6 z-10">
+                                <span className="px-4 py-2 bg-white/10 backdrop-blur-md text-white rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10">
+                                    Payment Proof
+                                </span>
+                            </div>
+                            <div className="flex-1 flex items-center justify-center overflow-hidden p-8">
+                                <img
+                                    src={selectedPayment.proofUrl}
+                                    alt="Payment Proof"
+                                    className="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-2xl group-hover:scale-[1.02] transition-transform duration-700"
+                                />
+                            </div>
+                            {/* Toolbar */}
+                            <div className="p-6 bg-slate-900/50 backdrop-blur-md flex justify-center gap-4 border-t border-white/5">
+                                <a
+                                    href={selectedPayment.proofUrl}
+                                    download
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-2xl hover:bg-white/20 transition-all text-sm font-black uppercase tracking-widest border border-white/10"
+                                >
+                                    <FaDownload size={14} /> Download Original
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Details Side */}
+                        <div className="flex-1 p-8 lg:p-12 space-y-8 flex flex-col bg-white">
+                            <div className="flex justify-between items-start">
+                                <div className="space-y-1">
+                                    <h4 className="text-3xl font-black text-slate-900 tracking-tighter">Verification</h4>
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Double check details below</p>
+                                </div>
+                                <button
+                                    onClick={() => setShowProofModal(false)}
+                                    className="h-12 w-12 bg-slate-50 hover:bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 transition-all active:scale-95"
+                                >
+                                    <FaTimes size={20} />
+                                </button>
+                            </div>
+
+                            <div className="flex-1 space-y-6">
+                                {/* Detail Rows */}
+                                <div className="grid gap-4">
+                                    {[
+                                        { icon: <FaUser />, label: "Customer", value: selectedPayment.customer?.name },
+                                        { icon: <FaMoneyBillWave />, label: "Paid Amount", value: `₹${selectedPayment.amount.toLocaleString()}`, highlight: true },
+                                        { icon: <FaFileInvoiceDollar />, label: "Transaction ID", value: selectedPayment.transactionId || "N/A", mono: true },
+                                        { icon: <FaCalendarAlt />, label: "Date & Time", value: `${new Date(selectedPayment.createdAt).toLocaleDateString()} ${new Date(selectedPayment.createdAt).toLocaleTimeString()}` }
+                                    ].map((detail, idx) => (
+                                        <div key={idx} className="flex items-center gap-4 p-4 bg-slate-50 rounded-[20px] border border-slate-100 group/item hover:bg-white hover:shadow-xl hover:shadow-slate-100 transition-all">
+                                            <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover/item:text-teal-600 transition-colors shadow-sm">
+                                                {detail.icon}
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{detail.label}</p>
+                                                <p className={`text-sm font-black ${detail.highlight ? 'text-teal-600' : 'text-slate-800'} ${detail.mono ? 'font-mono' : ''}`}>
+                                                    {detail.value}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Direct Actions in Modal */}
+                            {selectedPayment.status === 'pending' && (
+                                <div className="space-y-4 pt-4">
+                                    <div className="flex gap-4">
+                                        <button
+                                            onClick={() => { setShowProofModal(false); openReject(selectedPayment); }}
+                                            className="flex-1 py-4 border-2 border-red-500 text-red-500 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
+                                        >
+                                            Reject
+                                        </button>
+                                        <button
+                                            onClick={() => { setShowProofModal(false); openApprove(selectedPayment); }}
+                                            className="flex-[2] py-4 bg-green-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-green-600 shadow-xl shadow-green-200 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            Approve Payment <FaArrowRight size={10} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
