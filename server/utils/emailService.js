@@ -1,22 +1,34 @@
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 
-// Configure API key authorization: api-key
-const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = process.env.BREVO_API_KEY;
-
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-
-// Sender info from environment variable
-const sender = {
-    email: process.env.MAIL_FROM || 'noreply@svpharma.in',
-    name: 'Shree Veerabhadreshwara Pharma',
-};
-
 // Generic send email function
 const sendEmail = async (toEmail, subject, htmlContent) => {
+    // Check credentials at runtime to ensure env vars are loaded
+    if (!process.env.BREVO_API_KEY) {
+        console.error('BREVO_API_KEY is missing in environment variables');
+        throw new Error('Email configuration error: API Key missing');
+    }
+    if (!process.env.MAIL_FROM) {
+        console.error('MAIL_FROM is missing in environment variables');
+        throw new Error('Email configuration error: Sender email missing');
+    }
+
+    // Configure API key authorization at runtime
+    const defaultClient = SibApiV3Sdk.ApiClient.instance;
+    const apiKey = defaultClient.authentications['api-key'];
+    apiKey.apiKey = process.env.BREVO_API_KEY;
+
+    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+
+    // Define sender at runtime
+    const sender = {
+        email: process.env.MAIL_FROM,
+        name: 'Shree Veerabhadreshwara Pharma',
+    };
+
     try {
         console.log(`Sending email to ${toEmail} with subject: ${subject}`);
+        console.log(`Using Sender: ${sender.email} (${sender.name})`);
 
         const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
         sendSmtpEmail.to = [{ email: toEmail }];
