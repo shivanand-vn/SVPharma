@@ -283,7 +283,7 @@ const sendWelcomeEmail = async (email, username, password, role) => {
                         </div>
                     </div>
 
-                    <p style="color: #ef4444; font-size: 14px;"><strong>Important:</strong> Please log in and change your password immediately for security purposes.</p>
+                    <p style="color: #ef4444; font-size: 14px;"><strong>Important:</strong> Please log in and reset your password Soon...</p>
                     
                     <div style="text-align: center; margin-top: 30px;">
                         <!-- Link will be provided in footer strictly as per env rules -->
