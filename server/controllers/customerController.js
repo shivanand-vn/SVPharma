@@ -67,12 +67,20 @@ const updateProfile = asyncHandler(async (req, res) => {
 
     // Validate and update phone if changed
     if (phone && typeof phone === 'string' && phone.trim() && phone !== customer.phone) {
-        const phoneExists = await Customer.findOne({ phone, _id: { $ne: customer._id } });
+        const cleanPhone = phone.trim();
+        // Strict Mobile Number Validation
+        const phoneRegex = /^[6-9]\d{9}$/;
+        if (!phoneRegex.test(cleanPhone)) {
+            res.status(400);
+            throw new Error('Invalid mobile number. Must be exactly 10 digits and start with 6, 7, 8, or 9.');
+        }
+
+        const phoneExists = await Customer.findOne({ phone: cleanPhone, _id: { $ne: customer._id } });
         if (phoneExists) {
             res.status(400);
             throw new Error('A customer is already registered with this Mobile Number');
         }
-        customer.phone = phone.trim();
+        customer.phone = cleanPhone;
         console.log('Updated phone:', customer.phone);
     }
 

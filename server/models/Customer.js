@@ -8,7 +8,8 @@ const customerSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: true
+        required: true,
+        match: [/^[6-9]\d{9}$/, 'Please enter a valid 10-digit mobile number']
     },
     email: {
         type: String,

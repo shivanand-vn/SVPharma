@@ -64,6 +64,13 @@ const AdminProfile = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Strict Mobile Number Validation
+        if (settings.phone && !/^[6-9]\d{9}$/.test(settings.phone)) {
+            showNotification('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9', 'error');
+            return;
+        }
+
         setSaving(true);
         try {
             const { data } = await api.put('/settings/shop', settings);
@@ -151,10 +158,14 @@ const AdminProfile = () => {
                                     <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Public Phone</label>
                                     <input
                                         name="phone"
+                                        type="tel"
                                         value={settings.phone}
-                                        onChange={handleChange}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                            setSettings({ ...settings, phone: value });
+                                        }}
                                         className="w-full px-6 py-4 bg-white border border-gray-200 rounded-2xl font-bold text-gray-700 focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 transition-all shadow-sm"
-                                        placeholder="+91..."
+                                        placeholder="10-digit mobile number"
                                     />
                                 </div>
                             </div>

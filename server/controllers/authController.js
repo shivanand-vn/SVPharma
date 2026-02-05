@@ -14,6 +14,14 @@ const { validatePassword, generateOTP } = require('../utils/passwordUtils');
 const requestConnection = asyncHandler(async (req, res) => {
     const { name, email, phone, address, type } = req.body;
 
+    // Strict Mobile Number Validation
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(phone)) {
+        res.status(400);
+        throw new Error('Invalid mobile number. Must be exactly 10 digits and start with 6, 7, 8, or 9.');
+    }
+
+
     // 1. Check if a request already exists
     const emailRequestExists = await ConnectionRequest.findOne({ email });
     if (emailRequestExists) {

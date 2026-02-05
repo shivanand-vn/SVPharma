@@ -3,7 +3,11 @@ const mongoose = require('mongoose');
 const connectionRequestSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    phone: { type: String, required: true },
+    phone: {
+        type: String,
+        required: true,
+        match: [/^[6-9]\d{9}$/, 'Please enter a valid 10-digit mobile number']
+    },
     address: {
         shopName: String,
         line1: { type: String, required: true },

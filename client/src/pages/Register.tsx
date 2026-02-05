@@ -24,6 +24,13 @@ const Register = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Strict Mobile Number Validation
+        if (!form.phone || !/^[6-9]\d{9}$/.test(form.phone)) {
+            setError('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9');
+            return;
+        }
+
         try {
             await api.post('/auth/request-connection', form);
             setSuccess('Request sent successfully! Our team will review your application.');
@@ -125,7 +132,10 @@ const Register = () => {
                                         type="tel"
                                         placeholder="10-digit mobile number"
                                         value={form.phone}
-                                        onChange={handleChange}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                            setForm({ ...form, phone: value });
+                                        }}
                                         className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-teal-500 focus:bg-white focus:ring-2 focus:ring-teal-200 outline-none transition-all"
                                         required
                                     />

@@ -44,6 +44,13 @@ const ShopProfile = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Strict Mobile Number Validation
+        if (settings.phone && !/^[6-9]\d{9}$/.test(settings.phone)) {
+            setMessage('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9');
+            return;
+        }
+
         setLoading(true);
         setMessage('');
         try {
@@ -126,7 +133,17 @@ const ShopProfile = () => {
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">Public Phone</label>
-                            <input name="phone" value={settings.phone} onChange={handleChange} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" />
+                            <input
+                                name="phone"
+                                type="tel"
+                                value={settings.phone}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                    setSettings({ ...settings, phone: value });
+                                }}
+                                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
+                                placeholder="10-digit mobile number"
+                            />
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">Public Email</label>

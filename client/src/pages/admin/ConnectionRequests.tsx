@@ -114,6 +114,13 @@ const ConnectionRequests = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Strict Mobile Number Validation
+        if (!formData.phone || !/^[6-9]\d{9}$/.test(formData.phone)) {
+            showToast('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9', 'error');
+            return;
+        }
+
         setLoading(true);
         try {
             await api.post('/admin/customers', formData);
@@ -154,11 +161,14 @@ const ConnectionRequests = () => {
                                 required
                             />
                             <input
-                                type="text"
+                                type="tel"
                                 name="phone"
                                 placeholder="Mobile No."
                                 value={formData.phone}
-                                onChange={handleInputChange}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                    setFormData({ ...formData, phone: value });
+                                }}
                                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all placeholder-gray-400 bg-gray-50/50 font-medium"
                                 required
                             />

@@ -50,6 +50,13 @@ const Settings = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Strict Mobile Number Validation
+        if (settings.phone && !/^[6-9]\d{9}$/.test(settings.phone)) {
+            showNotification('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9', 'error');
+            return;
+        }
+
         setSaving(true);
         try {
             await api.put('/settings', settings);
@@ -113,10 +120,14 @@ const Settings = () => {
                                 <FaPhone className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
                                 <input
                                     name="phone"
+                                    type="tel"
                                     value={settings.phone}
-                                    onChange={handleChange}
+                                    onChange={(e) => {
+                                        const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                        setSettings({ ...settings, phone: value });
+                                    }}
                                     className="w-full pl-12 pr-5 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-teal-500/20 outline-none transition-all font-bold text-gray-700"
-                                    placeholder="+91 98765 43210"
+                                    placeholder="10-digit mobile number"
                                 />
                             </div>
                         </div>

@@ -284,6 +284,14 @@ const updateConnectionRequestStatus = asyncHandler(async (req, res) => {
 const addCustomer = asyncHandler(async (req, res) => {
     const { name, phone, email, address, type } = req.body;
 
+    // Strict Mobile Number Validation
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (phone && !phoneRegex.test(phone)) {
+        res.status(400);
+        throw new Error('Invalid mobile number. Must be exactly 10 digits and start with 6, 7, 8, or 9.');
+    }
+
+
     // 1. Validation
     if (!name || !phone || !type) {
         res.status(400);
