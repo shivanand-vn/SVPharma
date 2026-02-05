@@ -136,7 +136,7 @@ const MedicineCard = ({ med, cartItems, addToCart, updateQuantity, isCompact = f
                         </div>
                         {!hideOffers && (
                             <p className="text-[8px] sm:text-[10px] text-gray-400 font-bold">
-                                M.R.P: <span className="line-through">₹{med.mrp}</span>
+                                M.R.P: <span>₹{med.mrp}</span>
                             </p>
                         )}
                     </div>
