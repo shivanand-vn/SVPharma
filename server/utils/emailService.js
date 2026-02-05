@@ -285,8 +285,8 @@ const sendWelcomeEmail = async (email, username, password, role) => {
 
                     <p style="color: #ef4444; font-size: 14px;"><strong>Important:</strong> Please log in and reset your password Soon...</p>
                     
-                    <div style="text-align: center; margin-top: 30px;">
-                        <!-- Link will be provided in footer strictly as per env rules -->
+                    <div style="text-align: center; margin-top: 30px; font-size: 16px;">
+                        <p>Access your dashboard here: <a href="${process.env.WEBSITE_LINK}" style="color: #0d9488; font-weight: 600;">${process.env.WEBSITE_LINK}</a></p>
                     </div>
                 </div>
                 <div class="footer"></div>
