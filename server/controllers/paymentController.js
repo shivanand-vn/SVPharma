@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Payment = require('../models/Payment');
-const { sendPaymentStatusEmail } = require('../utils/emailService');
+// sendPaymentStatusEmail import removed as per strict email control rules
 const Customer = require('../models/Customer');
 const Wallet = require('../models/Wallet');
 const SiteSettings = require('../models/SiteSettings');
@@ -241,10 +241,7 @@ const approvePayment = asyncHandler(async (req, res) => {
         await wallet.save();
     }
 
-    // Send Email
-    if (customer.email) {
-        sendPaymentStatusEmail(customer.email, payment.amount, 'approved');
-    }
+    // Email sending removed as per strict email control rules
 
     res.json({ message: 'Payment approved', payment });
 });
@@ -284,10 +281,7 @@ const rejectPayment = asyncHandler(async (req, res) => {
 
     await payment.save();
 
-    const customer = await Customer.findById(payment.customer);
-    if (customer && customer.email) {
-        sendPaymentStatusEmail(customer.email, payment.amount, 'rejected', reason);
-    }
+    // Email sending removed as per strict email control rules
 
     res.json({ message: 'Payment rejected', payment });
 });

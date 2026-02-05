@@ -26,6 +26,31 @@ const sendEmail = async (toEmail, subject, htmlContent) => {
         name: 'Shree Veerabhadreshwara Pharma',
     };
 
+    // Helper to get strict link logic
+    const getLink = () => {
+        if (process.env.APP_LINK && process.env.APP_LINK.trim() !== '') {
+            return process.env.APP_LINK;
+        }
+        if (process.env.WEBSITE_LINK && process.env.WEBSITE_LINK.trim() !== '') {
+            return process.env.WEBSITE_LINK;
+        }
+        return null;
+    };
+
+    const link = getLink();
+    const footerHtml = `
+        <div class="footer">
+            &copy; ${new Date().getFullYear()} Shree Veerabhadreshwara Pharma. All rights reserved.<br>
+            This is a system-generated email. Please do not reply to this message.<br>
+            ${link ? `<div style="margin-top: 10px; font-weight: 600;">${link}</div>` : ''}
+        </div>
+    `;
+
+    // Inject footer if htmlContent has a footer placeholder
+    const finalHtml = htmlContent.includes('<div class="footer">')
+        ? htmlContent.replace(/<div class="footer">[\s\S]*?<\/div>/, footerHtml)
+        : htmlContent + footerHtml;
+
     try {
         console.log(`Sending email to ${toEmail} with subject: ${subject}`);
         console.log(`Using Sender: ${sender.email} (${sender.name})`);
@@ -34,7 +59,7 @@ const sendEmail = async (toEmail, subject, htmlContent) => {
         sendSmtpEmail.to = [{ email: toEmail }];
         sendSmtpEmail.sender = sender;
         sendSmtpEmail.subject = subject;
-        sendSmtpEmail.htmlContent = htmlContent;
+        sendSmtpEmail.htmlContent = finalHtml;
 
         const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
         console.log('Email sent successfully. Message ID:', data.messageId);
@@ -213,65 +238,7 @@ const sendUpiChangeOTP = async (email, otp) => {
     return sendEmail(email, subject, html);
 };
 
-// Send Payment Status Email
-const sendPaymentStatusEmail = async (email, payment, status, reason = '') => {
-    const isApproved = status === 'approved';
-    const statusColor = isApproved ? '#10b981' : '#ef4444'; // Green or Red
-    const statusText = isApproved ? 'APPROVED' : 'REJECTED';
-    const subject = `Payment Notification: ${statusText} - Shree Veerabhadreshwara Pharma`;
-
-    const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
-                .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden; border: 1px solid #e2e8f0; }
-                .header { background-color: ${statusColor}; padding: 30px; text-align: center; } /* Dynamic Green/Red Header */
-                .logo-text { color: #ffffff; font-size: 24px; font-weight: 700; margin: 0; letter-spacing: 0.5px; }
-                .content { padding: 40px 30px; color: #334155; }
-                .amount-box { background-color: #f8fafc; padding: 15px; border-left: 4px solid ${statusColor}; margin: 20px 0; font-size: 16px; }
-                .reason-box { background-color: #fef2f2; color: #b91c1c; padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 15px; border: 1px solid #fecaca; }
-                .footer { background-color: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1 class="logo-text">Shree Veerabhadreshwara Pharma</h1>
-                </div>
-                <div class="content">
-                    <h2 style="margin-top: 0; color: #1e293b; text-align: center;">Payment ${statusText}</h2>
-                    <p style="font-size: 16px; margin-bottom: 20px;">Hello,</p>
-                    <p style="font-size: 16px;">Your recent payment submission has been <strong>${statusText.toLowerCase()}</strong>.</p>
-                    
-                    <div class="amount-box">
-                        <strong>Amount:</strong> ₹${payment.amount}<br>
-                        <strong>Transaction ID:</strong> ${payment.transactionId}<br>
-                        <strong>Date:</strong> ${new Date(payment.createdAt).toLocaleDateString()}
-                    </div>
-
-                    ${!isApproved && reason ? `
-                    <div class="reason-box">
-                        <strong>Reason for Rejection:</strong><br>
-                        ${reason}
-                    </div>
-                     <p style="margin-top: 15px; font-size: 14px;"><strong>Please correct the issue and re-upload your proof via the "My Payments" section in your portal.</strong></p>
-                    ` : ''}
-
-                    ${isApproved ? '<p style="text-align: center; color: #10b981; font-weight: 600;">Your account balance has been updated successfully.</p>' : ''}
-                </div>
-                <div class="footer">
-                    &copy; ${new Date().getFullYear()} Shree Veerabhadreshwara Pharma. All rights reserved.<br>
-                    This is a system-generated email. Please do not reply.
-                </div>
-            </div>
-        </body>
-        </html>
-    `;
-    return sendEmail(email, subject, html);
-};
+// sendPaymentStatusEmail removed as per strict email control rules
 
 // Send Welcome Email
 const sendWelcomeEmail = async (email, username, password, role) => {
@@ -319,13 +286,10 @@ const sendWelcomeEmail = async (email, username, password, role) => {
                     <p style="color: #ef4444; font-size: 14px;"><strong>Important:</strong> Please log in and change your password immediately for security purposes.</p>
                     
                     <div style="text-align: center; margin-top: 30px;">
-                        <a href="${process.env.WEBSITE_LINK || '#'}" class="btn">Login to Portal</a>
+                        <!-- Link will be provided in footer strictly as per env rules -->
                     </div>
                 </div>
-                <div class="footer">
-                    &copy; ${new Date().getFullYear()} Shree Veerabhadreshwara Pharma. All rights reserved.<br>
-                    This is a system-generated email. Please do not reply.
-                </div>
+                <div class="footer"></div>
             </div>
         </body>
         </html>
@@ -368,10 +332,7 @@ const sendRejectionEmail = async (email, username, reason) => {
 
                     <p style="font-size: 16px;">If you believe this is an error or if you have rectified the issues mentioned above, please feel free to submit a new application.</p>
                 </div>
-                <div class="footer">
-                    &copy; ${new Date().getFullYear()} Shree Veerabhadreshwara Pharma. All rights reserved.<br>
-                    This is a system-generated email. Please do not reply.
-                </div>
+                <div class="footer"></div>
             </div>
         </body>
         </html>
@@ -384,7 +345,6 @@ module.exports = {
     sendUsernameEmail,
     sendPasswordResetOTP,
     sendUpiChangeOTP,
-    sendPaymentStatusEmail,
     sendWelcomeEmail,
     sendRejectionEmail
 };
