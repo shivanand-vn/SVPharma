@@ -52,7 +52,7 @@ const MedicineDetailsModal = ({ med, onClose, cartItems, addToCart, updateQuanti
                             <h2 className="text-2xl font-black text-gray-900 leading-tight">{med.name}</h2>
                             <div className="flex flex-col items-end">
                                 <span className="text-2xl font-black text-teal-600">₹{med.trp || med.price}</span>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">TRP Price</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Net Rate</span>
                             </div>
                         </div>
                         <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">{med.company}</p>
@@ -131,12 +131,12 @@ const MedicineCard = ({ med, cartItems, addToCart, updateQuantity, isCompact = f
                 <div className="flex items-end justify-between gap-2">
                     <div className="flex flex-col">
                         <div className="flex items-baseline gap-1">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase">Net Rate:</span>
                             <span className="text-xs sm:text-xl font-black text-teal-600">₹{med.trp || med.price}</span>
-                            <span className="text-[7px] sm:text-[9px] font-black text-gray-300 uppercase bg-gray-50 px-1 rounded-sm">TRP</span>
                         </div>
                         {!hideOffers && (
                             <p className="text-[8px] sm:text-[10px] text-gray-400 font-bold">
-                                M.R.P: <span className="line-through">₹{med.mrp}</span> <span className="text-orange-500 ml-1">({Math.round((1 - (med.trp / med.mrp)) * 100)}% off)</span>
+                                M.R.P: <span className="line-through">₹{med.mrp}</span>
                             </p>
                         )}
                     </div>

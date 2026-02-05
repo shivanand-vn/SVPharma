@@ -243,7 +243,7 @@ const Inventory = () => {
                         </div>
                         {/* TRP */}
                         <div>
-                            <label className="block text-xs font-bold text-teal-700 mb-1 uppercase tracking-wider">TRP (₹)</label>
+                            <label className="block text-xs font-bold text-teal-700 mb-1 uppercase tracking-wider">Net Rate (₹)</label>
                             <input
                                 type="number"
                                 name="trp"

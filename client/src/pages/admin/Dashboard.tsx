@@ -154,7 +154,7 @@ const EditMedicineModal = ({ isOpen, onClose, medicine, onSave }: any) => {
                             <input type="number" name="mrp" value={formData.mrp || ''} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 outline-none no-spinner" />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">TRP</label>
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Net Rate</label>
                             <input type="number" name="trp" value={formData.trp || ''} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 outline-none no-spinner" />
                         </div>
                         <div>
@@ -1032,7 +1032,7 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Type</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Description</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">MRP (₹)</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">TRP (₹)</th>
+                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Net Rate (₹)</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Packing</th>
                                     <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider">Action</th>
                                 </>
