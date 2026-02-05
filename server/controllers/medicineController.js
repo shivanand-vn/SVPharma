@@ -128,8 +128,8 @@ const getFastMovingMedicines = asyncHandler(async (req, res) => {
                 description: "$details.description",
                 company: "$details.company",
                 mrp: "$details.mrp",
-                trp: "$details.trp",
-                price: "$details.trp",
+                cost: "$details.cost",
+                price: "$details.cost",
                 image: "$details.imageUrl",
                 imageUrl: "$details.imageUrl",
                 category: "$details.category",
@@ -160,10 +160,10 @@ const getMedicineById = asyncHandler(async (req, res) => {
 // @route   POST /api/medicines
 // @access  Private/Admin
 const createMedicine = asyncHandler(async (req, res) => {
-    const { name, description, company, mrp, trp, category, type, packing } = req.body;
+    const { name, description, company, mrp, cost, category, type, packing } = req.body;
 
     // 1. Validation for Required Fields
-    if (!name || !description || !company || !mrp || !trp || !category || !type || !packing || !req.file) {
+    if (!name || !description || !company || !mrp || !cost || !category || !type || !packing || !req.file) {
         if (req.file) fs.unlinkSync(req.file.path); // Cleanup if uploaded
         res.status(400);
         throw new Error('All primary fields and image are mandatory');
@@ -203,8 +203,8 @@ const createMedicine = asyncHandler(async (req, res) => {
         description,
         company,
         mrp: Number(mrp),
-        trp: Number(trp),
-        price: Number(trp),
+        cost: Number(cost),
+        price: Number(cost),
         category,
         type,
         packing,
@@ -219,7 +219,7 @@ const createMedicine = asyncHandler(async (req, res) => {
 // @route   PUT /api/medicines/:id
 // @access  Private/Admin
 const updateMedicine = asyncHandler(async (req, res) => {
-    const { name, description, company, mrp, trp, category, type, packing } = req.body;
+    const { name, description, company, mrp, cost, category, type, packing } = req.body;
 
     const medicine = await Medicine.findById(req.params.id);
 
@@ -259,8 +259,8 @@ const updateMedicine = asyncHandler(async (req, res) => {
         medicine.description = description || medicine.description;
         medicine.company = company || medicine.company;
         medicine.mrp = mrp !== undefined ? Number(mrp) : medicine.mrp;
-        medicine.trp = trp !== undefined ? Number(trp) : medicine.trp;
-        medicine.price = trp !== undefined ? Number(trp) : medicine.price;
+        medicine.cost = cost !== undefined ? Number(cost) : medicine.cost;
+        medicine.price = cost !== undefined ? Number(cost) : medicine.price;
         medicine.category = category || medicine.category;
         medicine.type = type || medicine.type;
         medicine.packing = packing || medicine.packing;

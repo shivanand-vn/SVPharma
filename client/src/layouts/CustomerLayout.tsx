@@ -328,7 +328,7 @@ const CustomerLayout = () => {
                                                                 <span className="px-2 font-bold text-primary min-w-[15px] text-center text-[10px]">{item.quantity}</span>
                                                                 <button onClick={() => updateQuantity(item._id, 1)} className="px-2 py-1 hover:bg-white text-gray-400 hover:text-primary"><FaPlus size={10} /></button>
                                                             </div>
-                                                            <span className="text-[10px] text-gray-400">₹{item.trp || item.price}</span>
+                                                            <span className="text-[10px] text-gray-400">₹{item.cost || item.price}</span>
                                                         </div>
                                                     </div>
                                                     <button onClick={() => removeFromCart(item._id)} className="text-gray-300 hover:text-red-500 shrink-0 self-center"><FaTrash size={12} /></button>

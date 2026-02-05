@@ -31,17 +31,37 @@ const Inventory = () => {
         type: '',
         packing: '',
         mrp: '',
-        trp: ''
+        cost: ''
     });
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+    const [existingTypes, setExistingTypes] = useState<string[]>([]);
+
+    useEffect(() => {
+        // Fetch existing types for the datalist
+        const fetchTypes = async () => {
+            try {
+                const { data } = await api.get('/medicines');
+                // Extract unique types
+                const uniqueTypes = Array.from(new Set(data.map((m: any) => m.type || ""))).filter(Boolean) as string[];
+                setExistingTypes(uniqueTypes);
+            } catch (err) {
+                console.error("Failed to fetch types", err);
+            }
+        };
+        fetchTypes();
+    }, []);
 
     const categories = ['Ethical', 'PCD', 'Generic', 'Other'];
-    const types = ["Tablet", "Syrup", "Capsule", "Drops", "Pediatric Syrup",
+    // Default types as fallback
+    const defaultTypes = ["Tablet", "Syrup", "Capsule", "Drops", "Pediatric Syrup",
         "Pediatric Drops & Suspentions", "Injection", "Soap",
         "Ointment/Cream", "Protein Powder", "Sachet", "Dental", "ENT"];
+
+    // Combine defaults with fetched types for the dropdown
+    const allTypes = Array.from(new Set([...defaultTypes, ...existingTypes])).sort();
 
     const showToast = (message: string, type: 'success' | 'error') => {
         setToast({ message, type });
@@ -72,8 +92,8 @@ const Inventory = () => {
         e.preventDefault();
 
         // Final Frontend Validation
-        const { name, description, company, mrp, trp, category, type, packing } = formData;
-        if (!name || !description || !company || !mrp || !trp || !category || !type || !packing || !imageFile) {
+        const { name, description, company, mrp, cost, category, type, packing } = formData;
+        if (!name || !description || !company || !mrp || !cost || !category || !type || !packing || !imageFile) {
             showToast("All fields and image are mandatory!", "error");
             return;
         }
@@ -86,7 +106,7 @@ const Inventory = () => {
             submissionData.append('description', formData.description);
             submissionData.append('company', formData.company);
             submissionData.append('mrp', formData.mrp);
-            submissionData.append('trp', formData.trp);
+            submissionData.append('cost', formData.cost);
             submissionData.append('category', formData.category);
             submissionData.append('type', formData.type);
             submissionData.append('packing', formData.packing);
@@ -101,7 +121,7 @@ const Inventory = () => {
 
             showToast("Medicine added successfully!", "success");
 
-            // Reset Form
+            // Reset Form and refetch types to include the new one if needed
             setFormData({
                 name: '',
                 description: '',
@@ -110,10 +130,15 @@ const Inventory = () => {
                 type: '',
                 packing: '',
                 mrp: '',
-                trp: ''
+                cost: ''
             });
             setImageFile(null);
             setImagePreview(null);
+
+            // Allow immediate reuse of the new type
+            if (!existingTypes.includes(type)) {
+                setExistingTypes(prev => [...prev, type].sort());
+            }
 
         } catch (error: any) {
             console.error(error);
@@ -198,19 +223,22 @@ const Inventory = () => {
                             </div>
                         </div>
 
-                        {/* Type Dropdown */}
+                        {/* Type Dropdown (Typeable + Searchable) */}
                         <div>
                             <label className="block text-xs font-bold text-teal-700 mb-1 uppercase tracking-wider">Medicine Type</label>
-                            <select
+                            <input
+                                list="medicine-types"
                                 name="type"
+                                type="text"
+                                placeholder="Select or type new..."
                                 value={formData.type}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all bg-white text-gray-700 font-medium cursor-pointer"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all bg-white text-gray-700 font-medium"
                                 required
-                            >
-                                <option value="" disabled>Select Type</option>
-                                {types.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
+                            />
+                            <datalist id="medicine-types">
+                                {allTypes.map(t => <option key={t} value={t} />)}
+                            </datalist>
                         </div>
                     </div>
 
@@ -241,14 +269,14 @@ const Inventory = () => {
                                 required
                             />
                         </div>
-                        {/* TRP */}
+                        {/* Cost */}
                         <div>
-                            <label className="block text-xs font-bold text-teal-700 mb-1 uppercase tracking-wider">Net Rate (₹)</label>
+                            <label className="block text-xs font-bold text-teal-700 mb-1 uppercase tracking-wider">Cost (₹)</label>
                             <input
                                 type="number"
-                                name="trp"
+                                name="cost"
                                 placeholder="0.00"
-                                value={formData.trp}
+                                value={formData.cost}
                                 onChange={handleInputChange}
                                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all placeholder-gray-400 bg-gray-50/50 font-medium no-spinner"
                                 required

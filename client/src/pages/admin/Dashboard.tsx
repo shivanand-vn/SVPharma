@@ -154,8 +154,8 @@ const EditMedicineModal = ({ isOpen, onClose, medicine, onSave }: any) => {
                             <input type="number" name="mrp" value={formData.mrp || ''} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 outline-none no-spinner" />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Net Rate</label>
-                            <input type="number" name="trp" value={formData.trp || ''} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 outline-none no-spinner" />
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Cost</label>
+                            <input type="number" name="cost" value={formData.cost || ''} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 outline-none no-spinner" />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Packing</label>
@@ -974,18 +974,22 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                                 </button>
                             ))
                         ) : (
-                            categories.map(cat => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setCategoryFilter(cat)}
-                                    className={`px-4 py-2 rounded-full text-sm font-bold transition-all shadow-sm ${categoryFilter === cat
-                                        ? 'bg-teal-800 text-white'
-                                        : 'bg-white text-teal-700 hover:bg-teal-100'
-                                        }`}
-                                >
-                                    {cat} <span className="opacity-80 text-xs text-inherit">({getCount(cat)})</span>
-                                </button>
-                            ))
+                            categories.map(cat => {
+                                const count = getCount(cat);
+                                if (type === 'medicines' && cat !== 'All' && count === 0) return null; // Hide empty categories
+                                return (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setCategoryFilter(cat)}
+                                        className={`px-4 py-2 rounded-full text-sm font-bold transition-all shadow-sm ${categoryFilter === cat
+                                            ? 'bg-teal-800 text-white'
+                                            : 'bg-white text-teal-700 hover:bg-teal-100'
+                                            }`}
+                                    >
+                                        {cat} <span className="opacity-80 text-xs text-inherit">({count})</span>
+                                    </button>
+                                );
+                            })
                         )}
                     </div>
 
@@ -1005,18 +1009,22 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                 {/* Second Filter Bar for Types (Sub-categories) */}
                 {type === 'medicines' && (
                     <div className="flex flex-wrap gap-2 py-3 border-t border-teal-50">
-                        {subCategories.map(sub => (
-                            <button
-                                key={sub}
-                                onClick={() => setTypeFilter(sub)}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${typeFilter === sub
-                                    ? 'bg-teal-600 text-white'
-                                    : 'bg-teal-50 text-teal-600 hover:bg-teal-100'
-                                    }`}
-                            >
-                                {sub} <span className="opacity-70 ml-1">({getCount(sub, true)})</span>
-                            </button>
-                        ))}
+                        {subCategories.map(sub => {
+                            const count = getCount(sub, true);
+                            if (sub !== 'All' && count === 0) return null; // Hide empty types
+                            return (
+                                <button
+                                    key={sub}
+                                    onClick={() => setTypeFilter(sub)}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${typeFilter === sub
+                                        ? 'bg-teal-600 text-white'
+                                        : 'bg-teal-50 text-teal-600 hover:bg-teal-100'
+                                        }`}
+                                >
+                                    {sub} <span className="opacity-70 ml-1">({count})</span>
+                                </button>
+                            );
+                        })}
                     </div>
                 )}
             </div>
@@ -1027,14 +1035,14 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                         <tr>
                             {type === 'medicines' && (
                                 <>
-                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">S.No.</th>
+                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider w-16">S.No.</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Name</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Type</th>
+                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider w-24">Type</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Description</th>
+                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Cost (₹)</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">MRP (₹)</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Net Rate (₹)</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Packing</th>
-                                    <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider">Action</th>
+                                    <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider sticky right-0 bg-teal-900 z-10">Action</th>
                                 </>
                             )}
                             {type === 'customers' && (
@@ -1064,14 +1072,14 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                                 <tr key={i} className="hover:bg-teal-50/50 transition-colors border-b border-gray-100">
                                     {type === 'medicines' && (
                                         <>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">{i + 1}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono w-16">{i + 1}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-teal-900">{item.name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">{item.type || 'N/A'}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title={item.description}>{item.description}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium w-24">{item.type || 'N/A'}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title={item.description} style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-teal-700 font-bold">₹{item.cost}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-semibold">₹{item.mrp}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-teal-700 font-bold">₹{item.trp}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.packing}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-center">
+                                            <td className="px-6 py-4 whitespace-nowrap text-center sticky right-0 bg-white z-10 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.1)]">
                                                 <div className="flex justify-center gap-2">
                                                     <button onClick={() => onEdit(item)} className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm hover:shadow-md">Edit</button>
                                                     <button onClick={() => onDelete(item)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm hover:shadow-md">Delete</button>

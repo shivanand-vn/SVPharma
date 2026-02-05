@@ -6,7 +6,7 @@ interface CartItem {
     _id: string; // medicine id
     name: string;
     price: number;
-    trp?: number;
+    cost?: number;
     imageUrl?: string;
     quantity: number;
 }
@@ -44,7 +44,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         const key = getCartKey();
         const saved = localStorage.getItem(key);
         setCartItems(saved ? JSON.parse(saved) : []);
-        
+
         // Handle logout: If user was logged in and now is null, clear the state
         if (userRef.current && !user) {
             setCartItems([]);
@@ -88,7 +88,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         setCartItems([]);
     };
 
-    const cartTotal = cartItems.reduce((acc, item) => acc + (item.trp || item.price) * item.quantity, 0);
+    const cartTotal = cartItems.reduce((acc, item) => acc + (item.cost || item.price) * item.quantity, 0);
 
     return (
         <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal }}>

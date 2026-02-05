@@ -22,7 +22,7 @@ const medicineSchema = new mongoose.Schema({
         required: true,
         min: 0
     },
-    trp: {
+    cost: {
         type: Number,
         required: true,
         min: 0
@@ -40,11 +40,7 @@ const medicineSchema = new mongoose.Schema({
     type: {
         type: String,
         required: true,
-        enum: [
-            "Tablet", "Syrup", "Capsule", "Drops", "Pediatric Syrup",
-            "Pediatric Drops & Suspentions", "Injection", "Soap",
-            "Ointment/Cream", "Protein Powder", "Sachet", "Dental", "ENT"
-        ]
+        trim: true
     },
     packing: {
         type: String,

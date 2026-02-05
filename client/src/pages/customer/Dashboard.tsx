@@ -51,8 +51,8 @@ const MedicineDetailsModal = ({ med, onClose, cartItems, addToCart, updateQuanti
                         <div className="flex justify-between items-start gap-4 mb-2">
                             <h2 className="text-2xl font-black text-gray-900 leading-tight">{med.name}</h2>
                             <div className="flex flex-col items-end">
-                                <span className="text-2xl font-black text-teal-600">₹{med.trp || med.price}</span>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Net Rate</span>
+                                <span className="text-2xl font-black text-teal-600">₹{med.cost || med.price}</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cost</span>
                             </div>
                         </div>
                         <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">{med.company}</p>
@@ -81,7 +81,7 @@ const MedicineDetailsModal = ({ med, onClose, cartItems, addToCart, updateQuanti
                             </div>
                         ) : (
                             <button
-                                onClick={() => addToCart({ ...med, quantity: 1, price: med.trp || med.price })}
+                                onClick={() => addToCart({ ...med, quantity: 1, price: med.cost || med.price })}
                                 className="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl font-bold uppercase tracking-widest shadow-lg shadow-teal-200 transition-all hover:shadow-xl hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
                             >
                                 <FaPlus className="text-sm" /> Add to Cart
@@ -131,12 +131,12 @@ const MedicineCard = ({ med, cartItems, addToCart, updateQuantity, isCompact = f
                 <div className="flex items-end justify-between gap-2">
                     <div className="flex flex-col">
                         <div className="flex items-baseline gap-1">
-                            <span className="text-[10px] font-bold text-gray-500 uppercase">Net Rate:</span>
-                            <span className="text-xs sm:text-xl font-black text-teal-600">₹{med.trp || med.price}</span>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase">Cost:</span>
+                            <span className="text-xs sm:text-xl font-black text-teal-600">₹{med.cost || med.price}</span>
                         </div>
-                        {!hideOffers && (
+                        {!hideOffers && med.mrp && (
                             <p className="text-[8px] sm:text-[10px] text-gray-400 font-bold">
-                                M.R.P: <span>₹{med.mrp}</span>
+                                MRP: <span>₹{med.mrp}</span>
                             </p>
                         )}
                     </div>
@@ -150,7 +150,7 @@ const MedicineCard = ({ med, cartItems, addToCart, updateQuantity, isCompact = f
                             </div>
                         ) : (
                             <button
-                                onClick={() => addToCart({ ...med, quantity: 1, price: med.trp || med.price })}
+                                onClick={() => addToCart({ ...med, quantity: 1, price: med.cost || med.price })}
                                 className="bg-primary hover:bg-teal-700 text-white w-10 sm:w-12 h-8 sm:h-10 rounded-xl flex items-center justify-center shadow-lg shadow-teal-200 transition-all hover:-translate-y-1 active:scale-95 font-bold text-[10px] sm:text-xs"
                             >
                                 Add
@@ -250,17 +250,21 @@ const CustomerDashboard = () => {
                 {/* Horizontal Category Tabs & Search */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-teal-100/30">
                     <div className="flex gap-2 overflow-x-auto no-scrollbar">
-                        {tabs.map(tab => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-6 py-2.5 rounded-xl text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2 ${activeTab === tab
-                                    ? 'bg-primary border-primary text-white shadow-lg shadow-teal-900/10'
-                                    : 'bg-white border-white text-gray-400 hover:bg-teal-50 shadow-sm'}`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
+                        {tabs.map(tab => {
+                            const count = tab === 'All' ? medicines.length : medicines.filter((m: any) => m.category === tab).length;
+                            if (tab !== 'All' && count === 0) return null;
+                            return (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab)}
+                                    className={`px-6 py-2.5 rounded-xl text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2 ${activeTab === tab
+                                        ? 'bg-primary border-primary text-white shadow-lg shadow-teal-900/10'
+                                        : 'bg-white border-white text-gray-400 hover:bg-teal-50 shadow-sm'}`}
+                                >
+                                    {tab}
+                                </button>
+                            );
+                        })}
                     </div>
 
                     <div className="relative group w-full md:w-80">
@@ -278,17 +282,21 @@ const CustomerDashboard = () => {
                 {/* Horizontal Type Pills & Company Filter */}
                 <div className="flex flex-col sm:flex-row gap-4 justify-between items-center py-2 border-y border-teal-100/30">
                     <div className="flex gap-4 overflow-x-auto no-scrollbar w-full sm:w-auto">
-                        {categories.map(type => (
-                            <button
-                                key={type}
-                                onClick={() => setActiveType(type)}
-                                className={`whitespace-nowrap text-[11px] font-bold uppercase tracking-widest transition-all px-2 py-1 rounded-lg ${activeType === type
-                                    ? 'text-orange-500 bg-orange-50'
-                                    : 'text-gray-400 hover:text-gray-600'}`}
-                            >
-                                {type}
-                            </button>
-                        ))}
+                        {categories.map(type => {
+                            const count = type === 'All Types' ? medicines.length : medicines.filter((m: any) => m.type === type).length;
+                            if (type !== 'All Types' && count === 0) return null;
+                            return (
+                                <button
+                                    key={type}
+                                    onClick={() => setActiveType(type)}
+                                    className={`whitespace-nowrap text-[11px] font-bold uppercase tracking-widest transition-all px-2 py-1 rounded-lg ${activeType === type
+                                        ? 'text-orange-500 bg-orange-50'
+                                        : 'text-gray-400 hover:text-gray-600'}`}
+                                >
+                                    {type}
+                                </button>
+                            );
+                        })}
                     </div>
 
                     <div className="relative w-full sm:w-auto" ref={companyRef}>

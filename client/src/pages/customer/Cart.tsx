@@ -35,7 +35,7 @@ const Cart = () => {
                 medicine: item._id,
                 name: item.name,
                 quantity: item.quantity,
-                price: item.trp || item.price,
+                price: item.cost || item.price,
                 image: item.imageUrl
             }));
 
@@ -89,7 +89,7 @@ const Cart = () => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h3 className="font-black text-lg md:text-xl text-gray-800 mb-1 truncate">{item.name}</h3>
-                                        <p className="text-sm text-primary font-black tracking-tight">₹{item.trp || item.price}</p>
+                                        <p className="text-sm text-primary font-black tracking-tight">₹{item.cost || item.price}</p>
                                     </div>
                                 </div>
 
@@ -110,7 +110,7 @@ const Cart = () => {
                                             <FaPlus size={10} />
                                         </button>
                                     </div>
-                                    <div className="font-black text-xl md:text-2xl text-gray-800 md:w-24 text-right tracking-tight">₹{((item.trp || item.price) * item.quantity).toFixed(0)}</div>
+                                    <div className="font-black text-xl md:text-2xl text-gray-800 md:w-24 text-right tracking-tight">₹{((item.cost || item.price) * item.quantity).toFixed(0)}</div>
                                     <button
                                         onClick={() => removeFromCart(item._id)}
                                         className="p-2 md:p-3 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl md:rounded-2xl transition-all active:scale-95"
