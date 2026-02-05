@@ -158,8 +158,11 @@ const updateConnectionRequestStatus = asyncHandler(async (req, res) => {
         throw new Error('Request not found');
     }
 
-    request.status = status;
     if (status === 'rejected') {
+        if (!rejectionReason || !rejectionReason.trim()) {
+            res.status(400);
+            throw new Error('Rejection reason is mandatory when rejecting a request.');
+        }
         request.rejectionReason = rejectionReason;
     }
     await request.save();
@@ -167,6 +170,7 @@ const updateConnectionRequestStatus = asyncHandler(async (req, res) => {
     if (status === 'approved') {
         // 1. Generate username & check for collisions
         let username = genUsername(request.name, request.phone, request.type);
+        // ... (existing username generation logic) ...
         let attempts = 0;
         while (await Customer.findOne({ username })) {
             attempts++;
@@ -210,11 +214,29 @@ const updateConnectionRequestStatus = asyncHandler(async (req, res) => {
             console.error('Approval Email send failed', error);
         }
     } else if (status === 'rejected') {
+        // Construct Links Section
+        const websiteLink = process.env.WEBSITE_LINK;
+        const appLink = process.env.APP_LINK;
+        let linksHtml = '';
+
+        if (websiteLink && appLink) {
+            linksHtml = `
+                <p style="margin-top: 20px;">
+                    Visit us at: <a href="${websiteLink}" style="color: #ef4444; font-weight: bold;">${websiteLink}</a><br>
+                    Or download our app: <a href="${appLink}" style="color: #ef4444; font-weight: bold;">${appLink}</a>
+                </p>
+            `;
+        } else if (websiteLink) {
+            linksHtml = `<p style="margin-top: 20px;">Visit us at: <a href="${websiteLink}" style="color: #ef4444; font-weight: bold;">${websiteLink}</a></p>`;
+        } else if (appLink) {
+            linksHtml = `<p style="margin-top: 20px;">Download our app: <a href="${appLink}" style="color: #ef4444; font-weight: bold;">${appLink}</a></p>`;
+        }
+
         // Send Rejection Email
         try {
             await sendEmail({
                 email: request.email,
-                subject: 'Account Application Update - SV Pharma',
+                subject: 'SV Pharma – Account Request Rejected',
                 html: `
                     <!DOCTYPE html>
                     <html>
@@ -243,20 +265,22 @@ const updateConnectionRequestStatus = asyncHandler(async (req, res) => {
                                     <span class="brand-name">Shree Veerabhadreshwara Pharma</span>
                                 </div>
                                 <div class="header">
-                                    <h2>Application Status Update</h2>
+                                    <h2>Account Request Rejected</h2>
                                 </div>
                                 <div class="content">
                                     <p style="font-size: 16px; margin-top: 0;">Hello <strong>${request.name}</strong>,</p>
-                                    <p>We have carefully reviewed your application for a partner account at <strong>Shree Veerabhadreshwara Pharma</strong>.</p>
-                                    <p>Regrettably, we are unable to approve your application at this time.</p>
+                                    <p>Thank you for your interest in joining Shree Veerabhadreshwara Pharma. We have reviewed your request for a partner account.</p>
+                                    <p>Unfortunately, we are unable to approve your account at this time.</p>
                                     
                                     <div class="reason-box">
                                         <p style="margin: 0; color: #9f1239; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; margin-bottom: 8px;">Rejection Reason</p>
-                                        <p style="margin: 0; color: #be123c;">${rejectionReason || 'Your application did not meet our current manual verification criteria.'}</p>
+                                        <p style="margin: 0; color: #be123c; font-weight: 600;">${rejectionReason}</p>
                                     </div>
 
-                                    <p>If you believe this was an error or wish to provide additional documentation, please contact our administrative team.</p>
+                                    <p>If you have any questions or would like to appeal this decision, please contact our support team.</p>
                                     
+                                    ${linksHtml}
+
                                     <p style="margin-bottom: 0;">Best regards,<br><strong>Verification Team</strong></p>
                                 </div>
                             </div>
