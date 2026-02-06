@@ -7,7 +7,7 @@ import {
     FaExclamationTriangle,
     FaMoneyBillWave,
     FaUniversity,
-    FaDownload,
+    // FaDownload,
     FaEye,
     FaCalendarAlt,
     FaUser,
