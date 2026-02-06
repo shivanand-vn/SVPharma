@@ -39,10 +39,7 @@ const Footer = () => {
     const isAdmin = user?.role === 'admin';
     const isDeveloper = user?.role === 'developer';
 
-    const formatAddress = (addr: SiteSettings['address']) => {
-        const parts = [addr.line1, addr.line2, addr.area, addr.city, addr.state, addr.pincode].filter(Boolean);
-        return parts.join(', ');
-    };
+
 
     return (
         <footer className={`bg-[#0f172a] text-white pt-20 pb-10 border-t border-gray-800 transition-all duration-1000 transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} relative overflow-hidden`}>

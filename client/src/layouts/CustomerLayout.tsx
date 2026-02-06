@@ -11,7 +11,7 @@ import Logo from '../assets/Logo.png';
 import Footer from '../components/Footer';
 import api from '../utils/api';
 import StructuredAddressForm from '../components/StructuredAddressForm';
-import { Address, emptyAddress, normalizeAddress } from '../types/address';
+import { normalizeAddress, formatAddress } from '../types/address';
 
 const CustomerLayout = () => {
     const { logout, user, updateUser } = useContext(AuthContext);
@@ -114,10 +114,10 @@ const CustomerLayout = () => {
             // Clean payload - remove empty strings from address
             const cleanedAddress = {
                 ...profileData.address,
-                shopName: profileData.address.shopName?.trim() || undefined,
-                line1: profileData.address.line1?.trim() || undefined,
-                line2: profileData.address.line2?.trim() || undefined,
+                floor: profileData.address.floor?.trim() || undefined,
+                building: profileData.address.building?.trim() || undefined,
                 area: profileData.address.area?.trim() || undefined,
+                taluk: profileData.address.taluk?.trim() || undefined,
                 city: profileData.address.city?.trim() || undefined,
                 district: profileData.address.district?.trim() || undefined,
                 state: profileData.address.state?.trim() || undefined,

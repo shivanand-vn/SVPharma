@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaCity, FaMap, FaHashtag, FaBuilding, FaLayerGroup, FaMapPin, FaLandmark } from 'react-icons/fa';
-import { Address } from '../types/address';
+import type { Address } from '../types/address';
 
 export type { Address }; // Re-export if needed for backward compatibility only temporarily, but prefer direct import elsewhere.
 

@@ -3,7 +3,7 @@ import api from '../utils/api';
 import { Link } from 'react-router-dom';
 import { FaUserMd, FaClinicMedical, FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 import StructuredAddressForm from '../components/StructuredAddressForm';
-import { Address, emptyAddress } from '../types/address';
+import { emptyAddress } from '../types/address';
 import Logo from '../assets/Logo.png';
 
 const Register = () => {
@@ -95,7 +95,7 @@ const Register = () => {
                 name: '',
                 email: '',
                 phone: '',
-                address: { line1: '', city: '', state: '', pincode: '' } as Address,
+                address: { ...emptyAddress },
                 type: 'medical',
             });
             setTouched({ name: false, email: false, phone: false });

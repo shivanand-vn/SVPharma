@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import { FaSave, FaGlobe, FaCode, FaPhone, FaEnvelope, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaPlus, FaTrash } from 'react-icons/fa';
 import StructuredAddressForm from '../../components/StructuredAddressForm';
-import { Address, emptyAddress, normalizeAddress } from '../../types/address';
+import { emptyAddress } from '../../types/address';
 
 import { useNotification } from '../../context/NotificationContext';
 

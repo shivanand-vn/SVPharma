@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaTimes, FaSave, FaStore, FaUserCircle, FaInfoCircle, FaMapMarkedAlt, FaWhatsapp, FaInstagram, FaCheck } from 'react-icons/fa';
 import api from '../utils/api';
-import { Address } from '../types/address';
+import type { Address } from '../types/address';
 
 export interface SiteSettings {
     appName: string;

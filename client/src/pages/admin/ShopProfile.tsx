@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import { FaSave, FaBuilding, FaPhone, FaCode, FaFacebook } from 'react-icons/fa';
 import StructuredAddressForm from '../../components/StructuredAddressForm';
-import { Address, emptyAddress, normalizeAddress } from '../../types/address';
+import { emptyAddress } from '../../types/address';
 
 const ShopProfile = () => {
     const [settings, setSettings] = useState({

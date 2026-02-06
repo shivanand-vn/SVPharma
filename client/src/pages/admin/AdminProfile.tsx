@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import { FaSave, FaBuilding, FaPhone, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
 import StructuredAddressForm from '../../components/StructuredAddressForm';
-import { Address, emptyAddress, normalizeAddress } from '../../types/address';
+import { type Address, emptyAddress, normalizeAddress } from '../../types/address';
 import { useNotification } from '../../context/NotificationContext';
 
 const AdminProfile = () => {
