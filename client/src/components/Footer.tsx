@@ -45,8 +45,20 @@ const Footer = () => {
     };
 
     return (
-        <footer className={`bg-[#0f172a] text-white pt-20 pb-10 border-t border-gray-800 transition-all duration-1000 transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <div className="container mx-auto px-6 lg:px-16">
+        <footer className={`bg-[#0f172a] text-white pt-20 pb-10 border-t border-gray-800 transition-all duration-1000 transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} relative overflow-hidden`}>
+            {/* Medical Animations / Decorations */}
+            <div className="absolute top-0 right-0 p-20 opacity-5 pointer-events-none">
+                <div className="animate-spin-slow text-9xl text-teal-500">
+                    <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 14h-2v-4H5v-2h4V7h2v4h4v2h-4v4z" /></svg>
+                </div>
+            </div>
+            <div className="absolute bottom-0 left-0 p-10 opacity-5 pointer-events-none">
+                <div className="animate-bounce-slow text-8xl text-blue-500">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor"><path d="M6 10h12v4H6z" transform="rotate(45 12 12)" /></svg>
+                </div>
+            </div>
+
+            <div className="container mx-auto px-6 lg:px-16 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-20">
 
                     {/* Section A: Company Information */}
@@ -97,7 +109,13 @@ const Footer = () => {
                     {/* Section B: Contact Details */}
                     <div className="space-y-8">
                         <div className="relative inline-block group">
-                            <h4 className="text-sm font-black uppercase tracking-[0.2em] text-teal-500 mb-6">Contact Details</h4>
+                            <h4 className="text-sm font-black uppercase tracking-[0.2em] text-teal-500 mb-6 flex items-center gap-2">
+                                Contact Details
+                                <span className="flex h-2 w-2 relative">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+                                </span>
+                            </h4>
                             {isAdmin && (
                                 <button
                                     onClick={() => setShowShopModal(true)}
@@ -109,43 +127,57 @@ const Footer = () => {
                         </div>
                         <ul className="space-y-6">
                             <li className="flex items-start gap-4 group cursor-default">
-                                <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-800/50 text-teal-500 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300">
-                                    <FaMapMarkerAlt size={18} />
+                                <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-800/50 text-teal-500 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 relative overflow-hidden">
+                                    <FaMapMarkerAlt size={18} className="relative z-10" />
+                                    <div className="absolute inset-0 bg-teal-500/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Address</p>
-                                    <p className="text-gray-300 font-medium leading-relaxed">{formatAddress(settings.address)}</p>
-                                </div>
-                            </li>
-                            <li className="flex items-start gap-4 group cursor-default">
-                                <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-800/50 text-teal-500 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300">
-                                    <FaPhone size={18} />
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Phone Numbers</p>
-                                    <div className="flex flex-col gap-1">
-                                        {/* Primary */}
-                                        <a href={`tel:${settings.phone}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors flex items-center gap-2">
-                                            {settings.contactNumbers && settings.contactNumbers.length > 0 ? (
-                                                <span className="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-400 font-bold uppercase">Main</span>
-                                            ) : null}
-                                            {settings.phone}
-                                        </a>
-                                        {/* Additional */}
-                                        {settings.contactNumbers?.map((contact, idx) => (
-                                            <a key={idx} href={`tel:${contact.number}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors flex items-center gap-2">
-                                                {contact.label && (
-                                                    <span className="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-400 font-bold uppercase">{contact.label}</span>
-                                                )}
-                                                {contact.number}
-                                            </a>
+                                    <div className="text-gray-300 font-medium leading-relaxed text-sm">
+                                        {[
+                                            [settings.address.floor, settings.address.building].filter(Boolean).join(', '),
+                                            settings.address.area,
+                                            [settings.address.city, settings.address.pincode].filter(Boolean).join(' - '),
+                                            [settings.address.taluk && `Taluk: ${settings.address.taluk}`, settings.address.district && `District: ${settings.address.district}`].filter(Boolean).join(', '),
+                                            settings.address.state,
+                                            settings.address.landmark && `Landmark: ${settings.address.landmark}`
+                                        ].filter(Boolean).map((line, i) => (
+                                            <div key={i}>{line}</div>
                                         ))}
                                     </div>
                                 </div>
                             </li>
                             <li className="flex items-start gap-4 group cursor-default">
-                                <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-800/50 text-teal-500 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300">
-                                    <FaEnvelope size={18} />
+                                <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-800/50 text-teal-500 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 relative overflow-hidden">
+                                    <FaPhone size={18} className="relative z-10" />
+                                    <div className="absolute inset-0 bg-teal-500/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Phone Numbers</p>
+                                    <div className="flex flex-col gap-1">
+                                        {/* Contacts Loop */}
+                                        {settings.contacts?.map((contact, idx) => (
+                                            <a key={idx} href={`tel:${contact.phone}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors flex items-center gap-2 group/link">
+                                                {contact.name && (
+                                                    <span className="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-400 font-bold uppercase group-hover/link:bg-teal-900 group-hover/link:text-teal-400 transition-colors">{contact.name}</span>
+                                                )}
+                                                {contact.phone}
+                                            </a>
+                                        ))}
+                                        {/* Fallback for legacy phone if contacts empty (though backend should migrate) */}
+                                        {(!settings.contacts || settings.contacts.length === 0) && settings.phone && (
+                                            <a href={`tel:${settings.phone}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors flex items-center gap-2">
+                                                <span className="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-400 font-bold uppercase">Main</span>
+                                                {settings.phone}
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-4 group cursor-default">
+                                <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-800/50 text-teal-500 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 relative overflow-hidden">
+                                    <FaEnvelope size={18} className="relative z-10" />
+                                    <div className="absolute inset-0 bg-teal-500/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Email Address</p>

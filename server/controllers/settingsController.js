@@ -12,6 +12,13 @@ const getSettings = asyncHandler(async (req, res) => {
     if (!settings) {
         settings = await SiteSettings.create({}); // Create default if not exists
     }
+
+    // Migration Logic: If contacts is empty but phone exists, migrate it
+    if ((!settings.contacts || settings.contacts.length === 0) && settings.phone) {
+        settings.contacts = [{ name: 'Primary', phone: settings.phone }];
+        await settings.save();
+    }
+
     // Mask email/phone in public response if needed, but for now we send all
     // EXCEPT OTP hash inside Admin model (temp storage)
     res.json(settings);
@@ -26,8 +33,16 @@ const updateShopSettings = asyncHandler(async (req, res) => {
 
     settings.appName = req.body.appName || settings.appName;
     settings.email = req.body.email || settings.email;
-    settings.phone = req.body.phone || settings.phone;
-    settings.address = req.body.address || settings.address;
+    settings.phone = req.body.phone || settings.phone; // Keep syncing for now
+
+    if (req.body.contacts) {
+        settings.contacts = req.body.contacts;
+    }
+
+    if (req.body.address) {
+        settings.address = { ...settings.address, ...req.body.address };
+    }
+
     settings.facebook = req.body.facebook || settings.facebook;
     settings.twitter = req.body.twitter || settings.twitter;
     settings.instagram = req.body.instagram || settings.instagram;
@@ -63,7 +78,7 @@ const updateSettings = asyncHandler(async (req, res) => {
     let settings = await SiteSettings.findOne();
     if (!settings) settings = await SiteSettings.create({});
 
-    const adminFields = ['appName', 'email', 'phone', 'contactNumbers', 'address', 'facebook', 'twitter', 'instagram', 'whatsapp', 'linkedin'];
+    const adminFields = ['appName', 'email', 'phone', 'contacts', 'address', 'facebook', 'twitter', 'instagram', 'whatsapp', 'linkedin'];
 
     adminFields.forEach(field => {
         if (req.body[field] !== undefined) {
