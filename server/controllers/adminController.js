@@ -7,6 +7,7 @@ const Customer = require('../models/Customer');
 const Wallet = require('../models/Wallet');
 const Order = require('../models/Order');
 const Medicine = require('../models/Medicine');
+const Payment = require('../models/Payment');
 const { generateOTP, storeOTP, verifyOTP } = require('../utils/otpService');
 const { sendOTPEmail, sendWelcomeEmailDetailed, sendRejectionEmail, sendAdminNotification } = require('../utils/emailService');
 
@@ -483,6 +484,30 @@ const getDashboardAnalytics = asyncHandler(async (req, res) => {
     });
 });
 
+// @desc    Get notification counts (pending items since last visit)
+// @route   GET /api/admin/notifications
+// @access  Private/Admin
+const getNotificationCounts = asyncHandler(async (req, res) => {
+    const { requestsSince, ordersSince, paymentsSince } = req.query;
+
+    const parseDate = (dateStr) => {
+        const d = new Date(dateStr);
+        return isNaN(d.getTime()) ? new Date(0) : d;
+    };
+
+    const requestsDate = parseDate(requestsSince);
+    const ordersDate = parseDate(ordersSince);
+    const paymentsDate = parseDate(paymentsSince);
+
+    const [requests, orders, payments] = await Promise.all([
+        ConnectionRequest.countDocuments({ status: 'pending', createdAt: { $gt: requestsDate } }),
+        Order.countDocuments({ status: 'pending', createdAt: { $gt: ordersDate } }),
+        Payment.countDocuments({ status: 'pending', createdAt: { $gt: paymentsDate } })
+    ]);
+
+    res.json({ requests, orders, payments });
+});
+
 module.exports = {
     getShopProfile,
     updateShopProfile,
@@ -492,5 +517,6 @@ module.exports = {
     requestCustomerDeleteOTP,
     verifyOTPAndDeleteCustomer,
     getDashboardAnalytics,
-    addCustomer
+    addCustomer,
+    getNotificationCounts
 };

@@ -9,7 +9,8 @@ const {
     requestCustomerDeleteOTP,
     verifyOTPAndDeleteCustomer,
     getDashboardAnalytics,
-    addCustomer
+    addCustomer,
+    getNotificationCounts
 } = require('../controllers/adminController');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
 
@@ -35,5 +36,8 @@ router.route('/customers/:id/verify-delete-otp')
 
 router.route('/analytics')
     .get(protect, adminOnly, getDashboardAnalytics);
+
+router.route('/notifications')
+    .get(protect, adminOnly, getNotificationCounts);
 
 module.exports = router;

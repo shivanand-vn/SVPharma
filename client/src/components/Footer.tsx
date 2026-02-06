@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
-import { FaFacebook, FaInstagram, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaEdit } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaEdit, FaPills, FaHeartbeat, FaPlus } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
 import { ShopEditModal, DeveloperEditModal } from './FooterEditModals';
@@ -43,15 +43,40 @@ const Footer = () => {
     return (
         <footer className={`bg-[#0f172a] text-white pt-20 pb-10 border-t border-gray-800 transition-all duration-1000 transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} relative overflow-hidden`}>
             {/* Medical Animations / Decorations */}
-            <div className="absolute top-0 right-0 p-20 opacity-5 pointer-events-none">
-                <div className="animate-spin-slow text-9xl text-teal-500">
-                    <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 14h-2v-4H5v-2h4V7h2v4h4v2h-4v4z" /></svg>
-                </div>
+            {/* Background Pattern - Hex Mesh */}
+            <div className="absolute inset-0 opacity-[0.03]"
+                style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232dd4bf' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                }}
+            />
+
+            {/* Glowing Blobs */}
+            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl animate-blob"></div>
+            <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+
+            {/* ECG Line Animation */}
+            <div className="absolute bottom-1/3 left-0 w-full opacity-10 pointer-events-none overflow-hidden">
+                <svg viewBox="0 0 500 150" preserveAspectRatio="none" className="min-w-full h-24">
+                    <path
+                        d="M0 75 Q 100 75 125 75 L 135 10 L 145 140 L 155 75 Q 250 75 500 75"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="none"
+                        className="text-teal-400 animate-ecg"
+                        strokeDasharray="2000"
+                    />
+                </svg>
             </div>
-            <div className="absolute bottom-0 left-0 p-10 opacity-5 pointer-events-none">
-                <div className="animate-bounce-slow text-8xl text-blue-500">
-                    <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor"><path d="M6 10h12v4H6z" transform="rotate(45 12 12)" /></svg>
-                </div>
+
+            {/* Floating Icons */}
+            <div className="absolute top-20 right-20 opacity-20 pointer-events-none animate-float-slow">
+                <FaPills className="text-8xl text-teal-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.5)] transform rotate-12" />
+            </div>
+            <div className="absolute bottom-20 left-10 opacity-20 pointer-events-none animate-pulse-slow">
+                <FaHeartbeat className="text-7xl text-teal-300 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]" />
+            </div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-[0.05] pointer-events-none">
+                <FaPlus className="text-[30rem] text-teal-100 animate-spin-slow" />
             </div>
 
             <div className="container mx-auto px-6 lg:px-16 relative z-10">

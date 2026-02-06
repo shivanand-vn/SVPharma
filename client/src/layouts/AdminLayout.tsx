@@ -29,13 +29,46 @@ const AdminLayout = () => {
         navigate('/');
     };
 
+    // Notification State
+    const [counts, setCounts] = React.useState({ requests: 0, orders: 0, payments: 0 });
+    const lastSeenRef = React.useRef({
+        requests: localStorage.getItem('lastSeenRequests') || new Date(0).toISOString(),
+        orders: localStorage.getItem('lastSeenOrders') || new Date(0).toISOString(),
+        payments: localStorage.getItem('lastSeenPayments') || new Date(0).toISOString()
+    });
+
+    const fetchNotifications = React.useCallback(async () => {
+        try {
+            const { requests, orders, payments } = lastSeenRef.current;
+            const { data } = await api.get(`/admin/notifications?requestsSince=${requests}&ordersSince=${orders}&paymentsSince=${payments}`);
+            setCounts(data);
+        } catch (error) {
+            console.error("Failed to load notifications", error);
+        }
+    }, []);
+
+    React.useEffect(() => {
+        fetchNotifications();
+        const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
+        return () => clearInterval(interval);
+    }, [fetchNotifications]);
+
+    const handleNavClick = (type: 'requests' | 'orders' | 'payments' | null) => {
+        if (type) {
+            const now = new Date().toISOString();
+            localStorage.setItem(`lastSeen${type.charAt(0).toUpperCase() + type.slice(1)}`, now);
+            lastSeenRef.current[type] = now;
+            setCounts(prev => ({ ...prev, [type]: 0 }));
+        }
+    };
+
     const navItems = [
-        { path: '/admin', label: 'Dashboard', icon: <FaChartPie /> },
-        { path: '/admin/inventory', label: 'Add New Meds', icon: <FaPlus /> },
-        { path: '/admin/requests', label: 'Add Customer', icon: <FaUserPlus /> },
-        { path: '/admin/orders', label: 'Manage Orders', icon: <FaBox /> },
-        { path: '/admin/payments', label: 'Payment Updates', icon: <FaCreditCard /> },
-        { path: '/admin/profile', label: 'Profile', icon: <FaUserPlus /> },
+        { path: '/admin', label: 'Dashboard', icon: <FaChartPie />, type: null },
+        { path: '/admin/inventory', label: 'Add New Meds', icon: <FaPlus />, type: null },
+        { path: '/admin/requests', label: 'Add Customer', icon: <FaUserPlus />, type: 'requests' },
+        { path: '/admin/orders', label: 'Manage Orders', icon: <FaBox />, type: 'orders' },
+        { path: '/admin/payments', label: 'Payment Updates', icon: <FaCreditCard />, type: 'payments' },
+        { path: '/admin/profile', label: 'Profile', icon: <FaUserPlus />, type: null },
     ];
 
     return (
@@ -55,10 +88,16 @@ const AdminLayout = () => {
                         <Link
                             key={item.path}
                             to={item.path}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold transition-all duration-200 ${location.pathname === item.path ? 'bg-teal-200 text-teal-900 border-l-4 border-teal-600' : 'text-teal-700 hover:bg-teal-200/50 hover:text-teal-900'}`}
+                            onClick={() => handleNavClick(item.type as any)}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold transition-all duration-200 relative ${location.pathname === item.path ? 'bg-teal-200 text-teal-900 border-l-4 border-teal-600' : 'text-teal-700 hover:bg-teal-200/50 hover:text-teal-900'}`}
                         >
                             <span className="text-lg">{item.icon}</span>
-                            <span>{item.label}</span>
+                            <span className="flex-1">{item.label}</span>
+                            {item.type && counts[item.type as keyof typeof counts] > 0 && (
+                                <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+                                    {counts[item.type as keyof typeof counts]}
+                                </span>
+                            )}
                         </Link>
                     ))}
                 </nav>

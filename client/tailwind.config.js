@@ -32,6 +32,37 @@ export default {
             boxShadow: {
                 'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
                 'floating': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            },
+            keyframes: {
+                float: {
+                    '0%, 100%': { transform: 'translateY(0) rotate(45deg)' },
+                    '50%': { transform: 'translateY(-20px) rotate(45deg)' },
+                },
+                'pulse-slow': {
+                    '0%, 100%': { opacity: '0.05', transform: 'scale(1)' },
+                    '50%': { opacity: '0.1', transform: 'scale(1.1)' },
+                },
+                'spin-slow': {
+                    'from': { transform: 'translate(-50%, -50%) rotate(0deg)' },
+                    'to': { transform: 'translate(-50%, -50%) rotate(360deg)' },
+                },
+                'blob': {
+                    '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                    '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                    '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                    '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                },
+                'ecg': {
+                    '0%': { strokeDashoffset: '2000' },
+                    '100%': { strokeDashoffset: '0' },
+                }
+            },
+            animation: {
+                'float-slow': 'float 6s ease-in-out infinite',
+                'pulse-slow': 'pulse-slow 4s ease-in-out infinite',
+                'spin-slow': 'spin-slow 20s linear infinite',
+                'blob': 'blob 7s infinite',
+                'ecg': 'ecg 3s linear infinite',
             }
         },
     },
