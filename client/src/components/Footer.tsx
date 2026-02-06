@@ -2,7 +2,6 @@ import { useEffect, useState, useContext } from 'react';
 import { FaFacebook, FaInstagram, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaEdit } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
-import Logo from '../assets/Logo.png';
 import { ShopEditModal, DeveloperEditModal } from './FooterEditModals';
 import type { SiteSettings } from './FooterEditModals';
 
@@ -62,7 +61,7 @@ const Footer = () => {
                     <div className="space-y-8">
                         <div className="flex items-center gap-4">
                             <div className="p-2 bg-white rounded-2xl shadow-lg shadow-white/5">
-                                <img src={Logo} alt="Logo" className="h-12 w-auto object-contain" />
+                                <img src="/logo.png" alt="Logo" className="h-12 w-auto object-contain" />
                             </div>
                             <div className="relative group">
                                 <h3 className="text-2xl font-black tracking-tight font-serif leading-tight">

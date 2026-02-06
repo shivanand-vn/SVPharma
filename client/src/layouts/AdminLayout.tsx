@@ -3,7 +3,6 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
 import { FaSignOutAlt, FaChartPie, FaPlus, FaUserPlus, FaBox, FaCreditCard } from 'react-icons/fa';
-import Logo from '../assets/Logo.png';
 
 
 const AdminLayout = () => {
@@ -46,7 +45,7 @@ const AdminLayout = () => {
                 <div className="p-6">
                     {/* Logo/Header Area */}
                     <div className="flex flex-col items-center gap-2 text-teal-800 font-extrabold text-xl">
-                        <img src={Logo} alt="Logo" className="h-16 w-auto mb-2 drop-shadow-md transform hover:scale-105 transition-transform" />
+                        <img src="/logo.png" alt="Logo" className="h-16 w-auto mb-2 drop-shadow-md transform hover:scale-105 transition-transform" />
                         <span className="text-center text-xs tracking-widest uppercase opacity-80">{settings?.appName || 'SV Pharma'}</span>
                     </div>
                 </div>
