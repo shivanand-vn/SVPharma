@@ -25,6 +25,11 @@ const medicineSchema = new mongoose.Schema({
     cost: {
         type: Number,
         required: true,
+        min: 0,
+        default: function () { return this.trp; } // Auto-migrate if creating new from old data pattern
+    },
+    trp: { // Legacy field support
+        type: Number,
         min: 0
     },
     price: {

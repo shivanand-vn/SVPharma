@@ -20,8 +20,15 @@ const getMedicines = asyncHandler(async (req, res) => {
     if (company) {
         filter.company = company;
     }
-    const medicines = await Medicine.find(filter);
-    res.json(medicines);
+    const medicines = await Medicine.find(filter).lean(); // Use lean for performance and easier modification
+
+    // Map legacy 'trp' to 'cost' if 'cost' is missing
+    const mappedMedicines = medicines.map(med => ({
+        ...med,
+        cost: med.cost !== undefined ? med.cost : med.trp
+    }));
+
+    res.json(mappedMedicines);
 });
 
 // @desc    Get fast moving medicines (by unique customers)
