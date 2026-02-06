@@ -10,7 +10,7 @@ const connectionRequestSchema = new mongoose.Schema({
     },
     address: {
         shopName: String,
-        line1: { type: String, required: true },
+        line1: { type: String },
         line2: String,
         area: String,
         city: { type: String, required: true },
