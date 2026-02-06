@@ -39,6 +39,26 @@ const genPassword = (name, phone) => {
 // Helper for Styled Welcome Email
 const getWelcomeEmailTemplate = (name, type, username, password) => {
     const displayNamePrefix = type === "Doctor" ? "Dr. " : "";
+
+    // Construct Links Section
+    const websiteLink = process.env.WEBSITE_LINK;
+    const appLink = process.env.APP_LINK;
+    let actionButton = '';
+
+    if (appLink) {
+        actionButton = `
+            <div style="margin-top: 30px; text-align: center;">
+                <a href="${appLink}" style="display:inline-block; background: #0d9488; color: white; padding: 14px 30px; border-radius: 8px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.4);">Download App</a>
+            </div>
+        `;
+    } else if (websiteLink) {
+        actionButton = `
+            <div style="margin-top: 30px; text-align: center;">
+                <a href="${websiteLink}" style="display:inline-block; background: #0d9488; color: white; padding: 14px 30px; border-radius: 8px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.4);">Access Dashboard</a>
+            </div>
+        `;
+    }
+
     return `
         <!DOCTYPE html>
         <html>
@@ -89,9 +109,7 @@ const getWelcomeEmailTemplate = (name, type, username, password) => {
 
                         <p style="font-size: 14px; color: #64748b;">Please keep this information confidential. You will be asked to change your password upon your first login for security purposes.</p>
                         
-                        <div style="margin-top: 30px; text-align: center;">
-                            <a href="${process.env.APP_LINK || '#'}" style="display:inline-block; background: #0d9488; color: white; padding: 14px 30px; border-radius: 8px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.4);">Access Your Dashboard</a>
-                        </div>
+                        ${actionButton}
                     </div>
                 </div>
                 <div class="divider"></div>
@@ -159,16 +177,20 @@ const updateConnectionRequestStatus = asyncHandler(async (req, res) => {
         throw new Error('Request not found');
     }
 
+    if (request.status !== 'pending') {
+        res.status(400);
+        throw new Error(`Request is already ${request.status}. Action denied.`);
+    }
+
     if (status === 'rejected') {
         if (!rejectionReason || !rejectionReason.trim()) {
             res.status(400);
             throw new Error('Rejection reason is mandatory when rejecting a request.');
         }
         request.rejectionReason = rejectionReason;
-    }
-    await request.save();
-
-    if (status === 'approved') {
+        request.status = 'rejected';
+        await request.save();
+    } else if (status === 'approved') {
         // 1. Generate username & check for collisions
         let username = genUsername(request.name, request.phone, request.type);
         // ... (existing username generation logic) ...
@@ -198,13 +220,18 @@ const updateConnectionRequestStatus = asyncHandler(async (req, res) => {
 
             await Wallet.create({ customer: customer._id });
         } else {
+            // If customer exists but wasn't approved (rare case if checks are strict), update them
             customer.status = 'approved';
             customer.username = username;
             customer.password = rawPassword;
             await customer.save();
         }
 
-        // 4. Send Welcome Email
+        // 4. Update Request Status ONLY after successful customer creation
+        request.status = 'approved';
+        await request.save();
+
+        // 5. Send Welcome Email
         try {
             await sendEmail({
                 email: customer.email,
@@ -214,7 +241,11 @@ const updateConnectionRequestStatus = asyncHandler(async (req, res) => {
         } catch (error) {
             console.error('Approval Email send failed', error);
         }
-    } else if (status === 'rejected') {
+        return res.json(request);
+    }
+
+    // Fallback for rejection path early return logic
+    if (status === 'rejected') {
         // Construct Links Section
         const websiteLink = process.env.WEBSITE_LINK;
         const appLink = process.env.APP_LINK;
