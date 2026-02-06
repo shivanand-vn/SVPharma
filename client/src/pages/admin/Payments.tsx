@@ -659,7 +659,7 @@ const AdminPayments = () => {
                                     value={offlineForm.amount}
                                     onChange={handleAmountChange}
                                     placeholder="0.00"
-                                    className={`w-full p-5 bg-gray-50 rounded-[24px] border-2 ${Number(offlineForm.amount) >= selectedCustDue && selectedCustDue > 0 ? 'border-amber-300' : 'border-gray-100'} focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 font-black text-3xl text-teal-700 tracking-tighter`}
+                                    className={`w-full p-5 bg-gray-50 rounded-[24px] border-2 ${Number(offlineForm.amount) >= selectedCustDue && selectedCustDue > 0 ? 'border-amber-300' : 'border-gray-100'} focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 font-black text-3xl text-teal-700 tracking-tighter no-spinner`}
                                 />
                                 {offlineForm.customerId && Number(offlineForm.amount) >= selectedCustDue && selectedCustDue > 0 && (
                                     <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest ml-1 flex items-center gap-1">
