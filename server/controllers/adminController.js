@@ -150,7 +150,8 @@ const getConnectionRequests = asyncHandler(async (req, res) => {
 // @route   PUT /api/admin/connection-requests/:id
 // @access  Private/Admin
 const updateConnectionRequestStatus = asyncHandler(async (req, res) => {
-    const { status, rejectionReason } = req.body;
+    const { status } = req.body;
+    const rejectionReason = req.body.rejectionReason || req.body.reason;
     const request = await ConnectionRequest.findById(req.params.id);
 
     if (!request) {
