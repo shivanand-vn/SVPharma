@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import { FaSave, FaGlobe, FaCode, FaPhone, FaEnvelope, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaPlus, FaTrash } from 'react-icons/fa';
 import StructuredAddressForm from '../../components/StructuredAddressForm';
-import type { Address } from '../../components/StructuredAddressForm';
+import { Address, emptyAddress, normalizeAddress } from '../../types/address';
 
 import { useNotification } from '../../context/NotificationContext';
 
@@ -12,17 +12,7 @@ const Settings = () => {
         email: '',
         phone: '', // Keep for legacy/sync
         contacts: [] as { name: string, phone: string }[],
-        address: {
-            floor: '',
-            building: '',
-            area: '',
-            city: '',
-            district: '',
-            taluk: '',
-            state: '',
-            pincode: '',
-            landmark: ''
-        } as Address,
+        address: { ...emptyAddress },
         facebook: '',
         twitter: '',
         instagram: '',

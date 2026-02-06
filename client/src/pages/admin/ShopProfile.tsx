@@ -2,19 +2,14 @@ import { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import { FaSave, FaBuilding, FaPhone, FaCode, FaFacebook } from 'react-icons/fa';
 import StructuredAddressForm from '../../components/StructuredAddressForm';
-import type { Address } from '../../components/StructuredAddressForm';
+import { Address, emptyAddress, normalizeAddress } from '../../types/address';
 
 const ShopProfile = () => {
     const [settings, setSettings] = useState({
         appName: '',
         email: '',
         phone: '',
-        address: {
-            line1: '',
-            city: '',
-            state: '',
-            pincode: ''
-        } as Address,
+        address: { ...emptyAddress },
         facebook: '',
         twitter: '',
         instagram: '',

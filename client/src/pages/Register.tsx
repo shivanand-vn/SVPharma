@@ -3,7 +3,7 @@ import api from '../utils/api';
 import { Link } from 'react-router-dom';
 import { FaUserMd, FaClinicMedical, FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 import StructuredAddressForm from '../components/StructuredAddressForm';
-import type { Address } from '../components/StructuredAddressForm';
+import { Address, emptyAddress } from '../types/address';
 import Logo from '../assets/Logo.png';
 
 const Register = () => {
@@ -11,12 +11,7 @@ const Register = () => {
         name: '',
         email: '',
         phone: '',
-        address: {
-            line1: '',
-            city: '',
-            state: '',
-            pincode: ''
-        } as Address,
+        address: { ...emptyAddress },
         type: 'medical', // default
     });
 
@@ -74,7 +69,7 @@ const Register = () => {
     const isFormValid =
         !errors.name && !errors.email && !errors.phone &&
         form.name && form.email && form.phone &&
-        form.address.line1 && form.address.city && form.address.state && form.address.pincode;
+        form.address.city && form.address.state && form.address.pincode && form.address.district;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

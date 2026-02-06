@@ -1,17 +1,8 @@
 import React from 'react';
 import { FaCity, FaMap, FaHashtag, FaBuilding, FaLayerGroup, FaMapPin, FaLandmark } from 'react-icons/fa';
+import { Address } from '../types/address';
 
-export interface Address {
-    floor: string;
-    building: string;
-    area: string;
-    city: string;
-    district: string;
-    taluk: string;
-    state: string;
-    pincode: string;
-    landmark: string;
-}
+export type { Address }; // Re-export if needed for backward compatibility only temporarily, but prefer direct import elsewhere.
 
 interface StructuredAddressFormProps {
     address: Address;

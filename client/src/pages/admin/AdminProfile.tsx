@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import { FaSave, FaBuilding, FaPhone, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
 import StructuredAddressForm from '../../components/StructuredAddressForm';
-import type { Address } from '../../components/StructuredAddressForm';
+import { Address, emptyAddress, normalizeAddress } from '../../types/address';
 import { useNotification } from '../../context/NotificationContext';
 
 const AdminProfile = () => {
@@ -10,17 +10,7 @@ const AdminProfile = () => {
         appName: '',
         email: '',
         phone: '',
-        address: {
-            shopName: '',
-            line1: '',
-            line2: '',
-            area: '',
-            city: '',
-            district: '',
-            state: '',
-            pincode: '',
-            landmark: ''
-        } as Address,
+        address: { ...emptyAddress },
         facebook: '',
         twitter: '',
         instagram: '',
@@ -40,7 +30,7 @@ const AdminProfile = () => {
                         appName: data.appName || '',
                         email: data.email || '',
                         phone: data.phone || '',
-                        address: data.address || {} as Address,
+                        address: normalizeAddress(data.address),
                         facebook: data.facebook || '',
                         twitter: data.twitter || '',
                         instagram: data.instagram || '',

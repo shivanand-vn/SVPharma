@@ -1,28 +1,21 @@
 import React, { useState } from 'react';
 import { FaTimes, FaSave, FaStore, FaUserCircle, FaInfoCircle, FaMapMarkedAlt, FaWhatsapp, FaInstagram, FaCheck } from 'react-icons/fa';
 import api from '../utils/api';
+import { Address } from '../types/address';
 
 export interface SiteSettings {
     appName: string;
     email: string;
     phone: string;
-    address: {
-        line1: string;
-        line2: string;
-        area: string;
-        city: string;
-        state: string;
-        pincode: string;
-        landmark: string;
-    };
+    address: Address;
     facebook: string;
     twitter: string;
     instagram: string;
     whatsapp: string;
     linkedin: string;
-    contactNumbers: {
-        label: string;
-        number: string;
+    contacts: {
+        name: string;
+        phone: string;
     }[];
     developerName: string;
     developerDescription: string;
@@ -124,19 +117,28 @@ export const ShopEditModal = ({ isOpen, onClose, settings, onSuccess }: ModalPro
                             <h3 className="text-xs font-black uppercase tracking-widest">Address Details</h3>
                         </div>
                         <div className="space-y-4 bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                            <input
-                                type="text"
-                                placeholder="Line 1 (Building, Street)"
-                                value={formData.address.line1}
-                                onChange={e => setFormData({ ...formData, address: { ...formData.address, line1: e.target.value } })}
-                                className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-sm font-bold text-gray-800"
-                            />
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input
+                                    type="text"
+                                    placeholder="Area"
+                                    value={formData.address.area}
+                                    onChange={e => setFormData({ ...formData, address: { ...formData.address, area: e.target.value } })}
+                                    className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-sm font-bold text-gray-800"
+                                />
                                 <input
                                     type="text"
                                     placeholder="City"
                                     value={formData.address.city}
                                     onChange={e => setFormData({ ...formData, address: { ...formData.address, city: e.target.value } })}
+                                    className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-sm font-bold text-gray-800"
+                                />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input
+                                    type="text"
+                                    placeholder="State"
+                                    value={formData.address.state}
+                                    onChange={e => setFormData({ ...formData, address: { ...formData.address, state: e.target.value } })}
                                     className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-sm font-bold text-gray-800"
                                 />
                                 <input
@@ -146,6 +148,9 @@ export const ShopEditModal = ({ isOpen, onClose, settings, onSuccess }: ModalPro
                                     onChange={e => setFormData({ ...formData, address: { ...formData.address, pincode: e.target.value } })}
                                     className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-sm font-bold text-gray-800"
                                 />
+                            </div>
+                            <div className="text-xs text-gray-400 text-center italic">
+                                Use the main Settings page for detailed address editing (Floor, District, etc).
                             </div>
                         </div>
                     </div>

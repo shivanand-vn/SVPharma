@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
 import { FaCheck, FaTimes, FaEnvelope, FaPhone, FaMapMarkerAlt, FaUserPlus } from 'react-icons/fa';
 import StructuredAddressForm from '../../components/StructuredAddressForm';
-import type { Address } from '../../components/StructuredAddressForm';
-import { formatAddress } from '../../utils/addressHelper';
+import { Address, emptyAddress, formatAddress } from '../../types/address';
 
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => {
@@ -67,12 +66,7 @@ const ConnectionRequests = () => {
         phone: '',
         type: 'Medical',
         email: '',
-        address: {
-            line1: '',
-            city: '',
-            state: '',
-            pincode: ''
-        } as Address
+        address: { ...emptyAddress }
     });
 
     const showToast = (message: string, type: 'success' | 'error') => {

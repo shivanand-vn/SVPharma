@@ -11,10 +11,7 @@ import Logo from '../assets/Logo.png';
 import Footer from '../components/Footer';
 import api from '../utils/api';
 import StructuredAddressForm from '../components/StructuredAddressForm';
-import type { Address } from '../components/StructuredAddressForm';
-import { formatAddress } from '../utils/addressHelper';
-
-
+import { Address, emptyAddress, normalizeAddress } from '../types/address';
 
 const CustomerLayout = () => {
     const { logout, user, updateUser } = useContext(AuthContext);
@@ -35,12 +32,7 @@ const CustomerLayout = () => {
         name: user?.name || '',
         email: user?.email || '',
         phone: user?.phone || '',
-        address: (user?.address || {
-            line1: '',
-            city: '',
-            state: '',
-            pincode: ''
-        }) as Address,
+        address: normalizeAddress(user?.address),
         type: user?.type || 'Retailer'
     });
     const [editSaving, setEditSaving] = useState(false);
@@ -72,22 +64,11 @@ const CustomerLayout = () => {
     // Update profile form data when user context changes
     useEffect(() => {
         if (user) {
-            const existingAddress = user.address || ({} as Address);
             setProfileData({
                 name: user.name || '',
                 email: user.email || '',
                 phone: user.phone || '',
-                address: {
-                    shopName: existingAddress.shopName || '',
-                    line1: existingAddress.line1 || '',
-                    line2: existingAddress.line2 || '',
-                    area: existingAddress.area || '',
-                    city: existingAddress.city || '',
-                    district: existingAddress.district || '',
-                    state: existingAddress.state || '',
-                    pincode: existingAddress.pincode || '',
-                    landmark: existingAddress.landmark || ''
-                } as Address,
+                address: normalizeAddress(user.address),
                 type: user.type || 'Retailer'
             });
             console.log('Profile form data updated');
