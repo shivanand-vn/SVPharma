@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { FaSave, FaBuilding, FaPhone, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
+import { FaSave, FaBuilding, FaPhone, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaWhatsapp, FaPlus, FaTrash } from 'react-icons/fa';
 import StructuredAddressForm from '../../components/StructuredAddressForm';
 import { type Address, emptyAddress, normalizeAddress } from '../../types/address';
 import { useNotification } from '../../context/NotificationContext';
@@ -10,6 +10,7 @@ const AdminProfile = () => {
         appName: '',
         email: '',
         phone: '',
+        contacts: [] as { name: string, phone: string }[],
         address: { ...emptyAddress },
         facebook: '',
         twitter: '',
@@ -29,7 +30,8 @@ const AdminProfile = () => {
                     setSettings({
                         appName: data.appName || '',
                         email: data.email || '',
-                        phone: data.phone || '',
+                        phone: data.phone || '', // Legacy
+                        contacts: data.contacts || [],
                         address: normalizeAddress(data.address),
                         facebook: data.facebook || '',
                         twitter: data.twitter || '',
@@ -52,13 +54,38 @@ const AdminProfile = () => {
         setSettings({ ...settings, [e.target.name]: e.target.value });
     };
 
+    const handleContactChange = (index: number, field: 'name' | 'phone', value: string) => {
+        const newContacts = [...settings.contacts];
+        if (field === 'phone') {
+            value = value.replace(/\D/g, '').slice(0, 10);
+        }
+        newContacts[index] = { ...newContacts[index], [field]: value };
+        setSettings({ ...settings, contacts: newContacts });
+    };
+
+    const addContact = () => {
+        setSettings({
+            ...settings,
+            contacts: [...settings.contacts, { name: '', phone: '' }]
+        });
+    };
+
+    const removeContact = (index: number) => {
+        const newContacts = settings.contacts.filter((_, i) => i !== index);
+        setSettings({ ...settings, contacts: newContacts });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Strict Mobile Number Validation
-        if (settings.phone && !/^[6-9]\d{9}$/.test(settings.phone)) {
-            showNotification('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9', 'error');
-            return;
+        // Contact Validation
+        if (settings.contacts && settings.contacts.length > 0) {
+            for (const contact of settings.contacts) {
+                if (!contact.phone || !/^[6-9]\d{9}$/.test(contact.phone)) {
+                    showNotification(`Invalid phone number for ${contact.name || 'Contact'}: Must be 10 digits starting with 6-9`, 'error');
+                    return;
+                }
+            }
         }
 
         setSaving(true);
@@ -68,6 +95,7 @@ const AdminProfile = () => {
                 appName: data.appName || '',
                 email: data.email || '',
                 phone: data.phone || '',
+                contacts: data.contacts || [],
                 address: data.address || {} as Address,
                 facebook: data.facebook || '',
                 twitter: data.twitter || '',
@@ -127,12 +155,21 @@ const AdminProfile = () => {
 
                         {/* Section: Contact Details */}
                         <div className="space-y-6 md:col-span-2">
-                            <div className="pt-2 border-b border-gray-100 pb-2 flex items-center gap-2">
-                                <FaPhone className="text-teal-600" />
-                                <p className="text-[10px] font-black text-teal-600 uppercase tracking-widest">Contact Details</p>
+                            <div className="pt-2 border-b border-gray-100 pb-2 flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <FaPhone className="text-teal-600" />
+                                    <p className="text-[10px] font-black text-teal-600 uppercase tracking-widest">Contact Details</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={addContact}
+                                    className="text-[10px] bg-teal-50 text-teal-700 px-3 py-2 rounded-xl font-bold flex items-center gap-1 hover:bg-teal-100 transition-colors uppercase tracking-wider"
+                                >
+                                    <FaPlus size={10} /> Add Mob+
+                                </button>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-4">
                                 <div className="space-y-2">
                                     <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Public Email</label>
                                     <input
@@ -144,19 +181,41 @@ const AdminProfile = () => {
                                         placeholder="admin@example.com"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Public Phone</label>
-                                    <input
-                                        name="phone"
-                                        type="tel"
-                                        value={settings.phone}
-                                        onChange={(e) => {
-                                            const value = e.target.value.replace(/\D/g, '').slice(0, 10);
-                                            setSettings({ ...settings, phone: value });
-                                        }}
-                                        className="w-full px-6 py-4 bg-white border border-gray-200 rounded-2xl font-bold text-gray-700 focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 transition-all shadow-sm"
-                                        placeholder="10-digit mobile number"
-                                    />
+
+                                {/* Dynamic Contact List */}
+                                <div className="space-y-3">
+                                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Mobile Numbers</label>
+                                    {settings.contacts.length === 0 && (
+                                        <div className="text-sm text-gray-400 italic bg-white border border-gray-200 p-4 rounded-xl text-center">
+                                            No contacts added. Click "Add Mob+" above to add.
+                                        </div>
+                                    )}
+                                    {settings.contacts.map((contact, index) => (
+                                        <div key={index} className="flex items-center gap-3">
+                                            <input
+                                                type="text"
+                                                placeholder="Name (e.g. Sales)"
+                                                value={contact.name}
+                                                onChange={(e) => handleContactChange(index, 'name', e.target.value)}
+                                                className="w-1/3 px-4 py-3 bg-white border border-gray-200 rounded-xl font-bold text-gray-700 focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 transition-all text-sm"
+                                            />
+                                            <input
+                                                type="tel"
+                                                placeholder="Mobile Number"
+                                                value={contact.phone}
+                                                maxLength={10}
+                                                onChange={(e) => handleContactChange(index, 'phone', e.target.value)}
+                                                className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-xl font-mono font-bold text-gray-700 focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 transition-all"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeContact(index)}
+                                                className="p-3 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                                            >
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
