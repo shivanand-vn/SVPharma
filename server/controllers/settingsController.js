@@ -63,7 +63,7 @@ const updateSettings = asyncHandler(async (req, res) => {
     let settings = await SiteSettings.findOne();
     if (!settings) settings = await SiteSettings.create({});
 
-    const adminFields = ['appName', 'email', 'phone', 'address', 'facebook', 'twitter', 'instagram', 'whatsapp', 'linkedin'];
+    const adminFields = ['appName', 'email', 'phone', 'contactNumbers', 'address', 'facebook', 'twitter', 'instagram', 'whatsapp', 'linkedin'];
 
     adminFields.forEach(field => {
         if (req.body[field] !== undefined) {

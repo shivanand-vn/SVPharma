@@ -20,6 +20,10 @@ export interface SiteSettings {
     instagram: string;
     whatsapp: string;
     linkedin: string;
+    contactNumbers: {
+        label: string;
+        number: string;
+    }[];
     developerName: string;
     developerDescription: string;
     developerRoleName: string;

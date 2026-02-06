@@ -13,6 +13,12 @@ const Footer = () => {
     const [showShopModal, setShowShopModal] = useState(false);
     const [showDevModal, setShowDevModal] = useState(false);
 
+    // Initial Animation State
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     const fetchSettings = async () => {
         try {
             const { data } = await api.get('/settings');
@@ -39,7 +45,7 @@ const Footer = () => {
     };
 
     return (
-        <footer className="bg-[#0f172a] text-white pt-20 pb-10 border-t border-gray-800">
+        <footer className={`bg-[#0f172a] text-white pt-20 pb-10 border-t border-gray-800 transition-all duration-1000 transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <div className="container mx-auto px-6 lg:px-16">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-20">
 
@@ -116,8 +122,25 @@ const Footer = () => {
                                     <FaPhone size={18} />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Phone Number</p>
-                                    <a href={`tel:${settings.phone}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors">{settings.phone}</a>
+                                    <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Phone Numbers</p>
+                                    <div className="flex flex-col gap-1">
+                                        {/* Primary */}
+                                        <a href={`tel:${settings.phone}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors flex items-center gap-2">
+                                            {settings.contactNumbers && settings.contactNumbers.length > 0 ? (
+                                                <span className="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-400 font-bold uppercase">Main</span>
+                                            ) : null}
+                                            {settings.phone}
+                                        </a>
+                                        {/* Additional */}
+                                        {settings.contactNumbers?.map((contact, idx) => (
+                                            <a key={idx} href={`tel:${contact.number}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors flex items-center gap-2">
+                                                {contact.label && (
+                                                    <span className="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-400 font-bold uppercase">{contact.label}</span>
+                                                )}
+                                                {contact.number}
+                                            </a>
+                                        ))}
+                                    </div>
                                 </div>
                             </li>
                             <li className="flex items-start gap-4 group cursor-default">

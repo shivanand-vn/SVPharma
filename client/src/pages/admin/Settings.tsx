@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { FaSave, FaGlobe, FaCode, FaPhone, FaEnvelope, FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
+import { FaSave, FaGlobe, FaCode, FaPhone, FaEnvelope, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaPlus, FaTrash } from 'react-icons/fa';
 import StructuredAddressForm from '../../components/StructuredAddressForm';
 import type { Address } from '../../components/StructuredAddressForm';
 
@@ -11,6 +11,7 @@ const Settings = () => {
         appName: '',
         email: '',
         phone: '',
+        contactNumbers: [] as { label: string, number: string }[],
         address: {
             line1: '',
             city: '',
@@ -46,6 +47,28 @@ const Settings = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setSettings({ ...settings, [e.target.name]: e.target.value });
+    };
+
+    const handleContactChange = (index: number, field: 'label' | 'number', value: string) => {
+        const newContacts = [...settings.contactNumbers];
+        if (field === 'number') {
+            // Basic number/formatted cleaning if desired, or just allow input
+            value = value.replace(/[^\d\s\-\+]/g, '').slice(0, 15);
+        }
+        newContacts[index] = { ...newContacts[index], [field]: value };
+        setSettings({ ...settings, contactNumbers: newContacts });
+    };
+
+    const addContact = () => {
+        setSettings({
+            ...settings,
+            contactNumbers: [...settings.contactNumbers, { label: '', number: '' }]
+        });
+    };
+
+    const removeContact = (index: number) => {
+        const newContacts = settings.contactNumbers.filter((_, i) => i !== index);
+        setSettings({ ...settings, contactNumbers: newContacts });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -131,17 +154,65 @@ const Settings = () => {
                                 />
                             </div>
                         </div>
-                        <div className="md:col-span-2">
-                            <StructuredAddressForm
-                                address={settings.address}
-                                onChange={(address) => setSettings({ ...settings, address })}
-                                title="Physical Address"
-                                showShopName={false}
-                            />
+                    </div>
+
+                    {/* Multiple Contact Numbers */}
+                    <div className="md:col-span-2 space-y-4">
+                        <div className="flex justify-between items-center">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Additional Contact Numbers</label>
+                            <button
+                                type="button"
+                                onClick={addContact}
+                                className="text-[10px] font-black uppercase tracking-widest text-teal-600 flex items-center gap-1 hover:text-teal-800 transition-colors"
+                            >
+                                <FaPlus size={10} /> Add Number
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {settings.contactNumbers?.map((contact, index) => (
+                                <div key={index} className="flex gap-2 items-start bg-gray-50 p-2 rounded-2xl border border-gray-100 group hover:border-teal-200 transition-colors">
+                                    <div className="flex-1 space-y-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Label (e.g. Sales, Support)"
+                                            value={contact.label}
+                                            onChange={(e) => handleContactChange(index, 'label', e.target.value)}
+                                            className="w-full px-3 py-2 bg-white rounded-xl text-xs font-bold text-gray-700 border border-gray-100 focus:border-teal-400 focus:outline-none placeholder:text-gray-300 uppercase tracking-wide"
+                                        />
+                                        <input
+                                            type="tel"
+                                            placeholder="Phone Number"
+                                            value={contact.number}
+                                            onChange={(e) => handleContactChange(index, 'number', e.target.value)}
+                                            className="w-full px-3 py-2 bg-white rounded-xl text-sm font-black text-gray-800 border border-gray-100 focus:border-teal-400 focus:outline-none"
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeContact(index)}
+                                        className="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                    >
+                                        <FaTrash size={12} />
+                                    </button>
+                                </div>
+                            ))}
+                            {(!settings.contactNumbers || settings.contactNumbers.length === 0) && (
+                                <div className="md:col-span-2 text-center p-6 border-2 border-dashed border-gray-100 rounded-2xl text-gray-300 text-xs font-bold">
+                                    No additional numbers added
+                                </div>
+                            )}
                         </div>
                     </div>
+                    <div className="md:col-span-2">
+                        <StructuredAddressForm
+                            address={settings.address}
+                            onChange={(address) => setSettings({ ...settings, address })}
+                            title="Physical Address"
+                            showShopName={false}
+                        />
+                    </div>
                 </div>
-
                 {/* Social Media */}
                 <div className="bg-white rounded-3xl p-8 border border-teal-100 shadow-xl shadow-teal-900/5">
                     <h3 className="text-xl font-bold mb-6 text-teal-800">Social Media Links</h3>
@@ -203,9 +274,8 @@ const Settings = () => {
                 >
                     <FaSave /> {saving ? 'Saving Changes...' : 'Save Global Settings'}
                 </button>
-            </form>
-
-        </div>
+            </form >
+        </div >
     );
 };
 

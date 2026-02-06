@@ -546,15 +546,7 @@ const AdminPayments = () => {
                             </div>
                             {/* Toolbar */}
                             <div className="p-6 bg-slate-900/50 backdrop-blur-md flex justify-center gap-4 border-t border-white/5">
-                                <a
-                                    href={selectedPayment.proofUrl}
-                                    download
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-2xl hover:bg-white/20 transition-all text-sm font-black uppercase tracking-widest border border-white/10"
-                                >
-                                    <FaDownload size={14} /> Download Original
-                                </a>
+                                {/* Download Original button removed as per request */}
                             </div>
                         </div>
 

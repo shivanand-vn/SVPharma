@@ -3,7 +3,11 @@ const mongoose = require('mongoose');
 const siteSettingsSchema = new mongoose.Schema({
     appName: { type: String, default: 'Shree Veerabhadreshwara Pharma' },
     email: { type: String, default: 'admin@svpharma.in' },
-    phone: { type: String, default: '+91 98765 43210' },
+    phone: { type: String, default: '+91 98765 43210' }, // Deprecated, keeping for backward compatibility
+    contactNumbers: [{
+        label: { type: String, required: true },
+        number: { type: String, required: true }
+    }],
     address: {
         line1: { type: String, default: '123 Pharma Street' },
         line2: { type: String, default: '' },

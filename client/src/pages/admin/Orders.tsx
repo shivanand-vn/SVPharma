@@ -377,8 +377,8 @@ const AdminOrders = () => {
                                                 </button>
                                             )}
 
-                                            {/* Cancellation - Only for non-delivered/non-cancelled */}
-                                            {order.status !== 'delivered' && order.status !== 'cancelled' && (
+                                            {/* Cancellation - Only for pending orders */}
+                                            {order.status === 'pending' && (
                                                 <button
                                                     onClick={() => {
                                                         setSelectedOrder(order);
