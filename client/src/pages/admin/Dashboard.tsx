@@ -1052,7 +1052,7 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Email</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Address</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Username</th>
-                                    <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider">Action</th>
+                                    <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider sticky right-0 bg-teal-900 z-10">Action</th>
                                 </>
                             )}
                             {type === 'orders' && (
@@ -1061,7 +1061,7 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Customer</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Amount</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider">Action</th>
+                                    <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider sticky right-0 bg-teal-900 z-10">Action</th>
                                 </>
                             )}
                         </tr>
@@ -1099,12 +1099,12 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                                                 </button>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.phone}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.email}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title={item.email} style={{ maxWidth: '200px' }}>{item.email}</td>
                                             <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title={formatAddress(item.address)}>
                                                 {formatAddress(item.address)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.username}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-center">
+                                            <td className="px-6 py-4 whitespace-nowrap text-center sticky right-0 bg-white z-10 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.1)]">
                                                 <button onClick={() => onDelete(item)} className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded text-xs font-bold transition-colors shadow-sm">Delete</button>
                                             </td>
                                         </>
@@ -1119,7 +1119,7 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                                                 <p className="text-sm font-bold text-gray-800">{item.customer?.name || 'Walk-in'}</p>
                                                 <p className="text-[10px] text-gray-400 font-medium italic">{item.customer?.type || 'Guest'}</p>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-teal-700 font-black">₹{item.totalPrice.toFixed(0)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-teal-700 font-black">₹{item.totalPrice?.toFixed(0) || '0'}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${item.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                                                     item.status === 'processing' ? 'bg-blue-100 text-blue-700' :
@@ -1130,7 +1130,7 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                                                     {item.status}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-center">
+                                            <td className="px-6 py-4 whitespace-nowrap text-center sticky right-0 bg-white z-10 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.1)]">
                                                 <Link
                                                     to="/admin/orders"
                                                     state={{ highlightOrderId: item._id }}

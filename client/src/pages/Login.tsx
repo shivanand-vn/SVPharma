@@ -2,12 +2,14 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { useNavigate, Link } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 import Logo from '../assets/Logo.png';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const { login, user } = useContext(AuthContext); // Destructure user
     const navigate = useNavigate();
     const { showNotification } = useNotification();
@@ -71,13 +73,22 @@ const Login = () => {
                         </div>
                         <div>
                             <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                            <input
-                                type="password"
-                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:border-primary focus:bg-white focus:outline-none transition duration-200"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:border-primary focus:bg-white focus:outline-none transition duration-200"
+                                    placeholder="Enter your password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                >
+                                    {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                                </button>
+                            </div>
                         </div>
 
                         {/* Forgot Username/Password Links */}

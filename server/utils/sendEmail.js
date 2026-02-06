@@ -23,48 +23,17 @@ const sendEmail = async (options) => {
         name: 'Shree Veerabhadreshwara Pharma',
     };
 
-    // Helper to get strict link logic
-    const getLink = () => {
-        if (process.env.APP_LINK && process.env.APP_LINK.trim() !== '') {
-            return process.env.APP_LINK;
-        }
-        if (process.env.WEBSITE_LINK && process.env.WEBSITE_LINK.trim() !== '') {
-            return process.env.WEBSITE_LINK;
-        }
-        return null;
-    };
-
-    const link = getLink();
-    const footerHtml = `
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666;">
-            &copy; ${new Date().getFullYear()} Shree Veerabhadreshwara Pharma. All rights reserved.<br>
-            This is a system-generated email. Please do not reply to this message.<br>
-            ${link ? `<div style="margin-top: 10px; font-weight: 600;">${link}</div>` : ''}
-        </div>
-    `;
-
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
     sendSmtpEmail.to = [{ email: options.email }];
     sendSmtpEmail.sender = sender;
     sendSmtpEmail.subject = options.subject;
 
-    // Handle HTML and/or Text content
-    let finalHtml = '';
+    // Handle HTML content (Required)
     if (options.html) {
-        finalHtml = options.html + footerHtml;
-    } else if (options.message) {
-        finalHtml = `
-            <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-                <p>${options.message.replace(/\n/g, '<br>')}</p>
-                ${footerHtml}
-            </div>
-        `;
-        sendSmtpEmail.textContent = options.message;
+        sendSmtpEmail.htmlContent = options.html;
     } else {
-        throw new Error('Email must have message or html content');
+        throw new Error('Email must have html content');
     }
-
-    sendSmtpEmail.htmlContent = finalHtml;
 
     try {
         console.log(`Sending email to ${options.email} with subject: ${options.subject}`);

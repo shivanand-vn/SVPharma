@@ -171,7 +171,7 @@ const CustomerDashboard = () => {
     const { addToCart, cartItems, updateQuantity } = useCart();
 
     const [activeTab, setActiveTab] = useState('All');
-    const [activeType, setActiveType] = useState('All Types');
+    const [activeType, setActiveType] = useState('ALL'); // Default to ALL
     const [selectedCompany, setSelectedCompany] = useState('All Companies');
     const [allCompanies, setAllCompanies] = useState<string[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -228,12 +228,12 @@ const CustomerDashboard = () => {
         fetchMedicines();
     }, [selectedCompany]);
 
-    const categories = ['All Types', 'Tablet', 'Syrup', 'Capsule', 'Drops', 'Pediatric Syrup', 'Pediatric Drops & Suspentions', 'Injection', 'Soap', 'Ointment/Cream', 'Protein Powder', 'Sachet', 'Dental', 'ENT'];
+    const categories = ['ALL', 'Tablet', 'Syrup', 'Capsule', 'Drops', 'Pediatric Syrup', 'Pediatric Drops & Suspentions', 'Injection', 'Soap', 'Ointment/Cream', 'Protein Powder', 'Sachet', 'Dental', 'ENT'];
     const tabs = ['All', 'PCD', 'Generic', 'Ethical', 'Other'];
 
     const filteredMedicines = medicines.filter((med: any) => {
         const matchesCategory = activeTab === 'All' || med.category === activeTab;
-        const matchesType = activeType === 'All Types' || med.type === activeType;
+        const matchesType = activeType === 'ALL' || med.type === activeType;
         const matchesCompany = selectedCompany === 'All Companies' || med.company === selectedCompany;
         const matchesSearch = !searchQuery ||
             med.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -241,8 +241,33 @@ const CustomerDashboard = () => {
         return matchesCategory && matchesType && matchesCompany && matchesSearch;
     });
 
-    // NO CLIENT SIDE SLICE for fastMoving anymore
-    // const fastMoving = medicines.slice(0, 6);
+    // Dynamic Title Logic
+    const getPageTitle = () => {
+        if (activeType === 'ALL') return { title: 'All', subtitle: 'Browse our complete inventory' };
+
+        const titleMap: Record<string, string> = {
+            'Tablet': 'Tablets',
+            'Syrup': 'Syrups',
+            'Capsule': 'Capsules',
+            'Injection': 'Injections',
+            'Soap': 'Soaps',
+            'Ointment/Cream': 'Ointments & Creams',
+            'Drops': 'Drops',
+            'Pediatric Syrup': 'Pediatric Syrups',
+            'Pediatric Drops & Suspentions': 'Pediatric Drops',
+            'Protein Powder': 'Protein Powders',
+            'Sachet': 'Sachets',
+            'Dental': 'Dental Care',
+            'ENT': 'ENT Medicines'
+        };
+
+        return {
+            title: titleMap[activeType] || activeType,
+            subtitle: `Browse our collection of ${activeType.toLowerCase()}`
+        };
+    };
+
+    const { title: pageTitle, subtitle: pageSubtitle } = getPageTitle();
 
     return (
         <div className="min-h-screen w-full py-6 md:py-8 bg-[#ebf5f3] relative overflow-hidden">
@@ -283,8 +308,10 @@ const CustomerDashboard = () => {
                 <div className="flex flex-col sm:flex-row gap-4 justify-between items-center py-2 border-y border-teal-100/30">
                     <div className="flex gap-4 overflow-x-auto no-scrollbar w-full sm:w-auto">
                         {categories.map(type => {
-                            const count = type === 'All Types' ? medicines.length : medicines.filter((m: any) => m.type === type).length;
-                            if (type !== 'All Types' && count === 0) return null;
+                            const count = type === 'ALL' ? medicines.length : medicines.filter((m: any) => m.type === type).length;
+                            // Only hide if count is 0 and it's NOT 'ALL' (ALL should always show if there are medicines)
+                            if (type !== 'ALL' && count === 0) return null;
+
                             return (
                                 <button
                                     key={type}
@@ -337,8 +364,8 @@ const CustomerDashboard = () => {
                     </div>
                 </div>
 
-                {/* Fast Moving Section - Hidden when searching */}
-                {!searchQuery && (
+                {/* Fast Moving Section - Hidden when searching OR when specific category selected */}
+                {!searchQuery && activeType === 'ALL' && (
                     <div className="space-y-4">
                         <div className="flex justify-between items-center px-1">
                             <div>
@@ -388,11 +415,11 @@ const CustomerDashboard = () => {
                     </div>
                 )}
 
-                {/* All Medicines Grid */}
+                {/* All Medicines Grid (Dynamic Title) */}
                 <div className="space-y-4 pt-4">
                     <div className="px-1">
-                        <h2 className="text-xl sm:text-2xl font-black text-gray-800 font-serif">All Medicines</h2>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Browse our complete inventory</p>
+                        <h2 className="text-xl sm:text-2xl font-black text-gray-800 font-serif">{pageTitle}</h2>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{pageSubtitle}</p>
                     </div>
 
                     {loading ? (
