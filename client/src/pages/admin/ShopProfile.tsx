@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { FaSave, FaBuilding, FaPhone, FaCode, FaFacebook } from 'react-icons/fa';
+import { FaSave, FaBuilding, FaPhone, FaCode, FaFacebook, FaPlus, FaTrash } from 'react-icons/fa';
 import StructuredAddressForm from '../../components/StructuredAddressForm';
 import { emptyAddress } from '../../types/address';
 
@@ -9,6 +9,7 @@ const ShopProfile = () => {
         appName: '',
         email: '',
         phone: '',
+        contacts: [] as { name: string, phone: string }[],
         address: { ...emptyAddress },
         facebook: '',
         twitter: '',
@@ -25,7 +26,8 @@ const ShopProfile = () => {
         const fetchSettings = async () => {
             try {
                 const { data } = await api.get('/settings');
-                setSettings(data);
+                // Ensure contacts array exists
+                setSettings({ ...data, contacts: data.contacts || [] });
             } catch (error) {
                 console.error("Failed to fetch settings", error);
             }
@@ -37,13 +39,38 @@ const ShopProfile = () => {
         setSettings({ ...settings, [e.target.name]: e.target.value });
     };
 
+    const handleContactChange = (index: number, field: 'name' | 'phone', value: string) => {
+        const newContacts = [...settings.contacts];
+        if (field === 'phone') {
+            value = value.replace(/\D/g, '').slice(0, 10);
+        }
+        newContacts[index] = { ...newContacts[index], [field]: value };
+        setSettings({ ...settings, contacts: newContacts });
+    };
+
+    const addContact = () => {
+        setSettings({
+            ...settings,
+            contacts: [...settings.contacts, { name: '', phone: '' }]
+        });
+    };
+
+    const removeContact = (index: number) => {
+        const newContacts = settings.contacts.filter((_, i) => i !== index);
+        setSettings({ ...settings, contacts: newContacts });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Strict Mobile Number Validation
-        if (settings.phone && !/^[6-9]\d{9}$/.test(settings.phone)) {
-            setMessage('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9');
-            return;
+        // Validation
+        if (settings.contacts && settings.contacts.length > 0) {
+            for (const contact of settings.contacts) {
+                if (!contact.phone || !/^[6-9]\d{9}$/.test(contact.phone)) {
+                    setMessage(`Invalid phone number for ${contact.name || 'Contact'}: Must be 10 digits starting with 6-9`);
+                    return;
+                }
+            }
         }
 
         setLoading(true);
@@ -124,23 +151,55 @@ const ShopProfile = () => {
 
                 {/* Contact Info */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-teal-100">
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-teal-700"><FaPhone /> Contact Details</h3>
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Public Phone</label>
-                            <input
-                                name="phone"
-                                type="tel"
-                                value={settings.phone}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
-                                    setSettings({ ...settings, phone: value });
-                                }}
-                                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
-                                placeholder="10-digit mobile number"
-                            />
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-bold flex items-center gap-2 text-teal-700"><FaPhone /> Contact Details</h3>
+                        <button
+                            type="button"
+                            onClick={addContact}
+                            className="text-xs bg-teal-50 text-teal-700 px-3 py-2 rounded-lg font-bold flex items-center gap-1 hover:bg-teal-100 transition-colors"
+                        >
+                            <FaPlus size={10} /> Add Mobile
+                        </button>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {/* Dynamic Contact List */}
+                        <div className="md:col-span-2 space-y-3">
+                            <label className="block text-sm font-bold text-gray-700">Phone Numbers</label>
+                            {settings.contacts.length === 0 && (
+                                <div className="text-sm text-gray-400 italic bg-gray-50 p-4 rounded-xl text-center">
+                                    No contacts added. Click "Add Mobile" to add contacts.
+                                </div>
+                            )}
+                            {settings.contacts.map((contact, index) => (
+                                <div key={index} className="flex items-center gap-3">
+                                    <input
+                                        type="text"
+                                        placeholder="Name (e.g. Sales)"
+                                        value={contact.name}
+                                        onChange={(e) => handleContactChange(index, 'name', e.target.value)}
+                                        className="w-1/3 p-3 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none text-sm font-bold"
+                                    />
+                                    <input
+                                        type="tel"
+                                        placeholder="Mobile Number"
+                                        value={contact.phone}
+                                        maxLength={10}
+                                        onChange={(e) => handleContactChange(index, 'phone', e.target.value)}
+                                        className="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none font-mono"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeContact(index)}
+                                        className="p-3 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                </div>
+                            ))}
                         </div>
-                        <div>
+
+                        <div className="md:col-span-2">
                             <label className="block text-sm font-bold text-gray-700 mb-2">Public Email</label>
                             <input name="email" value={settings.email} onChange={handleChange} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" />
                         </div>

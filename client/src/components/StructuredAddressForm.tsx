@@ -32,20 +32,7 @@ const StructuredAddressForm: React.FC<StructuredAddressFormProps> = ({ address, 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                {/* Floor & Building */}
-                <div>
-                    <label className={labelClasses}>Floor Number (Optional)</label>
-                    <div className="relative">
-                        <FaLayerGroup className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
-                        <input
-                            name="floor"
-                            value={address.floor || ''}
-                            onChange={handleFieldChange}
-                            className={inputWithIconClasses}
-                            placeholder="e.g. 2nd Floor"
-                        />
-                    </div>
-                </div>
+                {/* Building & Floor */}
                 <div>
                     <label className={labelClasses}>Building Name (Optional)</label>
                     <div className="relative">
@@ -59,8 +46,21 @@ const StructuredAddressForm: React.FC<StructuredAddressFormProps> = ({ address, 
                         />
                     </div>
                 </div>
+                <div>
+                    <label className={labelClasses}>Floor Number (Optional)</label>
+                    <div className="relative">
+                        <FaLayerGroup className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
+                        <input
+                            name="floor"
+                            value={address.floor || ''}
+                            onChange={handleFieldChange}
+                            className={inputWithIconClasses}
+                            placeholder="e.g. 2nd Floor"
+                        />
+                    </div>
+                </div>
 
-                {/* Area & City */}
+                {/* Area & Landmark */}
                 <div className="md:col-span-2">
                     <label className={labelClasses}>Area / Locality</label>
                     <input
@@ -69,6 +69,31 @@ const StructuredAddressForm: React.FC<StructuredAddressFormProps> = ({ address, 
                         onChange={handleFieldChange}
                         className={inputNoIconClasses}
                         placeholder="e.g. Main Road, Gandhi Nagar"
+                    />
+                </div>
+                <div className="md:col-span-2">
+                    <label className={labelClasses}>Landmark (Optional)</label>
+                    <div className="relative">
+                        <FaLandmark className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
+                        <input
+                            name="landmark"
+                            value={address.landmark || ''}
+                            onChange={handleFieldChange}
+                            className={inputWithIconClasses}
+                            placeholder="e.g. Near Bus Stand"
+                        />
+                    </div>
+                </div>
+
+                {/* Taluk & City */}
+                <div>
+                    <label className={labelClasses}>Taluk (TQ)</label>
+                    <input
+                        name="taluk"
+                        value={address.taluk || ''}
+                        onChange={handleFieldChange}
+                        className={inputNoIconClasses}
+                        placeholder="Taluk"
                     />
                 </div>
                 <div>
@@ -86,17 +111,7 @@ const StructuredAddressForm: React.FC<StructuredAddressFormProps> = ({ address, 
                     </div>
                 </div>
 
-                {/* Taluk & District */}
-                <div>
-                    <label className={labelClasses}>Taluk (TQ)</label>
-                    <input
-                        name="taluk"
-                        value={address.taluk || ''}
-                        onChange={handleFieldChange}
-                        className={inputNoIconClasses}
-                        placeholder="Taluk"
-                    />
-                </div>
+                {/* District & State */}
                 <div>
                     <label className={labelClasses}>District (Required)</label>
                     <input
@@ -108,8 +123,6 @@ const StructuredAddressForm: React.FC<StructuredAddressFormProps> = ({ address, 
                         required
                     />
                 </div>
-
-                {/* State & Pincode */}
                 <div>
                     <label className={labelClasses}>State (Required)</label>
                     <div className="relative">
@@ -124,7 +137,9 @@ const StructuredAddressForm: React.FC<StructuredAddressFormProps> = ({ address, 
                         />
                     </div>
                 </div>
-                <div>
+
+                {/* Pincode */}
+                <div className="md:col-span-2">
                     <label className={labelClasses}>Pincode (Required)</label>
                     <div className="relative">
                         <FaHashtag className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
@@ -136,21 +151,6 @@ const StructuredAddressForm: React.FC<StructuredAddressFormProps> = ({ address, 
                             placeholder="6-digit Pincode"
                             required
                             maxLength={6}
-                        />
-                    </div>
-                </div>
-
-                {/* Landmark */}
-                <div className="md:col-span-2">
-                    <label className={labelClasses}>Landmark (Optional)</label>
-                    <div className="relative">
-                        <FaLandmark className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
-                        <input
-                            name="landmark"
-                            value={address.landmark || ''}
-                            onChange={handleFieldChange}
-                            className={inputWithIconClasses}
-                            placeholder="e.g. Near Bus Stand"
                         />
                     </div>
                 </div>

@@ -4,18 +4,22 @@ const siteSettingsSchema = new mongoose.Schema({
     appName: { type: String, default: 'Shree Veerabhadreshwara Pharma' },
     email: { type: String, default: 'admin@svpharma.in' },
     phone: { type: String, default: '+91 98765 43210' }, // Deprecated, keeping for backward compatibility
-    contactNumbers: [{
-        label: { type: String, required: true },
-        number: { type: String, required: true }
+    contacts: [{
+        name: { type: String, default: 'General' },
+        phone: { type: String, required: true }
     }],
     address: {
-        line1: { type: String, default: '123 Pharma Street' },
-        line2: { type: String, default: '' },
-        area: { type: String, default: 'Medical District' },
-        city: { type: String, default: 'City' },
-        state: { type: String, default: 'State' },
-        pincode: { type: String, default: '560001' },
-        landmark: { type: String, default: '' }
+        floor: { type: String, default: '' },
+        building: { type: String, default: '' },
+        line1: { type: String, default: '' }, // Keeping for backward compatibility
+        line2: { type: String, default: '' }, // Keeping for backward compatibility
+        area: { type: String, default: '' },
+        landmark: { type: String, default: '' },
+        city: { type: String, default: '' },
+        taluk: { type: String, default: '' },
+        district: { type: String, default: '' },
+        state: { type: String, default: 'Karnataka' },
+        pincode: { type: String, default: '' },
     },
     facebook: { type: String, default: '' },
     twitter: { type: String, default: '' },
