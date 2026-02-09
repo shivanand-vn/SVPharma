@@ -139,7 +139,11 @@ const CustomerLayout = () => {
             console.log('Sending profile update (address only):', payload);
 
             const { data } = await api.put('/customers/profile', payload);
-            updateUser(data);
+            if (user) {
+                updateUser({ ...user, ...data });
+            } else {
+                updateUser(data);
+            }
             setEditModalOpen(false);
             setProfileOpen(false);
 
