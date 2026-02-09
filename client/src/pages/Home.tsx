@@ -7,7 +7,6 @@ import {
     FaCreditCard,
     FaBoxOpen,
     FaCheckCircle,
-    FaPills,
 } from 'react-icons/fa';
 import Logo from '../assets/Logo.png';
 import api from '../utils/api';
