@@ -33,7 +33,8 @@ const siteSettingsSchema = new mongoose.Schema({
     developerProfileLink: { type: String, default: '#' },
     upiId: { type: String, default: 'admin@upi' },
     shopLocationLink: { type: String, default: '' },
-    shopImage: { type: String, default: '' }
+    shopImage: { type: String, default: '' },
+    shopImage2: { type: String, default: '' }
 }, { timestamps: true });
 
 const SiteSettings = mongoose.model('SiteSettings', siteSettingsSchema);

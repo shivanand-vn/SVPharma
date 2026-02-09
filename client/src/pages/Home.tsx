@@ -19,13 +19,15 @@ const Home = () => {
     const navigate = useNavigate();
     const observer = useRef<IntersectionObserver | null>(null);
     const [shopImage, setShopImage] = useState<string>('');
+    const [shopImage2, setShopImage2] = useState<string>('');
 
     useEffect(() => {
         const fetchSettings = async () => {
             try {
                 const { data } = await api.get('/settings');
-                if (data && data.shopImage) {
-                    setShopImage(data.shopImage);
+                if (data) {
+                    if (data.shopImage) setShopImage(data.shopImage);
+                    if (data.shopImage2) setShopImage2(data.shopImage2);
                 }
             } catch (error) {
                 console.error("Failed to load shop image", error);
@@ -233,7 +235,7 @@ const Home = () => {
                     <div className="relative fade-in">
                         <div className="absolute -inset-4 bg-teal-600/5 rounded-[50px] rotate-2" />
                         <img
-                            src="https://images.unsplash.com/photo-1584017945516-507f5c425049?auto=format&fit=crop&q=80&w=1000"
+                            src={shopImage2 || "https://images.unsplash.com/photo-1584017945516-507f5c425049?auto=format&fit=crop&q=80&w=1000"}
                             alt="Pharma Excellence"
                             className="relative rounded-[40px] shadow-3xl shadow-teal-100 object-cover w-full h-[600px]"
                         />

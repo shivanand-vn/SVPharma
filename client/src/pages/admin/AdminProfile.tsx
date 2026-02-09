@@ -18,7 +18,8 @@ const AdminProfile = () => {
         whatsapp: '',
         linkedin: '',
         shopLocationLink: '',
-        shopImage: ''
+        shopImage: '',
+        shopImage2: ''
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -41,7 +42,8 @@ const AdminProfile = () => {
                         whatsapp: data.whatsapp || '',
                         linkedin: data.linkedin || '',
                         shopLocationLink: data.shopLocationLink || '',
-                        shopImage: data.shopImage || ''
+                        shopImage: data.shopImage || '',
+                        shopImage2: data.shopImage2 || ''
                     });
                 }
             } catch (error) {
@@ -107,7 +109,8 @@ const AdminProfile = () => {
                 whatsapp: data.whatsapp || '',
                 linkedin: data.linkedin || '',
                 shopLocationLink: data.shopLocationLink || '',
-                shopImage: data.shopImage || ''
+                shopImage: data.shopImage || '',
+                shopImage2: data.shopImage2 || ''
             });
             showNotification('Profile updated successfully!', 'success');
         } catch (error) {
@@ -297,7 +300,50 @@ const AdminProfile = () => {
                                                   hover:file:bg-teal-100 transition-colors cursor-pointer"
                                             />
                                             <p className="mt-2 text-[10px] text-gray-400 font-medium">
-                                                Recommended: 800x600px, JPG/PNG. This image will be displayed on the landing page hero section.
+                                                Recommended: 800x600px, JPG/PNG. Landing page hero.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Shop Image 2 (Features Section)</label>
+                                    <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+                                        <div className="relative w-24 h-24 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
+                                            {settings.shopImage2 ? (
+                                                <img src={settings.shopImage2} alt="Shop 2" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="flex items-center justify-center h-full text-gray-400 text-[10px] text-center p-2">No Image</div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={async (e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (!file) return;
+                                                    const formData = new FormData();
+                                                    formData.append('image', file);
+                                                    try {
+                                                        const { data } = await api.post('/upload', formData, {
+                                                            headers: { 'Content-Type': 'multipart/form-data' },
+                                                        });
+                                                        setSettings(prev => ({ ...prev, shopImage2: data.url }));
+                                                    } catch (error) {
+                                                        console.error('Image upload failed', error);
+                                                        showNotification('Image upload failed', 'error');
+                                                    }
+                                                }}
+                                                className="block w-full text-sm text-gray-500
+                                                  file:mr-4 file:py-2 file:px-4
+                                                  file:rounded-full file:border-0
+                                                  file:text-xs file:font-bold
+                                                  file:bg-teal-50 file:text-teal-700
+                                                  hover:file:bg-teal-100 transition-colors cursor-pointer"
+                                            />
+                                            <p className="mt-2 text-[10px] text-gray-400 font-medium">
+                                                Recommended: 800x600px, JPG/PNG. Feature section.
                                             </p>
                                         </div>
                                     </div>
