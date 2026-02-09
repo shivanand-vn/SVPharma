@@ -99,7 +99,9 @@ const updateProfile = asyncHandler(async (req, res) => {
                 : (currentAddress.shopName || ''),
             line1: (address.line1 !== undefined && address.line1 !== '')
                 ? address.line1
-                : (currentAddress.line1 || ''),
+                : (address.building || address.floor)
+                    ? [address.floor, address.building].filter(Boolean).join(', ')
+                    : (currentAddress.line1 || ''),
             line2: (address.line2 !== undefined && address.line2 !== '')
                 ? address.line2
                 : (currentAddress.line2 || ''),
