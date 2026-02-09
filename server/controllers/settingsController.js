@@ -48,6 +48,8 @@ const updateShopSettings = asyncHandler(async (req, res) => {
     settings.instagram = req.body.instagram || settings.instagram;
     settings.whatsapp = req.body.whatsapp || settings.whatsapp;
     settings.linkedin = req.body.linkedin || settings.linkedin;
+    settings.shopLocationLink = req.body.shopLocationLink || settings.shopLocationLink;
+    settings.shopImage = req.body.shopImage || settings.shopImage;
 
     const updatedSettings = await settings.save();
     res.json(updatedSettings);
@@ -78,7 +80,7 @@ const updateSettings = asyncHandler(async (req, res) => {
     let settings = await SiteSettings.findOne();
     if (!settings) settings = await SiteSettings.create({});
 
-    const adminFields = ['appName', 'email', 'phone', 'contacts', 'address', 'facebook', 'twitter', 'instagram', 'whatsapp', 'linkedin'];
+    const adminFields = ['appName', 'email', 'phone', 'contacts', 'address', 'facebook', 'twitter', 'instagram', 'whatsapp', 'linkedin', 'shopLocationLink', 'shopImage'];
 
     adminFields.forEach(field => {
         if (req.body[field] !== undefined) {
