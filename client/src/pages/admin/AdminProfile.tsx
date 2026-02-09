@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import { FaSave, FaBuilding, FaPhone, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaWhatsapp, FaPlus, FaTrash } from 'react-icons/fa';
+import { FaSave, FaBuilding, FaPhone, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaWhatsapp, FaPlus, FaTrash, FaMapMarkerAlt } from 'react-icons/fa';
 import StructuredAddressForm from '../../components/StructuredAddressForm';
 import { type Address, emptyAddress, normalizeAddress } from '../../types/address';
 import { useNotification } from '../../context/NotificationContext';
@@ -16,7 +16,9 @@ const AdminProfile = () => {
         twitter: '',
         instagram: '',
         whatsapp: '',
-        linkedin: ''
+        linkedin: '',
+        shopLocationLink: '',
+        shopImage: ''
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -37,7 +39,9 @@ const AdminProfile = () => {
                         twitter: data.twitter || '',
                         instagram: data.instagram || '',
                         whatsapp: data.whatsapp || '',
-                        linkedin: data.linkedin || ''
+                        linkedin: data.linkedin || '',
+                        shopLocationLink: data.shopLocationLink || '',
+                        shopImage: data.shopImage || ''
                     });
                 }
             } catch (error) {
@@ -101,7 +105,9 @@ const AdminProfile = () => {
                 twitter: data.twitter || '',
                 instagram: data.instagram || '',
                 whatsapp: data.whatsapp || '',
-                linkedin: data.linkedin || ''
+                linkedin: data.linkedin || '',
+                shopLocationLink: data.shopLocationLink || '',
+                shopImage: data.shopImage || ''
             });
             showNotification('Profile updated successfully!', 'success');
         } catch (error) {
@@ -232,6 +238,70 @@ const AdminProfile = () => {
                                     title=""
                                     showShopName={false}
                                 />
+                            </div>
+                        </div>
+
+                        {/* Section: Shop Assets (Location & Image) */}
+                        <div className="space-y-6 md:col-span-2">
+                            <div className="pt-2 border-b border-gray-100 pb-2 flex items-center gap-2">
+                                <FaMapMarkerAlt className="text-teal-600" />
+                                <p className="text-[10px] font-black text-teal-600 uppercase tracking-widest">Digital Assets</p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Google Maps Link</label>
+                                    <input
+                                        name="shopLocationLink"
+                                        value={settings.shopLocationLink || ''}
+                                        onChange={handleChange}
+                                        className="w-full px-6 py-4 bg-white border border-gray-200 rounded-2xl font-bold text-gray-700 focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 transition-all shadow-sm"
+                                        placeholder="https://maps.google.com/..."
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Shop Image (Landing Page)</label>
+                                    <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+                                        <div className="relative w-24 h-24 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
+                                            {settings.shopImage ? (
+                                                <img src={settings.shopImage} alt="Shop" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="flex items-center justify-center h-full text-gray-400 text-[10px] text-center p-2">No Image</div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={async (e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (!file) return;
+                                                    const formData = new FormData();
+                                                    formData.append('image', file);
+                                                    try {
+                                                        const { data } = await api.post('/upload', formData, {
+                                                            headers: { 'Content-Type': 'multipart/form-data' },
+                                                        });
+                                                        setSettings(prev => ({ ...prev, shopImage: data.url }));
+                                                    } catch (error) {
+                                                        console.error('Image upload failed', error);
+                                                        showNotification('Image upload failed', 'error');
+                                                    }
+                                                }}
+                                                className="block w-full text-sm text-gray-500
+                                                  file:mr-4 file:py-2 file:px-4
+                                                  file:rounded-full file:border-0
+                                                  file:text-xs file:font-bold
+                                                  file:bg-teal-50 file:text-teal-700
+                                                  hover:file:bg-teal-100 transition-colors cursor-pointer"
+                                            />
+                                            <p className="mt-2 text-[10px] text-gray-400 font-medium">
+                                                Recommended: 800x600px, JPG/PNG. This image will be displayed on the landing page hero section.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
