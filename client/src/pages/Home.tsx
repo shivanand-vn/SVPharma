@@ -19,15 +19,13 @@ const Home = () => {
     const navigate = useNavigate();
     const observer = useRef<IntersectionObserver | null>(null);
     const [shopImage, setShopImage] = useState<string>('');
-    const [shopImage2, setShopImage2] = useState<string>('');
 
     useEffect(() => {
         const fetchSettings = async () => {
             try {
                 const { data } = await api.get('/settings');
-                if (data) {
-                    if (data.shopImage) setShopImage(data.shopImage);
-                    if (data.shopImage2) setShopImage2(data.shopImage2);
+                if (data && data.shopImage) {
+                    setShopImage(data.shopImage);
                 }
             } catch (error) {
                 console.error("Failed to load shop image", error);
@@ -232,17 +230,7 @@ const Home = () => {
             {/* Why Choose Us Section */}
             <section className="py-24 bg-white">
                 <div className="container mx-auto px-6 lg:px-16 grid lg:grid-cols-2 gap-20 items-center">
-                    <div className="relative fade-in">
-                        <div className="absolute -inset-4 bg-teal-600/5 rounded-[50px] rotate-2" />
-                        <img
-                            src={shopImage2 || "https://images.unsplash.com/photo-1584017945516-507f5c425049?auto=format&fit=crop&q=80&w=1000"}
-                            alt="Pharma Excellence"
-                            className="relative rounded-[40px] shadow-3xl shadow-teal-100 object-cover w-full h-[600px]"
-                        />
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-2xl pulse-animation">
-                            <FaPills className="text-teal-600 flex-shrink-0" size={32} />
-                        </div>
-                    </div>
+
 
                     <div className="fade-in">
                         <h2 className="text-3xl md:text-5xl font-black text-teal-950 mb-10 tracking-tight">Standardizing <br /><span className="text-teal-600">Medical Distribution</span></h2>
