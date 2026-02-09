@@ -148,10 +148,22 @@ const Footer = () => {
                         </div>
                         <ul className="space-y-6">
                             <li className="flex items-start gap-4 group cursor-default">
-                                <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-800/50 text-teal-500 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 relative overflow-hidden">
-                                    <FaMapMarkerAlt size={18} className="relative z-10" />
-                                    <div className="absolute inset-0 bg-teal-500/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                                </div>
+                                {settings.shopLocationLink ? (
+                                    <a
+                                        href={settings.shopLocationLink}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-800/50 text-teal-500 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 relative overflow-hidden hover:scale-110 shadow-lg cursor-pointer"
+                                    >
+                                        <FaMapMarkerAlt size={18} className="relative z-10" />
+                                        <div className="absolute inset-0 bg-teal-500/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                                    </a>
+                                ) : (
+                                    <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-800/50 text-teal-500 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 relative overflow-hidden">
+                                        <FaMapMarkerAlt size={18} className="relative z-10" />
+                                        <div className="absolute inset-0 bg-teal-500/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                                    </div>
+                                )}
                                 <div className="space-y-1">
                                     <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Address</p>
                                     <div className="text-gray-300 font-medium leading-relaxed text-sm">

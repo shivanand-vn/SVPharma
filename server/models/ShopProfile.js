@@ -28,6 +28,14 @@ const shopProfileSchema = new mongoose.Schema({
     logo: {
         type: String,
         default: ''
+    },
+    shopLocationLink: {
+        type: String,
+        default: ''
+    },
+    shopImage: {
+        type: String,
+        default: ''
     }
 }, { timestamps: true });
 

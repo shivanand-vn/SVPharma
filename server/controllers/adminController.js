@@ -60,6 +60,11 @@ const updateShopProfile = asyncHandler(async (req, res) => {
         shop.phone = req.body.phone || shop.phone;
         shop.email = req.body.email || shop.email;
         shop.logo = req.body.logo || shop.logo;
+        shop.instagram = req.body.instagram || shop.instagram;
+        shop.whatsapp = req.body.whatsapp || shop.whatsapp;
+        shop.facebook = req.body.facebook || shop.facebook;
+        shop.shopLocationLink = req.body.shopLocationLink || shop.shopLocationLink;
+        shop.shopImage = req.body.shopImage || shop.shopImage;
 
         const updatedShop = await shop.save();
         res.json(updatedShop);

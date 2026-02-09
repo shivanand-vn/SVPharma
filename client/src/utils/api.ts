@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://svpharma.onrender.com/api', // Adjust as needed
+    baseURL: 'https://svpharma.onrender.com/api', 
     headers: {
         'Content-Type': 'application/json',
     },

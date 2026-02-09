@@ -10,7 +10,7 @@ import {
     FaPills,
 } from 'react-icons/fa';
 import Logo from '../assets/Logo.png';
-//import api from '../utils/api';
+import api from '../utils/api';
 import Footer from '../components/Footer';
 
 const Home = () => {
@@ -18,6 +18,21 @@ const Home = () => {
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
     const observer = useRef<IntersectionObserver | null>(null);
+    const [shopImage, setShopImage] = useState<string>('');
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const { data } = await api.get('/settings');
+                if (data && data.shopImage) {
+                    setShopImage(data.shopImage);
+                }
+            } catch (error) {
+                console.error("Failed to load shop image", error);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const handleLogout = () => {
         logout();
@@ -132,7 +147,7 @@ const Home = () => {
                     <div className="relative slide-up" style={{ animationDelay: '0.2s' }}>
                         <div className="absolute inset-0 bg-teal-500/10 rounded-[40px] rotate-6 transform scale-105" />
                         <img
-                            src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=1000"
+                            src={shopImage || "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=1000"}
                             alt="Medical Support"
                             className="relative rounded-[40px] shadow-2xl border-8 border-white object-cover aspect-[4/3] w-full"
                         />

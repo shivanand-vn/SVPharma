@@ -22,6 +22,8 @@ export interface SiteSettings {
     developerRoleName: string;
     developerLink: string;
     developerProfileLink: string;
+    shopLocationLink: string;
+    shopImage: string;
 }
 
 interface ModalProps {
@@ -39,11 +41,35 @@ export const ShopEditModal = ({ isOpen, onClose, settings, onSuccess }: ModalPro
         address: { ...settings.address },
         instagram: settings.instagram,
         whatsapp: settings.whatsapp,
-        facebook: settings.facebook
+        facebook: settings.facebook,
+        shopLocationLink: settings.shopLocationLink || '',
+        shopImage: settings.shopImage || ''
     });
     const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     if (!isOpen) return null;
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+        setUploading(true);
+
+        try {
+            const { data } = await api.post('/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            setFormData(prev => ({ ...prev, shopImage: data.url }));
+        } catch (error) {
+            console.error('Image upload failed', error);
+            alert('Image upload failed');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -108,6 +134,53 @@ export const ShopEditModal = ({ isOpen, onClose, settings, onSuccess }: ModalPro
                             className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-sm font-bold text-gray-800 focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 transition-all"
                             required
                         />
+                    </div>
+
+                    {/* New Fields: Location & Image */}
+                    <div className="space-y-6 bg-blue-50/50 p-6 rounded-2xl border border-blue-100">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                                <FaMapMarkedAlt /> Google Maps Link
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.shopLocationLink}
+                                onChange={e => setFormData({ ...formData, shopLocationLink: e.target.value })}
+                                placeholder="https://maps.google.com/..."
+                                className="w-full bg-white border border-blue-100 rounded-2xl px-5 py-4 text-sm font-bold text-gray-800 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                                <FaStore /> Shop Landing Image
+                            </label>
+                            <div className="flex items-center gap-4">
+                                <div className="relative w-24 h-24 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+                                    {formData.shopImage ? (
+                                        <img src={formData.shopImage} alt="Shop" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="flex items-center justify-center h-full text-gray-400 text-xs text-center p-2">No Image</div>
+                                    )}
+                                </div>
+                                <div className="flex-1">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        className="block w-full text-sm text-gray-500
+                                          file:mr-4 file:py-2 file:px-4
+                                          file:rounded-full file:border-0
+                                          file:text-xs file:font-semibold
+                                          file:bg-blue-50 file:text-blue-700
+                                          hover:file:bg-blue-100"
+                                    />
+                                    <p className="mt-2 text-xs text-gray-400">
+                                        {uploading ? 'Uploading...' : 'Recommended: 800x600px, JPG/PNG'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Address Section */}
@@ -195,7 +268,7 @@ export const ShopEditModal = ({ isOpen, onClose, settings, onSuccess }: ModalPro
                         </button>
                         <button
                             type="submit"
-                            disabled={loading}
+                            disabled={loading || uploading}
                             className="flex-2 py-4 px-10 bg-teal-600 text-white text-sm font-black rounded-2xl hover:bg-teal-700 shadow-xl shadow-teal-100 transition-all active:scale-95 flex items-center justify-center gap-2"
                         >
                             <FaSave /> {loading ? 'Saving...' : 'Deploy Changes'}
