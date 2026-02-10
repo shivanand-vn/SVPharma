@@ -848,6 +848,25 @@ const AdminDashboard = () => {
                 )}
             </div>
 
+            {/* Total Due Card - Added Manually */}
+            {!loading && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+                    <div
+                        onClick={() => setDueModalOpen(true)}
+                        className="bg-white rounded-xl shadow-card p-6 flex flex-col items-center justify-center text-center h-48 border-l-4 border-red-500 shadow-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer group"
+                    >
+                        <div className="mb-4 bg-red-50 p-4 rounded-full group-hover:bg-red-100 transition-colors">
+                            <FaMoneyBillWave className="text-2xl text-red-500" />
+                        </div>
+                        <h3 className="text-gray-500 font-medium mb-1">Total Due</h3>
+                        <p className="text-3xl font-bold text-gray-800 group-hover:text-red-600 transition-colors">
+                            ₹{stats.totalDue?.toLocaleString('en-IN')}
+                        </p>
+                        <p className="text-[10px] font-bold text-red-400 mt-2 uppercase tracking-widest">Click to view list</p>
+                    </div>
+                </div>
+            )}
+
             {/* Interactive View Area */}
             {activeView && activeView !== 'analytics' && (
                 <div className="bg-white rounded-xl shadow-lg border border-teal-100 overflow-hidden animate-fade-in-up">
@@ -899,6 +918,21 @@ const AdminDashboard = () => {
                 isOpen={historyModalOpen}
                 onClose={() => setHistoryModalOpen(false)}
                 customer={selectedHistoryCustomer}
+            />
+
+            {/* Total Due Modals */}
+            <DueCustomersModal
+                isOpen={dueModalOpen}
+                onClose={() => setDueModalOpen(false)}
+                customers={data.customers}
+                onRecordPayment={handleOpenPaymentModal}
+            />
+
+            <RecordPaymentModal
+                isOpen={paymentModalOpen}
+                onClose={() => setPaymentModalOpen(false)}
+                customer={selectedDueCustomer}
+                onSuccess={handlePaymentSuccess}
             />
 
             {/* Toast Notification */}
