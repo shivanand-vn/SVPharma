@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaPills, FaUsers, FaBoxOpen, FaTimes, FaSave, FaTrash, FaCheckCircle, FaExclamationCircle, FaChartLine, FaHistory, FaChevronDown, FaUndo, FaMoneyBillWave } from 'react-icons/fa';
+import { FaPills, FaUsers, FaBoxOpen, FaTimes, FaSave, FaTrash, FaCheckCircle, FaExclamationCircle, FaChartLine, FaHistory, FaChevronDown, FaUndo, FaMoneyBillWave, FaSortAmountDown, FaChevronUp } from 'react-icons/fa';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import api from '../../utils/api';
 import { formatAddress } from '../../utils/addressHelper';
-import DueCustomersModal from '../../components/admin/DueCustomersModal';
 import RecordPaymentModal from '../../components/admin/RecordPaymentModal';
 
 // --- Skeleton Components ---
@@ -670,7 +669,7 @@ const AdminDashboard = () => {
         orders: []
     });
     const [analyticsData, setAnalyticsData] = useState<any>(null);
-    const [activeView, setActiveView] = useState<'medicines' | 'customers' | 'orders' | 'analytics' | null>('analytics');
+    const [activeView, setActiveView] = useState<'medicines' | 'customers' | 'orders' | 'due' | 'analytics' | null>('analytics');
     const [loading, setLoading] = useState(true);
 
     // Modal States
@@ -683,7 +682,6 @@ const AdminDashboard = () => {
     const [historyModalOpen, setHistoryModalOpen] = useState(false);
     const [selectedHistoryCustomer, setSelectedHistoryCustomer] = useState<any>(null);
 
-    const [dueModalOpen, setDueModalOpen] = useState(false);
     const [paymentModalOpen, setPaymentModalOpen] = useState(false);
     const [selectedDueCustomer, setSelectedDueCustomer] = useState<any>(null);
 
@@ -843,18 +841,18 @@ const AdminDashboard = () => {
                     cards.map((card, index) => (
                         <div
                             key={index}
-                            onClick={() => card.isSpecial ? setDueModalOpen(true) : setActiveView(card.view as any)}
+                            onClick={() => setActiveView(card.view as any)}
                             className={`bg-white rounded-xl shadow-card p-4 flex flex-col items-center justify-center text-center h-48 border transition-all duration-300 cursor-pointer group hover:shadow-lg transform hover:-translate-y-1 ${activeView === card.view
                                 ? 'ring-2 ring-teal-500 bg-teal-50 border-teal-200'
                                 : 'border-teal-50'
-                                } ${card.isSpecial ? 'border-l-4 border-l-red-500' : ''}`}
+                                } ${card.isSpecial ? 'border-l-4 border-l-red-500 shadow-sm' : ''}`}
                         >
                             <div className={`mb-3 ${card.isSpecial ? 'bg-red-50 text-red-500 group-hover:bg-red-100' : 'bg-teal-50 text-teal-600'} p-3 rounded-full transition-colors`}>
                                 {card.icon}
                             </div>
                             <h3 className="text-gray-400 text-xs font-black uppercase tracking-widest mb-1">{card.title}</h3>
                             <p className={`text-2xl font-black ${card.isSpecial ? 'text-gray-800 group-hover:text-red-600' : 'text-teal-800'}`}>{card.count}</p>
-                            {card.isSpecial && <p className="text-[9px] font-bold text-red-400 mt-2 uppercase tracking-widest">Click to view list</p>}
+                            {card.isSpecial && <p className="text-[9px] font-bold text-red-400 mt-2 uppercase tracking-widest transition-opacity group-hover:opacity-100">Click to view list</p>}
                         </div>
                     ))
                 )}
@@ -862,11 +860,12 @@ const AdminDashboard = () => {
             {activeView && activeView !== 'analytics' && (
                 <div className="bg-white rounded-xl shadow-lg border border-teal-100 overflow-hidden animate-fade-in-up">
                     <ListView
-                        type={activeView}
-                        data={data[activeView]}
+                        type={activeView as any}
+                        data={activeView === 'due' ? data.customers.filter((c: any) => (c.dueAmount || c.pendingBalance) > 0) : data[activeView as any]}
                         onEdit={openEditModal}
                         onDelete={openDeleteModal}
                         onHistory={openHistoryModal}
+                        onRecordPayment={handleOpenPaymentModal}
                     />
                 </div>
             )}
@@ -911,13 +910,7 @@ const AdminDashboard = () => {
                 customer={selectedHistoryCustomer}
             />
 
-            {/* Total Due Modals */}
-            <DueCustomersModal
-                isOpen={dueModalOpen}
-                onClose={() => setDueModalOpen(false)}
-                customers={data.customers}
-                onRecordPayment={handleOpenPaymentModal}
-            />
+
 
             <RecordPaymentModal
                 isOpen={paymentModalOpen}
@@ -939,10 +932,12 @@ const AdminDashboard = () => {
     );
 };
 
-const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicines' | 'customers' | 'orders', data: any[], onEdit: (item: any) => void, onDelete: (item: any) => void, onHistory: (item: any) => void }) => {
+const ListView = ({ type, data, onEdit, onDelete, onHistory, onRecordPayment }: { type: 'medicines' | 'customers' | 'orders' | 'due', data: any[], onEdit: (item: any) => void, onDelete: (item: any) => void, onHistory: (item: any) => void, onRecordPayment?: (customer: any) => void }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('All');
     const [typeFilter, setTypeFilter] = useState('All');
+
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
     // Calculate counts for filters
     const getCount = (filter: string, isType: boolean = false) => {
@@ -969,12 +964,14 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
         ]
         : [];
 
-    const filteredData = data.filter(item => {
+    let processedData = data.filter(item => {
         const matchesSearch = type === 'medicines'
             ? item.name.toLowerCase().includes(searchTerm.toLowerCase())
             : type === 'customers'
                 ? item.name.toLowerCase().includes(searchTerm.toLowerCase())
-                : item._id.toLowerCase().includes(searchTerm.toLowerCase());
+                : type === 'orders'
+                    ? item._id.toLowerCase().includes(searchTerm.toLowerCase())
+                    : true;
 
         const matchesCategory = categoryFilter === 'All'
             ? true
@@ -993,6 +990,16 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
         return matchesSearch && matchesCategory && matchesType;
     });
 
+    if (type === 'due') {
+        processedData.sort((a, b) => {
+            const valA = a.dueAmount || a.pendingBalance || 0;
+            const valB = b.dueAmount || b.pendingBalance || 0;
+            return sortOrder === 'desc' ? valB - valA : valA - valB;
+        });
+    } else {
+        processedData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+
     return (
         <div className="p-6 bg-teal-50/30 min-h-[500px]">
             <h2 className="text-3xl font-serif text-teal-800 text-center mb-8">
@@ -1003,49 +1010,69 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                 <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
                     {/* Filter Tabs with Counts (Category/Status) */}
                     <div className="flex flex-wrap gap-2">
-                        {type === 'orders' ? (
-                            ['All', 'Pending', 'Processing', 'Shipped', 'Delivered'].map(status => (
-                                <button
-                                    key={status}
-                                    onClick={() => setCategoryFilter(status)}
-                                    className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm ${categoryFilter === status
-                                        ? 'bg-teal-800 text-white'
-                                        : 'bg-white text-teal-700 hover:bg-teal-100 border border-teal-100'
-                                        }`}
-                                >
-                                    {status} <span className="opacity-60 text-[9px] ml-1">({status === 'All' ? data.length : data.filter((o: any) => o.status === status.toLowerCase()).length})</span>
-                                </button>
-                            ))
-                        ) : (
-                            categories.map(cat => {
-                                const count = getCount(cat);
-                                if (type === 'medicines' && cat !== 'All' && count === 0) return null; // Hide empty categories
-                                return (
+                        {type !== 'due' && (
+                            type === 'orders' ? (
+                                ['All', 'Pending', 'Processing', 'Shipped', 'Delivered'].map(status => (
                                     <button
-                                        key={cat}
-                                        onClick={() => setCategoryFilter(cat)}
-                                        className={`px-4 py-2 rounded-full text-sm font-bold transition-all shadow-sm ${categoryFilter === cat
+                                        key={status}
+                                        onClick={() => setCategoryFilter(status)}
+                                        className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm ${categoryFilter === status
                                             ? 'bg-teal-800 text-white'
-                                            : 'bg-white text-teal-700 hover:bg-teal-100'
+                                            : 'bg-white text-teal-700 hover:bg-teal-100 border border-teal-100'
                                             }`}
                                     >
-                                        {cat} <span className="opacity-80 text-xs text-inherit">({count})</span>
+                                        {status} <span className="opacity-60 text-[9px] ml-1">({status === 'All' ? data.length : data.filter((o: any) => o.status === status.toLowerCase()).length})</span>
                                     </button>
-                                );
-                            })
+                                ))
+                            ) : (
+                                categories.map(cat => {
+                                    const count = getCount(cat);
+                                    if (type === 'medicines' && cat !== 'All' && count === 0) return null; // Hide empty categories
+                                    return (
+                                        <button
+                                            key={cat}
+                                            onClick={() => setCategoryFilter(cat)}
+                                            className={`px-4 py-2 rounded-full text-sm font-bold transition-all shadow-sm ${categoryFilter === cat
+                                                ? 'bg-teal-800 text-white'
+                                                : 'bg-white text-teal-700 hover:bg-teal-100'
+                                                }`}
+                                        >
+                                            {cat} <span className="opacity-80 text-xs text-inherit">({count})</span>
+                                        </button>
+                                    );
+                                })
+                            )
                         )}
                     </div>
 
-                    {/* Search Bar */}
+                    {/* Search Bar or Sort Button */}
                     <div className="relative w-full lg:w-96">
-                        <input
-                            type="text"
-                            placeholder={type === 'orders' ? "Search Order ID..." : `Search ${type.slice(0, -1)}...`}
-                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-teal-200 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        {type === 'due' ? (
+                            <button
+                                onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                className="w-full flex items-center justify-between px-6 py-2 rounded-lg border border-teal-200 bg-white hover:bg-teal-50 transition-all group shadow-sm active:scale-95"
+                            >
+                                <span className="text-xs font-black text-teal-800 uppercase tracking-widest flex items-center gap-2">
+                                    <FaSortAmountDown className={`transition-transform duration-300 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
+                                    Sort by Amount ({sortOrder === 'desc' ? 'High to Low' : 'Low to High'})
+                                </span>
+                                <div className="flex flex-col text-[8px] text-teal-400 group-hover:text-teal-600 transition-colors">
+                                    <FaChevronUp className={sortOrder === 'asc' ? 'text-teal-600' : ''} />
+                                    <FaChevronDown className={sortOrder === 'desc' ? 'text-teal-600' : ''} />
+                                </div>
+                            </button>
+                        ) : (
+                            <>
+                                <input
+                                    type="text"
+                                    placeholder={type === 'orders' ? "Search Order ID..." : `Search ${type.slice(0, -1)}...`}
+                                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-teal-200 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                                <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -1107,11 +1134,20 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                                     <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider sticky right-0 bg-teal-900 z-10">Action</th>
                                 </>
                             )}
+                            {type === 'due' && (
+                                <>
+                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Customer Name</th>
+                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Phone</th>
+                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Shop Name</th>
+                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Outstanding Due</th>
+                                    <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider sticky right-0 bg-teal-900 z-10">Action</th>
+                                </>
+                            )}
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-100">
-                        {filteredData.length > 0 ? (
-                            filteredData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((item: any, i) => (
+                        {processedData.length > 0 ? (
+                            processedData.map((item: any, i) => (
                                 <tr key={i} className="hover:bg-teal-50/50 transition-colors border-b border-gray-100">
                                     {type === 'medicines' && (
                                         <>
@@ -1181,6 +1217,31 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory }: { type: 'medicine
                                                 >
                                                     Manage <span className="group-hover:translate-x-1 transition-transform">→</span>
                                                 </Link>
+                                            </td>
+                                        </>
+                                    )}
+                                    {type === 'due' && (
+                                        <>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-teal-900">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-8 w-8 rounded-full bg-teal-50 flex items-center justify-center text-teal-600 text-xs">
+                                                        {item.name?.charAt(0)}
+                                                    </div>
+                                                    {item.name}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.phone}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{item.shopName || 'N/A'}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-lg font-black text-red-600">
+                                                ₹{(item.dueAmount || item.pendingBalance || 0).toLocaleString('en-IN')}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-center sticky right-0 bg-white z-10 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.1)]">
+                                                <button
+                                                    onClick={() => onRecordPayment && onRecordPayment(item)}
+                                                    className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm shadow-teal-100 active:scale-95"
+                                                >
+                                                    Record Pay
+                                                </button>
                                             </td>
                                         </>
                                     )}
