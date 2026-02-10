@@ -34,8 +34,6 @@ const addOrderItems = asyncHandler(async (req, res) => {
 
     const createdOrder = await order.save();
 
-    const createdOrder = await order.save();
-
     // 1. Wallet Credit Logic (Keep for backward compatibility/loyalty)
     const wallet = await Wallet.findOne({ customer: req.user._id });
     if (wallet) {
