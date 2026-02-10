@@ -372,9 +372,7 @@ const CustomerDashboard = () => {
                                 <h2 className="text-xl sm:text-2xl font-black text-gray-800 font-serif">Fast Moving</h2>
                                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Most popular medicines in demand</p>
                             </div>
-                            <button className="flex items-center gap-1 text-[11px] font-black text-teal-600 uppercase tracking-widest group">
-                                View All <FaAngleRight className="group-hover:translate-x-1 transition-transform" />
-                            </button>
+
                         </div>
 
                         <div

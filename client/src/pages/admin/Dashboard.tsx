@@ -4,6 +4,8 @@ import { FaPills, FaUsers, FaBoxOpen, FaTimes, FaSave, FaTrash, FaCheckCircle, F
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import api from '../../utils/api';
 import { formatAddress } from '../../utils/addressHelper';
+import DueCustomersModal from '../../components/admin/DueCustomersModal';
+import RecordPaymentModal from '../../components/admin/RecordPaymentModal';
 
 // --- Skeleton Components ---
 const Skeleton = ({ className }: { className?: string }) => (
@@ -659,7 +661,8 @@ const AdminDashboard = () => {
         medicines: 0,
         customers: 0,
         orders: 0,
-        pendingOrders: 0
+        pendingOrders: 0,
+        totalDue: 0
     });
     const [data, setData] = useState<any>({
         medicines: [],
@@ -680,6 +683,10 @@ const AdminDashboard = () => {
     const [historyModalOpen, setHistoryModalOpen] = useState(false);
     const [selectedHistoryCustomer, setSelectedHistoryCustomer] = useState<any>(null);
 
+    const [dueModalOpen, setDueModalOpen] = useState(false);
+    const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+    const [selectedDueCustomer, setSelectedDueCustomer] = useState<any>(null);
+
     // Toast State
     const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
@@ -690,6 +697,16 @@ const AdminDashboard = () => {
     const openHistoryModal = (customer: any) => {
         setSelectedHistoryCustomer(customer);
         setHistoryModalOpen(true);
+    };
+
+    const handleOpenPaymentModal = (customer: any) => {
+        setSelectedDueCustomer(customer);
+        setPaymentModalOpen(true);
+    };
+
+    const handlePaymentSuccess = () => {
+        fetchData();
+        showToast("Payment recorded successfully", "success");
     };
 
     const fetchData = async () => {
@@ -713,7 +730,8 @@ const AdminDashboard = () => {
                 medicines: medRes.data.length || 0,
                 customers: custRes.data.length || 0,
                 orders: orderRes.data.length || 0,
-                pendingOrders: orderRes.data.filter((o: any) => o.status === 'pending').length || 0
+                pendingOrders: orderRes.data.filter((o: any) => o.status === 'pending').length || 0,
+                totalDue: custRes.data.reduce((acc: number, curr: any) => acc + (curr.pendingBalance || curr.dueAmount || 0), 0)
             });
         } catch (e) {
             console.error("Stats fetch error", e);
