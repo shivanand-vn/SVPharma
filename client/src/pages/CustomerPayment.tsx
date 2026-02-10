@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../utils/api';
-import { FaRupeeSign, FaUpload, FaHistory, FaCheckCircle, FaTimesCircle, FaClock, FaSpinner, FaTrash } from 'react-icons/fa';
+import { FaRupeeSign, FaUpload, FaHistory, FaCheckCircle, FaTimesCircle, FaClock, FaSpinner, FaTrash, FaArrowLeft } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 
@@ -196,7 +197,15 @@ const CustomerPayment = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-4 space-y-8 pb-24">
+        <div className="max-w-4xl mx-auto p-4 space-y-6 pb-24">
+            <Link
+                to="/customer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-teal-600 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm border border-teal-50 hover:bg-teal-50 transition-all hover:scale-105 active:scale-95 group w-fit"
+            >
+                <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" />
+                Back to Dashboard
+            </Link>
+
             {/* Header / Due Amount Card */}
             <div className="bg-gradient-to-r from-teal-600 to-teal-800 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-8 opacity-10 scale-150 group-hover:rotate-12 transition-transform duration-700">
