@@ -202,47 +202,47 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
             }
         }
     }
-}
+
 
     // --- Handle Specific Status Actions ---
     if (status === 'cancelled') {
-    if (!cancellationReason) {
-        res.status(400);
-        throw new Error('Cancellation reason is required');
-    }
-    order.cancellationReason = cancellationReason;
-}
-
-if (status === 'delivered') {
-    if (!req.file) {
-        res.status(400);
-        throw new Error('Delivery slip image is required for delivered status');
+        if (!cancellationReason) {
+            res.status(400);
+            throw new Error('Cancellation reason is required');
+        }
+        order.cancellationReason = cancellationReason;
     }
 
-    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-        if (req.file) fs.unlinkSync(req.file.path);
-        res.status(500);
-        throw new Error('Cloudinary configuration is missing');
+    if (status === 'delivered') {
+        if (!req.file) {
+            res.status(400);
+            throw new Error('Delivery slip image is required for delivered status');
+        }
+
+        if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+            if (req.file) fs.unlinkSync(req.file.path);
+            res.status(500);
+            throw new Error('Cloudinary configuration is missing');
+        }
+
+        try {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'delivery_slips',
+            });
+            order.deliverySlipUrl = result.secure_url;
+            fs.unlinkSync(req.file.path); // Cleanup local file
+        } catch (error) {
+            if (req.file) fs.unlinkSync(req.file.path);
+            res.status(500);
+            throw new Error('Image upload failed');
+        }
     }
 
-    try {
-        const result = await cloudinary.uploader.upload(req.file.path, {
-            folder: 'delivery_slips',
-        });
-        order.deliverySlipUrl = result.secure_url;
-        fs.unlinkSync(req.file.path); // Cleanup local file
-    } catch (error) {
-        if (req.file) fs.unlinkSync(req.file.path);
-        res.status(500);
-        throw new Error('Image upload failed');
-    }
-}
+    order.status = status;
+    order.statusHistory.push({ status, timestamp: new Date() });
 
-order.status = status;
-order.statusHistory.push({ status, timestamp: new Date() });
-
-const updatedOrder = await order.save();
-res.json(updatedOrder);
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
 });
 
 // @desc    Get orders by customer ID
