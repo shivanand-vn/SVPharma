@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaPills, FaUsers, FaBoxOpen, FaTimes, FaSave, FaTrash, FaCheckCircle, FaExclamationCircle, FaChartLine, FaHistory, FaChevronDown, FaUndo } from 'react-icons/fa';
+import { FaPills, FaUsers, FaBoxOpen, FaTimes, FaSave, FaTrash, FaCheckCircle, FaExclamationCircle, FaChartLine, FaHistory, FaChevronDown, FaUndo, FaMoneyBillWave } from 'react-icons/fa';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import api from '../../utils/api';
 import { formatAddress } from '../../utils/addressHelper';
