@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
-import { FaPlus, FaMinus, FaAngleRight, FaSearch, FaTimes, FaChevronDown, FaBuilding } from 'react-icons/fa';
+import { FaPlus, FaMinus, FaSearch, FaTimes, FaChevronDown, FaBuilding } from 'react-icons/fa';
 
 const MedicineSkeleton = ({ isCompact }: { isCompact?: boolean }) => (
     <div className={`bg-white rounded-2xl md:rounded-3xl border border-gray-100 p-3 sm:p-5 flex flex-col h-full animate-pulse transition-all ${isCompact ? 'w-48 sm:w-64 flex-shrink-0' : 'w-full'}`}>

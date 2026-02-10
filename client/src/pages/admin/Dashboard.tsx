@@ -24,7 +24,7 @@ const AnalyticsSkeleton = () => (
     <div className="p-8 space-y-8 bg-teal-50/20">
         <Skeleton className="h-10 w-64 mx-auto mb-8" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map(i => (
+            {[1, 2, 3, 4, 5].map(i => (
                 <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
                     <Skeleton className="h-4 w-24 mb-2" />
                     <Skeleton className="h-8 w-32" />

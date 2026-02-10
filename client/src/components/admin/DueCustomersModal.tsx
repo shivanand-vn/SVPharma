@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaSearch, FaMoneyBillWave, FaSortAmountDown, FaSortAmountUp, FaUser } from 'react-icons/fa';
-import api from '../../utils/api';
 
 interface DueCustomersModalProps {
     isOpen: boolean;
