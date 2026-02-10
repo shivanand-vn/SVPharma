@@ -69,7 +69,7 @@ const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, onClose
                                     type="number"
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-100 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 outline-none font-bold text-gray-700 text-lg transition-all"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-100 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 outline-none font-bold text-gray-700 text-lg transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                     placeholder="0.00"
                                     max={currentDue}
                                     min={1}
@@ -84,6 +84,18 @@ const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, onClose
                                 {error}
                             </div>
                         )}
+
+                        <div className="p-3 bg-amber-50 rounded-xl border border-amber-100 flex gap-3 items-start">
+                            <div className="mt-0.5 text-amber-500">
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <div className="text-[10px] text-amber-700 font-medium leading-relaxed">
+                                <span className="font-bold block uppercase tracking-wider mb-0.5">Warning</span>
+                                This action cannot be undone. Please verify the amount and customer before proceeding.
+                            </div>
+                        </div>
 
                         <div className="flex gap-3">
                             <button

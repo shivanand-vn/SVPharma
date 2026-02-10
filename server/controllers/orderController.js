@@ -34,10 +34,9 @@ const addOrderItems = asyncHandler(async (req, res) => {
 
     const createdOrder = await order.save();
 
-    // 1. Increment Customer Due Amount
-    customer.dueAmount = (customer.dueAmount || 0) + Number(totalPrice);
+    const createdOrder = await order.save();
 
-    // 2. Wallet Credit Logic (Keep for backward compatibility/loyalty)
+    // 1. Wallet Credit Logic (Keep for backward compatibility/loyalty)
     const wallet = await Wallet.findOne({ customer: req.user._id });
     if (wallet) {
         if (wallet.walletBalance > 0) {
@@ -45,8 +44,11 @@ const addOrderItems = asyncHandler(async (req, res) => {
             wallet.walletBalance -= walletUsed;
             wallet.totalPaid += walletUsed;
 
-            // If wallet credits are used, they reduce the due amount immediately
-            customer.dueAmount = Math.max(0, (customer.dueAmount || 0) - walletUsed);
+            // Store wallet usage in order
+            createdOrder.walletAmountUsed = walletUsed;
+
+            // Note: We do NOT update dueAmount here anymore. 
+            // It will be updated when order is processed/accepted.
 
             wallet.walletHistory.push({
                 type: 'order_usage',
@@ -58,16 +60,16 @@ const addOrderItems = asyncHandler(async (req, res) => {
 
             if (walletUsed === totalPrice) {
                 createdOrder.paymentStatus = 'paid';
-                await createdOrder.save();
             }
+            // Save updated order with wallet info
+            await createdOrder.save();
         }
-        // Sync wallet totalDue for logging/audit
-        wallet.totalDue += Number(totalPrice);
-        wallet.pendingBalance = customer.dueAmount;
         await wallet.save();
     }
 
-    await customer.save();
+    // Note: We do NOT increment customer.dueAmount here anymore.
+    // It is deferred until admin approval.
+
     res.status(201).json(createdOrder);
 });
 
@@ -160,7 +162,6 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
             res.status(400); throw new Error('modifiedItems must be an array');
         }
 
-        // Store original state before first modification
         if (!order.isAdminModified) {
             order.originalItems = order.items.map(item => ({
                 medicine: item.medicine,
@@ -175,69 +176,75 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
         // Update items and recalculate
         order.items = modifiedItems;
         const newTotal = order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-        const difference = order.originalTotalPrice - newTotal;
 
-        // Update Wallet and Customer balance
-        if (difference > 0) {
-            const [wallet, customer] = await Promise.all([
-                Wallet.findOne({ customer: order.customer }),
-                Customer.findById(order.customer)
-            ]);
-
-            if (customer) {
-                customer.dueAmount = Math.max(0, customer.dueAmount - difference);
-                await customer.save();
-            }
-
-            if (wallet) {
-                wallet.totalDue -= difference;
-                wallet.pendingBalance = customer ? customer.dueAmount : Math.max(0, wallet.pendingBalance - difference);
-                await wallet.save();
-            }
-        }
-
+        // Update price but DO NOT adjust due amount yet. 
+        // It will be handled in the status transition block below.
         order.totalPrice = newTotal;
     }
 
+    // --- Update Due Amount on Acceptance (Pending -> Processing) ---
+    if (status === 'processing' && currentStatus === 'pending') {
+        const [wallet, customer] = await Promise.all([
+            Wallet.findOne({ customer: order.customer }),
+            Customer.findById(order.customer)
+        ]);
+
+        if (customer) {
+            // Calculate final amount to add to due
+            // Subtract any amount already paid via wallet
+            const amountToAdd = Math.max(0, order.totalPrice - (order.walletAmountUsed || 0));
+
+            customer.dueAmount = (customer.dueAmount || 0) + amountToAdd;
+            await customer.save();
+
+            if (wallet) {
+                wallet.totalDue += amountToAdd;
+                wallet.pendingBalance = customer.dueAmount;
+                await wallet.save();
+            }
+        }
+    }
+}
+
     // --- Handle Specific Status Actions ---
     if (status === 'cancelled') {
-        if (!cancellationReason) {
-            res.status(400);
-            throw new Error('Cancellation reason is required');
-        }
-        order.cancellationReason = cancellationReason;
+    if (!cancellationReason) {
+        res.status(400);
+        throw new Error('Cancellation reason is required');
+    }
+    order.cancellationReason = cancellationReason;
+}
+
+if (status === 'delivered') {
+    if (!req.file) {
+        res.status(400);
+        throw new Error('Delivery slip image is required for delivered status');
     }
 
-    if (status === 'delivered') {
-        if (!req.file) {
-            res.status(400);
-            throw new Error('Delivery slip image is required for delivered status');
-        }
-
-        if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-            if (req.file) fs.unlinkSync(req.file.path);
-            res.status(500);
-            throw new Error('Cloudinary configuration is missing');
-        }
-
-        try {
-            const result = await cloudinary.uploader.upload(req.file.path, {
-                folder: 'delivery_slips',
-            });
-            order.deliverySlipUrl = result.secure_url;
-            fs.unlinkSync(req.file.path); // Cleanup local file
-        } catch (error) {
-            if (req.file) fs.unlinkSync(req.file.path);
-            res.status(500);
-            throw new Error('Image upload failed');
-        }
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+        if (req.file) fs.unlinkSync(req.file.path);
+        res.status(500);
+        throw new Error('Cloudinary configuration is missing');
     }
 
-    order.status = status;
-    order.statusHistory.push({ status, timestamp: new Date() });
+    try {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'delivery_slips',
+        });
+        order.deliverySlipUrl = result.secure_url;
+        fs.unlinkSync(req.file.path); // Cleanup local file
+    } catch (error) {
+        if (req.file) fs.unlinkSync(req.file.path);
+        res.status(500);
+        throw new Error('Image upload failed');
+    }
+}
 
-    const updatedOrder = await order.save();
-    res.json(updatedOrder);
+order.status = status;
+order.statusHistory.push({ status, timestamp: new Date() });
+
+const updatedOrder = await order.save();
+res.json(updatedOrder);
 });
 
 // @desc    Get orders by customer ID

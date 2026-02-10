@@ -23,7 +23,7 @@ const StatCardSkeleton = () => (
 const AnalyticsSkeleton = () => (
     <div className="p-8 space-y-8 bg-teal-50/20">
         <Skeleton className="h-10 w-64 mx-auto mb-8" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {[1, 2, 3, 4, 5].map(i => (
                 <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
                     <Skeleton className="h-4 w-24 mb-2" />
@@ -823,51 +823,42 @@ const AdminDashboard = () => {
         { title: 'Total Medicines', count: stats.medicines, icon: <FaPills size={24} />, color: 'text-teal-600', view: 'medicines' },
         { title: 'Total Customers', count: stats.customers, icon: <FaUsers size={24} />, color: 'text-teal-600', view: 'customers' },
         { title: 'Orders', count: stats.orders, icon: <FaBoxOpen size={24} />, color: 'text-teal-600', view: 'orders' },
-        { title: 'Analytics', count: 'View', icon: <FaChartLine size={24} />, color: 'text-teal-600', view: 'analytics' }
+        { title: 'Analytics', count: 'View', icon: <FaChartLine size={24} />, color: 'text-teal-600', view: 'analytics' },
+        {
+            title: 'Total Due',
+            count: `₹${stats.totalDue?.toLocaleString('en-IN')}`,
+            icon: <FaMoneyBillWave size={24} />,
+            color: 'text-red-500',
+            view: 'due',
+            isSpecial: true
+        }
     ];
 
     return (
         <div className="space-y-8 relative">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 {loading ? (
-                    Array(4).fill(0).map((_, i) => <StatCardSkeleton key={i} />)
+                    Array(5).fill(0).map((_, i) => <StatCardSkeleton key={i} />)
                 ) : (
                     cards.map((card, index) => (
                         <div
                             key={index}
-                            onClick={() => setActiveView(card.view as any)}
-                            className={`bg-white rounded-xl shadow-card p-6 flex flex-col items-center justify-center text-center h-48 border border-teal-50 transform hover:scale-105 transition-transform duration-300 cursor-pointer ${activeView === card.view ? 'ring-2 ring-teal-500 bg-teal-50' : ''}`}
+                            onClick={() => card.isSpecial ? setDueModalOpen(true) : setActiveView(card.view as any)}
+                            className={`bg-white rounded-xl shadow-card p-4 flex flex-col items-center justify-center text-center h-48 border transition-all duration-300 cursor-pointer group hover:shadow-lg transform hover:-translate-y-1 ${activeView === card.view
+                                ? 'ring-2 ring-teal-500 bg-teal-50 border-teal-200'
+                                : 'border-teal-50'
+                                } ${card.isSpecial ? 'border-l-4 border-l-red-500' : ''}`}
                         >
-                            <div className={`mb-4 ${card.color} bg-teal-50 p-4 rounded-full`}>
+                            <div className={`mb-3 ${card.isSpecial ? 'bg-red-50 text-red-500 group-hover:bg-red-100' : 'bg-teal-50 text-teal-600'} p-3 rounded-full transition-colors`}>
                                 {card.icon}
                             </div>
-                            <h3 className="text-gray-500 font-medium mb-2">{card.title}</h3>
-                            <p className="text-4xl font-bold text-teal-800">{card.count}</p>
+                            <h3 className="text-gray-400 text-xs font-black uppercase tracking-widest mb-1">{card.title}</h3>
+                            <p className={`text-2xl font-black ${card.isSpecial ? 'text-gray-800 group-hover:text-red-600' : 'text-teal-800'}`}>{card.count}</p>
+                            {card.isSpecial && <p className="text-[9px] font-bold text-red-400 mt-2 uppercase tracking-widest">Click to view list</p>}
                         </div>
                     ))
                 )}
             </div>
-
-            {/* Total Due Card - Added Manually */}
-            {!loading && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-                    <div
-                        onClick={() => setDueModalOpen(true)}
-                        className="bg-white rounded-xl shadow-card p-6 flex flex-col items-center justify-center text-center h-48 border-l-4 border-red-500 shadow-sm hover:shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer group"
-                    >
-                        <div className="mb-4 bg-red-50 p-4 rounded-full group-hover:bg-red-100 transition-colors">
-                            <FaMoneyBillWave className="text-2xl text-red-500" />
-                        </div>
-                        <h3 className="text-gray-500 font-medium mb-1">Total Due</h3>
-                        <p className="text-3xl font-bold text-gray-800 group-hover:text-red-600 transition-colors">
-                            ₹{stats.totalDue?.toLocaleString('en-IN')}
-                        </p>
-                        <p className="text-[10px] font-bold text-red-400 mt-2 uppercase tracking-widest">Click to view list</p>
-                    </div>
-                </div>
-            )}
-
-            {/* Interactive View Area */}
             {activeView && activeView !== 'analytics' && (
                 <div className="bg-white rounded-xl shadow-lg border border-teal-100 overflow-hidden animate-fade-in-up">
                     <ListView
