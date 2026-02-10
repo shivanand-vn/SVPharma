@@ -971,7 +971,11 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory, onRecordPayment }: 
                 ? item.name.toLowerCase().includes(searchTerm.toLowerCase())
                 : type === 'orders'
                     ? item._id.toLowerCase().includes(searchTerm.toLowerCase())
-                    : true;
+                    : type === 'due'
+                        ? (item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            item.phone?.includes(searchTerm) ||
+                            (item.dueAmount || item.pendingBalance || 0).toString().includes(searchTerm))
+                        : true;
 
         const matchesCategory = categoryFilter === 'All'
             ? true
@@ -1008,9 +1012,23 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory, onRecordPayment }: 
 
             <div className="space-y-4">
                 <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
-                    {/* Filter Tabs with Counts (Category/Status) */}
-                    <div className="flex flex-wrap gap-2">
-                        {type !== 'due' && (
+                    {/* Left Side: Filter Tabs or Sort Button */}
+                    <div className="flex flex-wrap gap-2 flex-1">
+                        {type === 'due' ? (
+                            <button
+                                onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                className="w-full lg:w-72 flex items-center justify-between px-6 py-2 rounded-lg border border-teal-200 bg-white hover:bg-teal-50 transition-all group shadow-sm active:scale-95"
+                            >
+                                <span className="text-xs font-black text-teal-800 uppercase tracking-widest flex items-center gap-2">
+                                    <FaSortAmountDown className={`transition-transform duration-300 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
+                                    Sort by Amount
+                                </span>
+                                <div className="flex flex-col text-[8px] text-teal-400 group-hover:text-teal-600 transition-colors">
+                                    <FaChevronUp className={sortOrder === 'asc' ? 'text-teal-600' : ''} />
+                                    <FaChevronDown className={sortOrder === 'desc' ? 'text-teal-600' : ''} />
+                                </div>
+                            </button>
+                        ) : (
                             type === 'orders' ? (
                                 ['All', 'Pending', 'Processing', 'Shipped', 'Delivered'].map(status => (
                                     <button
@@ -1045,34 +1063,16 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory, onRecordPayment }: 
                         )}
                     </div>
 
-                    {/* Search Bar or Sort Button */}
+                    {/* Right Side: Search Bar */}
                     <div className="relative w-full lg:w-96">
-                        {type === 'due' ? (
-                            <button
-                                onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-                                className="w-full flex items-center justify-between px-6 py-2 rounded-lg border border-teal-200 bg-white hover:bg-teal-50 transition-all group shadow-sm active:scale-95"
-                            >
-                                <span className="text-xs font-black text-teal-800 uppercase tracking-widest flex items-center gap-2">
-                                    <FaSortAmountDown className={`transition-transform duration-300 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
-                                    Sort by Amount ({sortOrder === 'desc' ? 'High to Low' : 'Low to High'})
-                                </span>
-                                <div className="flex flex-col text-[8px] text-teal-400 group-hover:text-teal-600 transition-colors">
-                                    <FaChevronUp className={sortOrder === 'asc' ? 'text-teal-600' : ''} />
-                                    <FaChevronDown className={sortOrder === 'desc' ? 'text-teal-600' : ''} />
-                                </div>
-                            </button>
-                        ) : (
-                            <>
-                                <input
-                                    type="text"
-                                    placeholder={type === 'orders' ? "Search Order ID..." : `Search ${type.slice(0, -1)}...`}
-                                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-teal-200 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                                <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                            </>
-                        )}
+                        <input
+                            type="text"
+                            placeholder={type === 'due' ? "Search Name, Phone or Amount..." : type === 'orders' ? "Search Order ID..." : `Search ${type.slice(0, -1)}...`}
+                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-teal-200 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </div>
                 </div>
 
