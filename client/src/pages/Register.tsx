@@ -14,6 +14,7 @@ const Register = () => {
         address: { ...emptyAddress },
         type: 'medical', // default
     });
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
 
     // Validation State
     const [errors, setErrors] = useState({
@@ -65,11 +66,11 @@ const Register = () => {
         }));
     }, [form, touched]);
 
-    // Check if entire form is valid
     const isFormValid =
         !errors.name && !errors.email && !errors.phone &&
         form.name && form.email && form.phone &&
-        form.address.city && form.address.state && form.address.pincode && form.address.district;
+        form.address.city && form.address.state && form.address.pincode && form.address.district &&
+        acceptedTerms;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -87,7 +88,10 @@ const Register = () => {
 
         setSubmitting(true);
         try {
-            await api.post('/auth/request-connection', form);
+            await api.post('/auth/request-connection', {
+                ...form,
+                termsAcceptedAt: new Date()
+            });
             setSuccess('Request sent successfully! Our team will review your application.');
             setGeneralError('');
             // Reset form
@@ -98,6 +102,7 @@ const Register = () => {
                 address: { ...emptyAddress },
                 type: 'medical',
             });
+            setAcceptedTerms(false);
             setTouched({ name: false, email: false, phone: false });
         } catch (err: any) {
             setGeneralError(err.response?.data?.message || 'Registration failed');
@@ -263,13 +268,27 @@ const Register = () => {
                                     />
                                 </div>
 
-                                <button
-                                    type="submit"
-                                    disabled={submitting || !isFormValid}
-                                    className={`w-full text-white font-bold py-4 rounded-xl shadow-lg transition-all transform flex items-center justify-center gap-2 ${submitting || !isFormValid ? 'bg-gray-300 cursor-not-allowed shadow-none' : 'bg-teal-600 hover:bg-teal-700 hover:shadow-xl hover:-translate-y-0.5'}`}
-                                >
-                                    {submitting ? 'Sending Request...' : 'Submit Request'}
-                                </button>
+                                <div className="space-y-4">
+                                    <label className="flex items-start gap-3 cursor-pointer group">
+                                        <input
+                                            type="checkbox"
+                                            checked={acceptedTerms}
+                                            onChange={(e) => setAcceptedTerms(e.target.checked)}
+                                            className="mt-1 h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500 transition-all cursor-pointer"
+                                        />
+                                        <span className="text-xs text-gray-500 font-medium leading-relaxed group-hover:text-gray-700 transition-colors">
+                                            I agree to the <Link to="/privacy-policy" className="text-teal-600 font-bold hover:underline">Privacy Policy</Link> and <Link to="/terms-of-service" className="text-teal-600 font-bold hover:underline">Terms of Service</Link>
+                                        </span>
+                                    </label>
+
+                                    <button
+                                        type="submit"
+                                        disabled={submitting || !isFormValid}
+                                        className={`w-full text-white font-bold py-4 rounded-xl shadow-lg transition-all transform flex items-center justify-center gap-2 ${submitting || !isFormValid ? 'bg-gray-300 cursor-not-allowed shadow-none' : 'bg-teal-600 hover:bg-teal-700 hover:shadow-xl hover:-translate-y-0.5'}`}
+                                    >
+                                        {submitting ? 'Sending Request...' : 'Submit Request'}
+                                    </button>
+                                </div>
                             </form>
                         )}
 

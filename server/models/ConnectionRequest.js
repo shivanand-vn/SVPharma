@@ -25,7 +25,8 @@ const connectionRequestSchema = new mongoose.Schema({
         enum: ['pending', 'approved', 'rejected'],
         default: 'pending'
     },
-    rejectionReason: { type: String }
+    rejectionReason: { type: String },
+    termsAcceptedAt: { type: Date }
 }, { timestamps: true });
 
 const ConnectionRequest = mongoose.model('ConnectionRequest', connectionRequestSchema);

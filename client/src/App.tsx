@@ -22,6 +22,8 @@ import CustomerDashboard from './pages/customer/Dashboard';
 import { CartProvider } from './context/CartContext';
 import Cart from './pages/customer/Cart';
 import CustomerOrders from './pages/customer/Orders';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 const PrivateRoute = ({ children, role }: { children: React.ReactNode, role: string }) => {
   const { user, loading } = React.useContext(AuthContext);
@@ -53,6 +55,8 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-username" element={<ForgotUsername />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
 
               {/* Admin Routes */}
               <Route path="/admin" element={

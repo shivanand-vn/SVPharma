@@ -133,7 +133,8 @@ const updateConnectionRequestStatus = asyncHandler(async (req, res) => {
                 type: request.type, // Map 'Medical Store' to 'Medical' or keep as is? User registration uses 'medical'
                 username,
                 password: rawPassword, // will be hashed by pre-save hook
-                status: 'approved'
+                status: 'approved',
+                termsAcceptedAt: request.termsAcceptedAt
             });
 
             await Wallet.create({ customer: customer._id });
@@ -229,7 +230,8 @@ const addCustomer = asyncHandler(async (req, res) => {
         type,
         username,
         password: rawPassword,
-        status: 'approved'
+        status: 'approved',
+        termsAcceptedAt: new Date()
     });
 
     await Wallet.create({ customer: customer._id });

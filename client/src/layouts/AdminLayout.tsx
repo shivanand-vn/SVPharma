@@ -3,6 +3,7 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
 import { FaSignOutAlt, FaChartPie, FaPlus, FaUserPlus, FaBox, FaCreditCard } from 'react-icons/fa';
+import Footer from '../components/Footer';
 
 
 const AdminLayout = () => {
@@ -123,26 +124,14 @@ const AdminLayout = () => {
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-auto p-8 relative">
-                    <Outlet />
+                <main className="flex-1 overflow-auto p-8 relative flex flex-col">
+                    <div className="flex-1">
+                        <Outlet />
+                    </div>
 
-                    {/* Admin Footer */}
-                    <div className="mt-8 pt-8 border-t border-teal-200 flex justify-between items-center text-xs font-bold text-teal-600 uppercase tracking-widest opacity-60">
-                        <p>© {new Date().getFullYear()} {settings?.appName || 'Shree Veerabhadreshwara Pharma'}</p>
-                        <div className="text-right">
-                            <p>Admin Control Panel v2.1</p>
-                            <p className="mt-1">
-                                Developed by{' '}
-                                <a
-                                    href={settings?.developerProfileLink || '#'}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-teal-800 hover:text-teal-900 transition-colors underline decoration-teal-200 underline-offset-2"
-                                >
-                                    {settings?.developerName || 'Shivanand VN'}
-                                </a>
-                            </p>
-                        </div>
+                    {/* Global Footer */}
+                    <div className="mt-auto pt-10">
+                        <Footer />
                     </div>
                 </main>
             </div>

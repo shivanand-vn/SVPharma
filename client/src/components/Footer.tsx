@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { FaFacebook, FaInstagram, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaEdit, FaPills, FaHeartbeat, FaPlus } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
@@ -268,8 +269,8 @@ const Footer = () => {
                         &copy; {new Date().getFullYear()} <span className="text-gray-300">{settings.appName}</span>. All rights reserved.
                     </p>
                     <div className="flex gap-8 text-xs font-black text-gray-500 uppercase tracking-[0.2em]">
-                        <button className="hover:text-teal-500 transition-colors">Privacy Policy</button>
-                        <button className="hover:text-teal-500 transition-colors">Terms of Service</button>
+                        <Link to="/privacy-policy" className="hover:text-teal-500 transition-colors">Privacy Policy</Link>
+                        <Link to="/terms-of-service" className="hover:text-teal-500 transition-colors">Terms of Service</Link>
                     </div>
                 </div>
             </div>

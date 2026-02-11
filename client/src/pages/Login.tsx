@@ -114,6 +114,11 @@ const Login = () => {
                         <p>New Pharmacy?</p>
                         <Link to="/register" className="text-primary font-bold hover:underline mt-1 inline-block">Request Connection</Link>
                     </div>
+
+                    <div className="mt-6 pt-6 border-t border-gray-100 flex justify-center gap-6 text-[10px] uppercase font-black tracking-widest text-gray-400">
+                        <Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+                        <Link to="/terms-of-service" className="hover:text-primary transition-colors">Terms of Service</Link>
+                    </div>
                 </div>
             </div>
         </div>

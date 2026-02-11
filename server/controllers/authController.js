@@ -12,13 +12,18 @@ const { validatePassword, generateOTP } = require('../utils/passwordUtils');
 // @route   POST /api/auth/request-connection
 // @access  Public
 const requestConnection = asyncHandler(async (req, res) => {
-    const { name, email, phone, address, type } = req.body;
+    const { name, email, phone, address, type, termsAcceptedAt } = req.body;
 
     // Strict Mobile Number Validation
     const phoneRegex = /^[6-9]\d{9}$/;
     if (!phoneRegex.test(phone)) {
         res.status(400);
         throw new Error('Invalid mobile number. Must be exactly 10 digits and start with 6, 7, 8, or 9.');
+    }
+
+    if (!termsAcceptedAt) {
+        res.status(400);
+        throw new Error('You must accept the Privacy Policy and Terms of Service.');
     }
 
 
@@ -54,7 +59,8 @@ const requestConnection = asyncHandler(async (req, res) => {
         phone,
         address,
         type,
-        status: 'pending'
+        status: 'pending',
+        termsAcceptedAt
     });
 
     if (request) {
