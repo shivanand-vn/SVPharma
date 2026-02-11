@@ -115,12 +115,12 @@ const CustomerOrders = () => {
                                             {order.isAdminModified && (
                                                 <p className="text-[10px] font-bold text-gray-400 line-through flex items-center gap-0.5">
                                                     <FaRupeeSign size={8} />
-                                                    {order.originalTotalPrice.toFixed(2)}
+                                                    {order.originalTotalPrice}
                                                 </p>
                                             )}
                                             <p className="text-sm font-black text-primary flex items-center gap-1">
                                                 <FaRupeeSign className="text-primary" />
-                                                {order.totalPrice.toFixed(2)}
+                                                {order.totalPrice}
                                             </p>
                                         </div>
                                     </div>
@@ -206,7 +206,7 @@ const CustomerOrders = () => {
                                         <div>
                                             <p className="text-xs font-black text-amber-700 uppercase tracking-tight">Admin Modified Order</p>
                                             <p className="text-[10px] text-amber-600 font-bold uppercase tracking-widest mt-1">
-                                                The payable amount was {order.totalPrice > order.originalTotalPrice ? 'increased' : 'reduced'} by ₹{Math.abs(order.originalTotalPrice - order.totalPrice).toFixed(2)}. Original total was ₹{order.originalTotalPrice.toFixed(2)} and the new total is ₹{order.totalPrice.toFixed(2)}.
+                                                The payable amount was {order.totalPrice > order.originalTotalPrice ? 'increased' : 'reduced'} by ₹{Math.abs(order.originalTotalPrice - order.totalPrice)}. Original total was ₹{order.originalTotalPrice} and the new total is ₹{order.totalPrice}.
                                             </p>
                                         </div>
                                     </div>

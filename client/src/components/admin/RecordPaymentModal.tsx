@@ -56,7 +56,7 @@ const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({ isOpen, onClose
                         <div>
                             <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Customer</p>
                             <p className="font-bold text-teal-900">{customer.name}</p>
-                            <p className="text-xs font-medium text-gray-500">Current Due: <span className="text-red-600 font-bold">₹{currentDue.toLocaleString('en-IN')}</span></p>
+                            <p className="text-xs font-medium text-gray-500">Current Due: <span className="text-red-600 font-bold">₹{currentDue}</span></p>
                         </div>
                     </div>
 

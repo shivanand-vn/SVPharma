@@ -297,7 +297,7 @@ const AdminOrders = () => {
                                                 </div>
                                                 <div className="flex items-center gap-1.5 text-[10px] font-black text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg uppercase tracking-wider">
                                                     <FaRupeeSign size={10} />
-                                                    {order.totalPrice.toFixed(2)}
+                                                    {order.totalPrice}
                                                 </div>
                                             </div>
                                         </div>
@@ -712,7 +712,7 @@ const AdminOrders = () => {
                                                                         </p>
                                                                     </div>
                                                                 </div>
-                                                                <p className="text-[10px] font-black text-amber-700">₹{(ret.price * ret.quantity).toFixed(2)}</p>
+                                                                <p className="text-[10px] font-black text-amber-700">₹{ret.price * ret.quantity}</p>
                                                             </div>
                                                             <p className="text-[9px] font-bold text-amber-600 bg-white/50 p-2 rounded-lg border border-amber-100/50">
                                                                 Reason: {ret.reason}
@@ -732,7 +732,7 @@ const AdminOrders = () => {
                                                     <div>
                                                         <p className="text-[9px] font-black text-amber-700 uppercase tracking-tight">Admin Modified Order</p>
                                                         <p className="text-[9px] text-amber-600 font-bold uppercase tracking-widest mt-1">
-                                                            The payable amount was {selectedOrder.totalPrice > selectedOrder.originalTotalPrice ? 'increased' : 'reduced'} by ₹{Math.abs(selectedOrder.originalTotalPrice - selectedOrder.totalPrice).toFixed(2)}. Original total was ₹{selectedOrder.originalTotalPrice.toFixed(2)} and the new total is ₹{selectedOrder.totalPrice.toFixed(2)}.
+                                                            The payable amount was {selectedOrder.totalPrice > selectedOrder.originalTotalPrice ? 'increased' : 'reduced'} by ₹{Math.abs(selectedOrder.originalTotalPrice - selectedOrder.totalPrice)}. Original total was ₹{selectedOrder.originalTotalPrice} and the new total is ₹{selectedOrder.totalPrice}.
                                                         </p>
                                                     </div>
                                                 </div>
@@ -741,9 +741,9 @@ const AdminOrders = () => {
                                                 <span className="text-[10px] font-black uppercase tracking-widest">Total Amount</span>
                                                 <div className="flex items-center gap-3">
                                                     {selectedOrder.isAdminModified && (
-                                                        <span className="text-xs font-bold text-white/50 line-through">₹{selectedOrder.originalTotalPrice.toFixed(2)}</span>
+                                                        <span className="text-xs font-bold text-white/50 line-through">₹{selectedOrder.originalTotalPrice}</span>
                                                     )}
-                                                    <span className="text-xl font-black">₹{selectedOrder.totalPrice.toFixed(2)}</span>
+                                                    <span className="text-xl font-black">₹{selectedOrder.totalPrice}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -909,7 +909,7 @@ const AdminOrders = () => {
                                             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                                 <div className="space-y-1">
                                                     <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest opacity-60">Financial Review</p>
-                                                    <p className="text-3xl font-black text-amber-800 tracking-tighter">₹{returnItems.reduce((acc, item) => acc + (item.price * item.returnQuantity), 0).toFixed(2)}</p>
+                                                    <p className="text-3xl font-black text-amber-800 tracking-tighter">₹{returnItems.reduce((acc, item) => acc + (item.price * item.returnQuantity), 0)}</p>
                                                     <p className="text-[9px] text-amber-600 font-bold uppercase tracking-[0.1em] mt-1 italic">* This amount will be adjusted in customer's due amount</p>
                                                 </div>
                                                 <button
@@ -958,7 +958,7 @@ const AdminOrders = () => {
                                     <div className="text-right space-y-1">
                                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-tight">Approved Total</p>
                                         <p className="text-xl font-black text-blue-600 tracking-tighter">
-                                            ₹{editedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(2)}
+                                            ₹{editedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)}
                                         </p>
                                     </div>
                                 </div>
