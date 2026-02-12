@@ -821,7 +821,7 @@ const AdminDashboard = () => {
         { title: 'Analytics', count: 'View', icon: <FaChartLine size={24} />, color: 'text-teal-600', view: 'analytics' },
         {
             title: 'Total Due',
-            count: `₹${stats.totalDue}`,
+            count: `₹${Number(stats.totalDue || 0).toFixed(2)}`,
             icon: <FaMoneyBillWave size={24} />,
             color: 'text-red-500',
             view: 'due',

@@ -89,7 +89,7 @@ const Cart = () => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h3 className="font-black text-lg md:text-xl text-gray-800 mb-1 truncate">{item.name}</h3>
-                                        <p className="text-sm text-primary font-black tracking-tight">₹{item.cost || item.price}</p>
+                                        <p className="text-sm text-primary font-black tracking-tight">₹{(item.cost || item.price).toFixed(2)}</p>
                                     </div>
                                 </div>
 
@@ -191,7 +191,7 @@ const Cart = () => {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[10px] font-black text-teal-600 uppercase tracking-[0.2em] mb-1">Total Amount</p>
-                                    <p className="text-2xl font-black text-primary">₹{orderData?.totalPrice !== undefined ? orderData.totalPrice : cartTotal}</p>
+                                    <p className="text-2xl font-black text-primary">₹{(orderData?.totalPrice !== undefined ? orderData.totalPrice : cartTotal).toFixed(2)}</p>
                                 </div>
                             </div>
 

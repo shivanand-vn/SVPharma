@@ -78,7 +78,7 @@ const CustomerPayment = () => {
         const val = e.target.value;
         if (/^\d*\.?\d*$/.test(val)) {
             if (Number(val) > displayDue) {
-                showNotification(`Amount cannot exceed total due (₹${displayDue})`, 'warning');
+                showNotification(`Amount cannot exceed total due (₹${displayDue.toFixed(2)})`, 'warning');
             } else {
                 setAmount(val);
             }
