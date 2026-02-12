@@ -249,7 +249,23 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 // @route   GET /api/orders/customer/:customerId
 // @access  Private/Admin
 const getOrdersByCustomer = asyncHandler(async (req, res) => {
-    const orders = await Order.find({ customer: req.params.customerId })
+    const { range = 'all' } = req.query;
+    const query = { customer: req.params.customerId };
+
+    if (range !== 'all') {
+        let startDate = new Date();
+        if (range === 'weekly') {
+            startDate.setDate(startDate.getDate() - 7);
+        } else if (range === 'monthly') {
+            startDate.setDate(startDate.getDate() - 30);
+        } else if (range === 'yearly') {
+            startDate.setFullYear(startDate.getFullYear() - 1);
+        }
+        startDate.setHours(0, 0, 0, 0);
+        query.createdAt = { $gte: startDate };
+    }
+
+    const orders = await Order.find(query)
         .populate('customer', 'id name type email phone')
         .sort({ createdAt: -1 });
     res.json(orders);

@@ -396,37 +396,98 @@ const verifyOTPAndDeleteCustomer = asyncHandler(async (req, res) => {
 // @route   GET /api/admin/analytics
 // @access  Private/Admin
 const getDashboardAnalytics = asyncHandler(async (req, res) => {
-    // 1. Sales Analytics (Total revenue and order count)
-    const orders = await Order.find({ status: { $ne: 'cancelled' } });
+    const { filterType = 'monthly', year = new Date().getFullYear(), month = new Date().getMonth() } = req.query;
+
+    const selectedYear = parseInt(year);
+    const selectedMonth = parseInt(month);
+
+    let startDate, endDate;
+    let grouping = 'daily';
+
+    if (filterType === 'monthly') {
+        startDate = new Date(selectedYear, selectedMonth, 1);
+        endDate = new Date(selectedYear, selectedMonth + 1, 0, 23, 59, 59, 999);
+        grouping = 'daily';
+    } else if (filterType === 'yearly') {
+        startDate = new Date(selectedYear, 0, 1);
+        endDate = new Date(selectedYear, 11, 31, 23, 59, 59, 999);
+        grouping = 'monthly';
+    } else {
+        // Fallback to current month if invalid
+        startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        endDate = new Date();
+        grouping = 'daily';
+    }
+
+    // 1. Sales Analytics (Total revenue and order count for the specific period)
+    const orders = await Order.find({
+        status: { $ne: 'cancelled' },
+        createdAt: { $gte: startDate, $lte: endDate }
+    });
 
     const totalRevenue = orders.reduce((acc, order) => acc + order.totalPrice, 0);
     const totalOrders = orders.length;
 
-    // 2. Sales by Date (last 7 days)
-    const last7Days = [];
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        date.setHours(0, 0, 0, 0);
-        last7Days.push({
-            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            fullDate: date,
-            revenue: 0,
-            orders: 0
+    // 2. Sales Trends based on grouping
+    const salesTrends = [];
+    if (grouping === 'daily') {
+        // Generate all days for the selected month
+        const daysInMonth = endDate.getDate();
+        for (let i = 1; i <= daysInMonth; i++) {
+            const date = new Date(selectedYear, selectedMonth, i);
+            salesTrends.push({
+                date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                day: i,
+                revenue: 0,
+                orders: 0
+            });
+        }
+
+        orders.forEach(order => {
+            const orderDate = new Date(order.createdAt);
+            // Match by day of month, considering the order's local date
+            const orderDay = orderDate.getDate();
+            const orderMonth = orderDate.getMonth();
+            const orderYear = orderDate.getFullYear();
+
+            // Only match if the order is in the selected month and year
+            if (orderYear === selectedYear && orderMonth === selectedMonth) {
+                const match = salesTrends.find(d => d.day === orderDay);
+                if (match) {
+                    match.revenue += order.totalPrice;
+                    match.orders += 1;
+                }
+            }
+        });
+    } else if (grouping === 'monthly') {
+        // Generate all 12 months for the year
+        for (let i = 0; i < 12; i++) {
+            const date = new Date(selectedYear, i, 1);
+            salesTrends.push({
+                date: date.toLocaleDateString('en-US', { month: 'short' }),
+                monthIndex: i,
+                revenue: 0,
+                orders: 0
+            });
+        }
+
+        orders.forEach(order => {
+            const orderDate = new Date(order.createdAt);
+            const orderMonth = orderDate.getMonth();
+            const orderYear = orderDate.getFullYear();
+
+            // Only match if the order is in the selected year
+            if (orderYear === selectedYear) {
+                const match = salesTrends.find(m => m.monthIndex === orderMonth);
+                if (match) {
+                    match.revenue += order.totalPrice;
+                    match.orders += 1;
+                }
+            }
         });
     }
 
-    orders.forEach(order => {
-        const orderDate = new Date(order.createdAt);
-        orderDate.setHours(0, 0, 0, 0);
-        const dayMatch = last7Days.find(d => d.fullDate.getTime() === orderDate.getTime());
-        if (dayMatch) {
-            dayMatch.revenue += order.totalPrice;
-            dayMatch.orders += 1;
-        }
-    });
-
-    // 3. Top Customers (by total spend)
+    // 3. Top Customers (by total spend in period)
     const customerSpend = {};
     orders.forEach(order => {
         const customerId = order.customer.toString();
@@ -437,17 +498,17 @@ const getDashboardAnalytics = asyncHandler(async (req, res) => {
         .sort(([, a], [, b]) => b - a)
         .slice(0, 5);
 
-    const topCustomers = await Promise.resolve(
-        Promise.all(topCustomersRaw.map(async ([id, spend]) => {
+    const topCustomers = await Promise.all(
+        topCustomersRaw.map(async ([id, spend]) => {
             const customer = await Customer.findById(id).select('name');
             return {
                 name: customer ? customer.name : 'Unknown',
-                spend: Math.round(spend * 100) / 100
+                spend: spend
             };
-        }))
+        })
     );
 
-    // 4. Best Selling Products (by quantity)
+    // 4. Best Selling Products (by quantity in period)
     const productSales = {};
     orders.forEach(order => {
         order.items.forEach(item => {
@@ -478,13 +539,13 @@ const getDashboardAnalytics = asyncHandler(async (req, res) => {
 
     const salesByCategory = Object.entries(categorySales).map(([name, value]) => ({
         name,
-        value: Math.round(value * 100) / 100
+        value: value
     }));
 
     res.json({
-        totalRevenue: Math.round(totalRevenue * 100) / 100,
+        totalRevenue: totalRevenue,
         totalOrders,
-        salesTrends: last7Days.map(({ date, revenue, orders }) => ({ date, revenue, orders })),
+        salesTrends: salesTrends.map(({ date, revenue, orders }) => ({ date, revenue, orders })),
         topCustomers,
         bestSellingProducts,
         salesByCategory

@@ -11,6 +11,7 @@ import Footer from '../components/Footer';
 import api from '../utils/api';
 import StructuredAddressForm from '../components/StructuredAddressForm';
 import { normalizeAddress, formatAddress } from '../types/address';
+import Logo from '../assets/Logo.png';
 
 const CustomerLayout = () => {
     const { logout, user, updateUser } = useContext(AuthContext);
@@ -200,7 +201,7 @@ const CustomerLayout = () => {
                         <div className="hidden md:flex flex-1 items-center gap-6 relative">
                             <div className="flex items-center">
                                 <Link to="/customer" className="flex items-center gap-3">
-                                    <img src="/logo.png" alt="Logo" className="h-12 w-auto drop-shadow-sm transform hover:scale-105 transition-transform" />
+                                    <img src={Logo} alt="Logo" className="h-12 w-auto drop-shadow-sm transform hover:scale-105 transition-transform" />
                                 </Link>
                             </div>
                             <div className="flex-1 text-center pr-20">
@@ -214,7 +215,7 @@ const CustomerLayout = () => {
                         {/* Mobile Row 2: (Logo, SearchBar, Actions) */}
                         <div className="flex flex-1 items-center gap-2 md:hidden">
                             <Link to="/customer" className="flex items-center">
-                                <img src="/logo.png" alt="Logo" className="h-7 w-auto drop-shadow-sm" />
+                                <img src={Logo} alt="Logo" className="h-7 w-auto drop-shadow-sm" />
                             </Link>
 
                             <div className="flex-1 min-w-0">
