@@ -157,7 +157,7 @@ const submitOfflinePayment = asyncHandler(async (req, res) => {
         status: 'approved',
         proofUrl: 'offline_payment',
         originalDueAmount: originalDue,
-        remainingDueAmount: originalDue - amount,
+        remainingDueAmount: Math.round((originalDue - amount) * 100) / 100,
         auditLogs: [{
             action: 'created_offline',
             performerModel: 'Admin',
@@ -167,7 +167,7 @@ const submitOfflinePayment = asyncHandler(async (req, res) => {
     });
 
     // 1. Reduce Customer Due Amount
-    customer.dueAmount = Math.max(0, (customer.dueAmount || 0) - amount);
+    customer.dueAmount = Math.max(0, Math.round(((customer.dueAmount || 0) - amount) * 100) / 100);
     await customer.save();
 
     // 2. Sync Wallet & History
@@ -214,7 +214,7 @@ const approvePayment = asyncHandler(async (req, res) => {
     // 1. Update Payment
     payment.status = 'approved';
     payment.originalDueAmount = originalDue;
-    payment.remainingDueAmount = Math.max(0, originalDue - payment.amount);
+    payment.remainingDueAmount = Math.max(0, Math.round((originalDue - payment.amount) * 100) / 100);
     payment.auditLogs.push({
         action: 'approved',
         performerModel: 'Admin',
@@ -224,7 +224,7 @@ const approvePayment = asyncHandler(async (req, res) => {
     await payment.save();
 
     // 2. Update Customer Balance
-    customer.dueAmount = Math.max(0, (customer.dueAmount || 0) - payment.amount);
+    customer.dueAmount = Math.max(0, Math.round(((customer.dueAmount || 0) - payment.amount) * 100) / 100);
     await customer.save();
 
     // 3. Sync Wallet

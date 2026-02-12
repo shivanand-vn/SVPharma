@@ -442,7 +442,7 @@ const getDashboardAnalytics = asyncHandler(async (req, res) => {
             const customer = await Customer.findById(id).select('name');
             return {
                 name: customer ? customer.name : 'Unknown',
-                spend: spend
+                spend: Math.round(spend * 100) / 100
             };
         }))
     );
@@ -478,11 +478,11 @@ const getDashboardAnalytics = asyncHandler(async (req, res) => {
 
     const salesByCategory = Object.entries(categorySales).map(([name, value]) => ({
         name,
-        value: value
+        value: Math.round(value * 100) / 100
     }));
 
     res.json({
-        totalRevenue: totalRevenue,
+        totalRevenue: Math.round(totalRevenue * 100) / 100,
         totalOrders,
         salesTrends: last7Days.map(({ date, revenue, orders }) => ({ date, revenue, orders })),
         topCustomers,

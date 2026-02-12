@@ -173,7 +173,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
         // Update items and recalculate
         order.items = modifiedItems;
-        const newTotal = order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+        const newTotal = Math.round(order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0) * 100) / 100;
 
         // Update price but DO NOT adjust due amount yet. 
         // It will be handled in the status transition block below.
@@ -192,7 +192,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
             // Subtract any amount already paid via wallet
             const amountToAdd = Math.max(0, order.totalPrice - (order.walletAmountUsed || 0));
 
-            customer.dueAmount = (customer.dueAmount || 0) + amountToAdd;
+            customer.dueAmount = Math.round(((customer.dueAmount || 0) + amountToAdd) * 100) / 100;
             await customer.save();
 
             if (wallet) {
@@ -328,7 +328,7 @@ const processOrderReturn = asyncHandler(async (req, res) => {
     if (pendingAmount > 0) {
         if (totalReturnValue <= pendingAmount) {
             pendingReduced = totalReturnValue;
-            customer.dueAmount = Math.max(0, (customer.dueAmount || 0) - totalReturnValue);
+            customer.dueAmount = Math.max(0, Math.round(((customer.dueAmount || 0) - totalReturnValue) * 100) / 100);
             wallet.totalDue -= totalReturnValue;
         } else {
             pendingReduced = pendingAmount;
