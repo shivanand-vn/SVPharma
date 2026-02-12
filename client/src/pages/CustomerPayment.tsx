@@ -215,7 +215,7 @@ const CustomerPayment = () => {
                     <p className="text-teal-100 text-[10px] font-black uppercase tracking-[0.2em] mb-3">Total Outstanding Due</p>
                     <div className="flex items-baseline gap-2">
                         <span className="text-4xl font-black opacity-60">₹</span>
-                        <span className="text-6xl md:text-7xl font-black tracking-tighter">{displayDue}</span>
+                        <span className="text-6xl md:text-7xl font-black tracking-tighter">{displayDue.toFixed(2)}</span>
                     </div>
                     <div className="mt-8 flex items-center gap-2 text-[10px] font-bold text-teal-100/60 uppercase tracking-widest bg-black/10 w-fit px-4 py-2 rounded-xl backdrop-blur-sm">
                         <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
@@ -340,7 +340,7 @@ const CustomerPayment = () => {
                                         <div className="flex justify-between items-start">
                                             <div>
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-xl font-black text-gray-800 tracking-tight">₹{payment.amount}</span>
+                                                    <span className="text-xl font-black text-gray-800 tracking-tight">₹{payment.amount.toFixed(2)}</span>
                                                     {payment.paymentMethod === 'CASH' && (
                                                         <span className="text-[7px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-md font-black uppercase tracking-wider border border-amber-100">Offline</span>
                                                     )}

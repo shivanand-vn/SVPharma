@@ -338,7 +338,7 @@ const AdminPayments = () => {
                                             <td className="px-6 py-6 whitespace-nowrap">
                                                 <div className="flex flex-col">
                                                     <span className={`text-lg font-black tracking-tighter ${payment.status === 'approved' ? 'text-green-600' : 'text-slate-900'}`}>
-                                                        ₹{payment.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                                        ₹{payment.amount.toFixed(2)}
                                                     </span>
                                                     {payment.transactionId && (
                                                         <span className="text-[9px] font-mono text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 w-fit mt-1">
@@ -433,7 +433,7 @@ const AdminPayments = () => {
                                 <div className="flex justify-between items-end">
                                     <div className="space-y-1">
                                         <p className="text-xs font-bold text-slate-500">{selectedPayment.customer?.name}</p>
-                                        <p className="text-2xl font-black text-slate-900 tracking-tighter">₹{selectedPayment.amount.toLocaleString()}</p>
+                                        <p className="text-2xl font-black text-slate-900 tracking-tighter">₹{selectedPayment.amount.toFixed(2)}</p>
                                     </div>
                                     <div className="h-8 w-8 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
                                         <FaMoneyBillWave size={16} />
@@ -570,7 +570,7 @@ const AdminPayments = () => {
                                 <div className="grid gap-4">
                                     {[
                                         { icon: <FaUser />, label: "Customer", value: selectedPayment.customer?.name },
-                                        { icon: <FaMoneyBillWave />, label: "Paid Amount", value: `₹${selectedPayment.amount.toLocaleString()}`, highlight: true },
+                                        { icon: <FaMoneyBillWave />, label: "Paid Amount", value: `₹${selectedPayment.amount.toFixed(2)}`, highlight: true },
                                         { icon: <FaFileInvoiceDollar />, label: "Transaction ID", value: selectedPayment.transactionId || "N/A", mono: true },
                                         { icon: <FaCalendarAlt />, label: "Date & Time", value: `${new Date(selectedPayment.createdAt).toLocaleDateString()} ${new Date(selectedPayment.createdAt).toLocaleTimeString()}` }
                                     ].map((detail, idx) => (
@@ -647,7 +647,7 @@ const AdminPayments = () => {
                                 {offlineForm.customerId && (
                                     <div className="flex justify-between items-center px-2">
                                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Due Balance</span>
-                                        <span className="text-xs font-black text-teal-600">₹{selectedCustDue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                                        <span className="text-xs font-black text-teal-600">₹{selectedCustDue.toFixed(2)}</span>
                                     </div>
                                 )}
                             </div>
@@ -697,7 +697,7 @@ const AdminPayments = () => {
                         <div className="text-center space-y-3">
                             <h3 className="text-2xl font-black text-gray-800 tracking-tight">Confirm Cash</h3>
                             <p className="text-sm text-gray-500 font-medium leading-relaxed px-2">
-                                Are you sure you want to record a cash payment of <span className="text-green-600 font-black">₹{Number(offlineForm.amount).toLocaleString()}</span>?
+                                Are you sure you want to record a cash payment of <span className="text-green-600 font-black">₹{Number(offlineForm.amount).toFixed(2)}</span>?
                             </p>
                         </div>
                         <div className="p-4 bg-teal-50 rounded-2xl border border-teal-100">

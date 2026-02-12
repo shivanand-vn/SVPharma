@@ -110,7 +110,7 @@ const Cart = () => {
                                             <FaPlus size={10} />
                                         </button>
                                     </div>
-                                    <div className="font-black text-xl md:text-2xl text-gray-800 md:w-24 text-right tracking-tight">₹{(item.cost || item.price) * item.quantity}</div>
+                                    <div className="font-black text-xl md:text-2xl text-gray-800 md:w-24 text-right tracking-tight">₹{((item.cost || item.price) * item.quantity).toFixed(2)}</div>
                                     <button
                                         onClick={() => removeFromCart(item._id)}
                                         className="p-2 md:p-3 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl md:rounded-2xl transition-all active:scale-95"
@@ -131,7 +131,7 @@ const Cart = () => {
                                 <div className="space-y-4 md:space-y-5 mb-8 md:mb-10">
                                     <div className="flex justify-between text-gray-400 font-bold uppercase text-[10px] md:text-xs tracking-widest">
                                         <span>Subtotal</span>
-                                        <span className="text-gray-800">₹{cartTotal}</span>
+                                        <span className="text-gray-800">₹{cartTotal.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between text-gray-400 font-bold uppercase text-[10px] md:text-xs tracking-widest">
                                         <span>Tax estimate</span>
@@ -139,7 +139,7 @@ const Cart = () => {
                                     </div>
                                     <div className="pt-6 border-t border-gray-100 flex justify-between items-end">
                                         <span className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-widest pb-1">Order Total</span>
-                                        <span className="text-3xl md:text-4xl font-black text-primary tracking-tight">₹{cartTotal}</span>
+                                        <span className="text-3xl md:text-4xl font-black text-primary tracking-tight">₹{cartTotal.toFixed(2)}</span>
                                     </div>
                                 </div>
 

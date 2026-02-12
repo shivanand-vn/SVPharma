@@ -51,7 +51,7 @@ const MedicineDetailsModal = ({ med, onClose, cartItems, addToCart, updateQuanti
                         <div className="flex justify-between items-start gap-4 mb-2">
                             <h2 className="text-2xl font-black text-gray-900 leading-tight">{med.name}</h2>
                             <div className="flex flex-col items-end">
-                                <span className="text-2xl font-black text-teal-600">₹{med.cost || med.price}</span>
+                                <span className="text-2xl font-black text-teal-600">₹{(med.cost || med.price).toFixed(2)}</span>
                                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cost</span>
                             </div>
                         </div>
@@ -132,11 +132,11 @@ const MedicineCard = ({ med, cartItems, addToCart, updateQuantity, isCompact = f
                     <div className="flex flex-col">
                         <div className="flex items-baseline gap-1">
                             <span className="text-[10px] font-bold text-gray-500 uppercase">Cost:</span>
-                            <span className="text-xs sm:text-xl font-black text-teal-600">₹{med.cost || med.price}</span>
+                            <span className="text-xs sm:text-xl font-black text-teal-600">₹{(med.cost || med.price).toFixed(2)}</span>
                         </div>
                         {!hideOffers && med.mrp && (
                             <p className="text-[8px] sm:text-[10px] text-gray-400 font-bold">
-                                MRP: <span>₹{med.mrp}</span>
+                                MRP: <span>₹{med.mrp.toFixed(2)}</span>
                             </p>
                         )}
                     </div>

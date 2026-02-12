@@ -55,7 +55,7 @@ const DueCustomersModal: React.FC<DueCustomersModalProps> = ({ isOpen, onClose, 
                         <div>
                             <h2 className="text-2xl font-black tracking-tight">Outstanding Dues</h2>
                             <p className="text-xs font-medium opacity-80 uppercase tracking-widest mt-1">
-                                Total: ₹{totalDueInList} • {filteredCustomers.length} Customers
+                                Total: ₹{totalDueInList.toFixed(2)} • {filteredCustomers.length} Customers
                             </p>
                         </div>
                     </div>
@@ -118,7 +118,7 @@ const DueCustomersModal: React.FC<DueCustomersModalProps> = ({ isOpen, onClose, 
                                         <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto">
                                             <div className="text-right">
                                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Due Amount</p>
-                                                <p className="text-lg font-black text-red-600 tracking-tighter">₹{due}</p>
+                                                <p className="text-lg font-black text-red-600 tracking-tighter">₹{due.toFixed(2)}</p>
                                             </div>
                                             <button
                                                 onClick={() => onRecordPayment(customer)}

@@ -234,7 +234,7 @@ const CustomerLayout = () => {
                                         <FaWallet className={`text-sm sm:text-lg ${walletCredit > 0 ? 'text-amber-500' : 'text-teal-600'}`} />
                                         {(displayDue > 0 || walletCredit > 0) && (
                                             <span className={`absolute -top-1.5 -right-1.5 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full border border-white ${walletCredit > 0 ? 'bg-amber-500' : 'bg-orange-500'}`}>
-                                                ₹{walletCredit > 0 ? walletCredit : displayDue}
+                                                ₹{walletCredit > 0 ? walletCredit.toFixed(2) : displayDue.toFixed(2)}
                                             </span>
                                         )}
                                     </div>
@@ -256,12 +256,12 @@ const CustomerLayout = () => {
                                                 <div className="bg-white rounded-[20px] p-4 text-center border border-white shadow-lg shadow-teal-900/5 relative overflow-hidden group flex-1">
                                                     <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8 blur-lg group-hover:bg-primary/10 transition-colors" />
                                                     <p className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5 relative z-10">Outstanding Due</p>
-                                                    <p className="text-2xl font-black text-primary tracking-tighter relative z-10">₹{displayDue}</p>
+                                                    <p className="text-2xl font-black text-primary tracking-tighter relative z-10">₹{displayDue.toFixed(2)}</p>
                                                 </div>
                                                 {walletCredit > 0 && (
                                                     <div className="bg-amber-50 rounded-[20px] p-4 text-center border border-amber-100 shadow-sm relative overflow-hidden group flex-1">
                                                         <p className="text-[8px] font-black text-amber-600 uppercase tracking-[0.2em] mb-0.5 relative z-10">Credit Balance</p>
-                                                        <p className="text-2xl font-black text-amber-600 tracking-tighter relative z-10">₹{walletCredit}</p>
+                                                        <p className="text-2xl font-black text-amber-600 tracking-tighter relative z-10">₹{walletCredit.toFixed(2)}</p>
                                                     </div>
                                                 )}
                                                 <Link
@@ -321,7 +321,7 @@ const CustomerLayout = () => {
                                         </div>
                                         {cartItems.length > 0 && (
                                             <button onClick={() => { navigate('/customer/cart'); setCartOpen(false); }} className="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl font-black shadow-lg shadow-teal-100 transition-all text-sm uppercase tracking-widest">
-                                                Checkout ₹{cartTotal}
+                                                Checkout ₹{cartTotal.toFixed(2)}
                                             </button>
                                         )}
                                     </div>

@@ -340,7 +340,7 @@ const AnalyticsView = ({ data }: { data: any }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
                     <p className="text-gray-500 text-sm font-medium">Total Revenue</p>
-                    <p className="text-3xl font-bold text-teal-700">₹{data.totalRevenue}</p>
+                    <p className="text-3xl font-bold text-teal-700">₹{data.totalRevenue?.toFixed(2)}</p>
                 </div>
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
                     <p className="text-gray-500 text-sm font-medium">Total Volume</p>
@@ -348,7 +348,7 @@ const AnalyticsView = ({ data }: { data: any }) => {
                 </div>
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
                     <p className="text-gray-500 text-sm font-medium">Avg Order Value</p>
-                    <p className="text-3xl font-bold text-teal-700">₹{data.totalOrders > 0 ? (data.totalRevenue / data.totalOrders) : 0}</p>
+                    <p className="text-3xl font-bold text-teal-700">₹{data.totalOrders > 0 ? (data.totalRevenue / data.totalOrders).toFixed(2) : '0.00'}</p>
                 </div>
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
                     <p className="text-gray-500 text-sm font-medium">Top Selling Product</p>
@@ -368,7 +368,7 @@ const AnalyticsView = ({ data }: { data: any }) => {
                                 <YAxis stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val}`} />
                                 <Tooltip
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                    formatter={(value) => [`₹${value}`, 'Revenue']}
+                                    formatter={(value: any) => [`₹${Number(value).toFixed(2)}`, 'Revenue']}
                                 />
                                 <Line type="monotone" dataKey="revenue" stroke="#0d9488" strokeWidth={3} dot={{ r: 4, fill: '#0d9488' }} activeDot={{ r: 6 }} />
                             </LineChart>
@@ -387,7 +387,7 @@ const AnalyticsView = ({ data }: { data: any }) => {
                                 <YAxis dataKey="name" type="category" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} width={100} />
                                 <Tooltip
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                    formatter={(value) => [`₹${value}`, 'Total Spend']}
+                                    formatter={(value: any) => [`₹${Number(value).toFixed(2)}`, 'Total Spend']}
                                 />
                                 <Bar dataKey="spend" fill="#0d9488" radius={[0, 4, 4, 0]} />
                             </BarChart>
@@ -434,7 +434,7 @@ const AnalyticsView = ({ data }: { data: any }) => {
                                 </Pie>
                                 <Tooltip
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                    formatter={(value) => [`₹${value}`, 'Sales']}
+                                    formatter={(value: any) => [`₹${Number(value).toFixed(2)}`, 'Sales']}
                                 />
                                 <Legend verticalAlign="bottom" height={36} />
                             </PieChart>
@@ -525,10 +525,7 @@ const CustomerOrdersModal = ({ isOpen, onClose, customer }: { isOpen: boolean, o
                                             <div className="text-right space-y-1">
                                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Final Amount</p>
                                                 <div className="flex items-center justify-end gap-2">
-                                                    {order.isAdminModified && (
-                                                        <span className="text-[10px] font-bold text-gray-400 line-through">₹{order.originalTotalPrice}</span>
-                                                    )}
-                                                    <p className="text-lg font-black text-teal-700 tracking-tighter">₹{order.totalPrice}</p>
+                                                    <p className="text-lg font-black text-teal-700 tracking-tighter">₹{order.totalPrice.toFixed(2)}</p>
                                                 </div>
                                             </div>
                                             <div className={`h-8 w-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 transition-transform duration-300 ${expandedOrder === order._id ? 'rotate-180' : ''}`}>
@@ -560,7 +557,7 @@ const CustomerOrdersModal = ({ isOpen, onClose, customer }: { isOpen: boolean, o
                                                                                 )}
                                                                             </div>
                                                                         </div>
-                                                                        <p className="text-xs font-black text-gray-700">₹{item.price}</p>
+                                                                        <p className="text-xs font-black text-gray-700">₹{item.price.toFixed(2)}</p>
                                                                     </div>
                                                                 );
                                                             })}
@@ -574,10 +571,10 @@ const CustomerOrdersModal = ({ isOpen, onClose, customer }: { isOpen: boolean, o
                                                                 <div className="p-4 bg-teal-50 rounded-2xl border border-teal-100 space-y-2">
                                                                     <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-teal-700">
                                                                         <span>Due Amount Adjustment</span>
-                                                                        <span className="font-black text-teal-900">-₹{order.originalTotalPrice - order.totalPrice}</span>
+                                                                        <span className="font-black text-teal-900">-₹{(order.originalTotalPrice - order.totalPrice).toFixed(2)}</span>
                                                                     </div>
                                                                     <p className="text-[9px] text-teal-600/70 font-medium leading-relaxed">
-                                                                        The payable amount was {order.totalPrice > order.originalTotalPrice ? 'increased' : 'reduced'} by ₹{Math.abs(order.originalTotalPrice - order.totalPrice)}. Original total was ₹{order.originalTotalPrice} and the new total is ₹{order.totalPrice}.
+                                                                        The payable amount was {order.totalPrice > order.originalTotalPrice ? 'increased' : 'reduced'} by ₹{Math.abs(order.originalTotalPrice - order.totalPrice).toFixed(2)}. Original total was ₹{order.originalTotalPrice.toFixed(2)} and the new total is ₹{order.totalPrice.toFixed(2)}.
                                                                     </p>
                                                                 </div>
 
@@ -591,7 +588,7 @@ const CustomerOrdersModal = ({ isOpen, onClose, customer }: { isOpen: boolean, o
                                                                             <div key={idx} className="p-3 rounded-2xl bg-amber-50 border border-amber-100 space-y-1">
                                                                                 <div className="flex justify-between items-center text-[10px] font-black text-amber-800 uppercase">
                                                                                     <span>{ret.quantity}x {ret.name}</span>
-                                                                                    <span>₹{ret.price * ret.quantity}</span>
+                                                                                    <span>₹{(ret.price * ret.quantity).toFixed(2)}</span>
                                                                                 </div>
                                                                                 <p className="text-[9px] font-bold text-amber-600 italic leading-tight">Reason: {ret.reason}</p>
                                                                             </div>
@@ -1198,7 +1195,7 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory, onRecordPayment }: 
                                                 <p className="text-sm font-bold text-gray-800">{item.customer?.name || 'Walk-in'}</p>
                                                 <p className="text-[10px] text-gray-400 font-medium italic">{item.customer?.type || 'Guest'}</p>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-teal-700 font-black">₹{item.totalPrice !== undefined ? item.totalPrice : '0'}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-teal-700 font-black">₹{item.totalPrice !== undefined ? item.totalPrice.toFixed(2) : '0.00'}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${item.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                                                     item.status === 'processing' ? 'bg-blue-100 text-blue-700' :
@@ -1233,7 +1230,7 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory, onRecordPayment }: 
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.phone}</td>
                                             <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{item.shopName || 'N/A'}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-lg font-black text-red-600">
-                                                ₹{item.dueAmount || item.pendingBalance || 0}
+                                                ₹{(item.dueAmount || item.pendingBalance || 0).toFixed(2)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-center sticky right-0 bg-white z-10 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.1)]">
                                                 <button
