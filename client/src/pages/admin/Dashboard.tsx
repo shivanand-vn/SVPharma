@@ -327,118 +327,199 @@ const OTPVerificationModal = ({ isOpen, onClose, customer, onVerify, loading }: 
 };
 
 // --- Analytics View Component ---
-const AnalyticsView = ({ data }: { data: any }) => {
+const AnalyticsView = ({ data, filter, onFilterChange }: { data: any, filter: { type: 'monthly' | 'yearly', year: number, month: number }, onFilterChange: (f: any) => void }) => {
     if (!data) return <div className="p-8 text-center text-teal-600">Loading analytics...</div>;
 
     const COLORS = ['#0d9488', '#0ea5e9', '#6366f1', '#8b5cf6', '#d946ef'];
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
 
     return (
-        <div className="p-8 space-y-8 bg-teal-50/20">
-            <h2 className="text-3xl font-serif text-teal-800 text-center mb-8">Business Analytics</h2>
+        <div className="p-8 space-y-8 bg-teal-50/20 relative">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <div className="flex flex-col items-center md:items-start">
+                    <h2 className="text-3xl font-serif text-teal-800">Business Analytics</h2>
+                    <p className="text-[10px] font-black text-teal-600/60 uppercase tracking-widest mt-1">
+                        Viewing: <span className="text-teal-600 font-black">{filter.type === 'monthly' ? `${months[filter.month]} ${filter.year}` : `${filter.year} Annual Overview`}</span>
+                    </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 bg-white p-2 rounded-[24px] shadow-sm border border-teal-100">
+                    <select
+                        value={filter.type}
+                        onChange={(e) => onFilterChange({ ...filter, type: e.target.value as 'monthly' | 'yearly' })}
+                        className="bg-gray-50 text-[10px] font-black uppercase tracking-widest text-teal-700 px-4 py-1.5 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer"
+                    >
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+
+                    <select
+                        value={filter.type === 'monthly' ? `${filter.year}-${filter.month}` : filter.year}
+                        onChange={(e) => {
+                            if (filter.type === 'monthly') {
+                                const [year, month] = e.target.value.split('-');
+                                onFilterChange({ ...filter, year: parseInt(year), month: parseInt(month) });
+                            } else {
+                                onFilterChange({ ...filter, year: parseInt(e.target.value) });
+                            }
+                        }}
+                        className="bg-gray-50 text-[10px] font-black uppercase tracking-widest text-teal-700 px-4 py-1.5 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer min-w-[140px]"
+                    >
+                        {filter.type === 'monthly' ? (
+                            // Monthly options: show only 2026 months up to current month (newest first)
+                            (() => {
+                                const currentDate = new Date();
+                                const currentMonth = currentDate.getMonth();
+                                const options = [];
+
+                                // Only show 2026 months from current month down to January
+                                for (let month = currentMonth; month >= 0; month--) {
+                                    options.push(
+                                        <option key={`2026-${month}`} value={`2026-${month}`}>
+                                            {months[month]} 2026
+                                        </option>
+                                    );
+                                }
+                                return options;
+                            })()
+                        ) : (
+                            // Yearly options: show only 2026
+                            <option value="2026">2026</option>
+                        )}
+                    </select>
+                </div>
+            </div>
 
             {/* Overview Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
-                    <p className="text-gray-500 text-sm font-medium">Total Revenue</p>
-                    <p className="text-3xl font-bold text-teal-700">₹{data.totalRevenue?.toFixed(2)}</p>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100 group hover:shadow-md transition-shadow">
+                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-2 opacity-60">Revenue</p>
+                    <p className="text-3xl font-black text-teal-700 tracking-tighter">₹{data.totalRevenue?.toFixed(2)}</p>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
-                    <p className="text-gray-500 text-sm font-medium">Total Volume</p>
-                    <p className="text-3xl font-bold text-teal-700">{data.totalOrders} Orders</p>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100 group hover:shadow-md transition-shadow">
+                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-2 opacity-60">Total Orders</p>
+                    <p className="text-3xl font-black text-teal-700 tracking-tighter">{data.totalOrders}</p>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
-                    <p className="text-gray-500 text-sm font-medium">Avg Order Value</p>
-                    <p className="text-3xl font-bold text-teal-700">₹{data.totalOrders > 0 ? (data.totalRevenue / data.totalOrders).toFixed(2) : '0.00'}</p>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100 group hover:shadow-md transition-shadow">
+                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-2 opacity-60">Avg Order Value</p>
+                    <p className="text-3xl font-black text-teal-700 tracking-tighter">₹{data.totalOrders > 0 ? (data.totalRevenue / data.totalOrders).toFixed(2) : '0.00'}</p>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
-                    <p className="text-gray-500 text-sm font-medium">Top Selling Product</p>
-                    <p className="text-xl font-bold text-teal-700 truncate">{data.bestSellingProducts?.[0]?.name || 'N/A'}</p>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-teal-100 group hover:shadow-md transition-shadow">
+                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-2 opacity-60">Top Product</p>
+                    <p className="text-xl font-black text-teal-700 truncate tracking-tight">{data.bestSellingProducts?.[0]?.name || 'N/A'}</p>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Sales Trend Chart */}
-                <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50">
-                    <h3 className="text-lg font-bold text-gray-800 mb-6">Sales Trend (Last 7 Days)</h3>
+                <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Revenue Trend ({filter.type === 'monthly' ? `Daily - ${months[filter.month]}` : `Monthly - ${filter.year}`})</h3>
                     <div className="h-80 w-full">
                         <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                             <LineChart data={data.salesTrends}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                                <XAxis dataKey="date" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val}`} />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis dataKey="date" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val}`} />
                                 <Tooltip
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    cursor={{ stroke: '#0d9488', strokeWidth: 1, strokeDasharray: '4 4' }}
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', padding: '12px' }}
                                     formatter={(value: any) => [`₹${Number(value).toFixed(2)}`, 'Revenue']}
                                 />
-                                <Line type="monotone" dataKey="revenue" stroke="#0d9488" strokeWidth={3} dot={{ r: 4, fill: '#0d9488' }} activeDot={{ r: 6 }} />
+                                <Line
+                                    type="monotone"
+                                    dataKey="revenue"
+                                    stroke="#0d9488"
+                                    strokeWidth={3}
+                                    dot={{ r: 4, fill: '#0d9488', strokeWidth: 2, stroke: '#fff' }}
+                                    activeDot={{ r: 6, fill: '#0d9488', strokeWidth: 2, stroke: '#fff' }}
+                                    animationDuration={1500}
+                                />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
                 {/* Top Customers Bar Chart */}
-                <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50">
-                    <h3 className="text-lg font-bold text-gray-800 mb-6">Top 5 Customers by Spend</h3>
-                    <div className="h-80 w-full">
-                        <ResponsiveContainer width="100%" height="100%" minHeight={300}>
-                            <BarChart data={data.topCustomers} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
-                                <XAxis type="number" hide />
-                                <YAxis dataKey="name" type="category" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} width={100} />
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                    formatter={(value: any) => [`₹${Number(value).toFixed(2)}`, 'Total Spend']}
-                                />
-                                <Bar dataKey="spend" fill="#0d9488" radius={[0, 4, 4, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-75">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Top 5 Customers</h3>
+                    <div className="h-80 w-full text-center">
+                        {data.topCustomers?.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+                                <BarChart data={data.topCustomers} layout="vertical">
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                                    <XAxis type="number" hide />
+                                    <YAxis dataKey="name" type="category" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} width={100} />
+                                    <Tooltip
+                                        cursor={{ fill: '#f8fafc' }}
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                                        formatter={(value: any) => [`₹${Number(value).toFixed(2)}`, 'Spend']}
+                                    />
+                                    <Bar dataKey="spend" fill="#0d9488" radius={[0, 8, 8, 0]} barSize={20} animationDuration={1500} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="flex items-center justify-center h-full text-gray-400 text-[10px] font-black uppercase tracking-widest">No data available for this period</div>
+                        )}
                     </div>
                 </div>
 
                 {/* Best Selling Products */}
-                <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50">
-                    <h3 className="text-lg font-bold text-gray-800 mb-6">Best Selling Products</h3>
-                    <div className="h-80 w-full">
-                        <ResponsiveContainer width="100%" height="100%" minHeight={300}>
-                            <BarChart data={data.bestSellingProducts}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                                <XAxis dataKey="name" stroke="#6B7280" fontSize={10} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                />
-                                <Bar dataKey="quantity" fill="#14b8a6" radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Best Selling Products</h3>
+                    <div className="h-80 w-full text-center">
+                        {data.bestSellingProducts?.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+                                <BarChart data={data.bestSellingProducts}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                    <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                    <Tooltip
+                                        cursor={{ fill: '#f8fafc' }}
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                                    />
+                                    <Bar dataKey="quantity" fill="#14b8a6" radius={[8, 8, 0, 0]} barSize={32} animationDuration={1500} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="flex items-center justify-center h-full text-gray-400 text-[10px] font-black uppercase tracking-widest">No data available for this period</div>
+                        )}
                     </div>
                 </div>
 
                 {/* Sales by Category Pie Chart */}
-                <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50">
-                    <h3 className="text-lg font-bold text-gray-800 mb-6">Sales by Category</h3>
-                    <div className="h-80 w-full">
-                        <ResponsiveContainer width="100%" height="100%" minHeight={300}>
-                            <PieChart>
-                                <Pie
-                                    data={data.salesByCategory}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                >
-                                    {data.salesByCategory.map((_: any, index: number) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                    formatter={(value: any) => [`₹${Number(value).toFixed(2)}`, 'Sales']}
-                                />
-                                <Legend verticalAlign="bottom" height={36} />
-                            </PieChart>
-                        </ResponsiveContainer>
+                <div className="bg-white p-6 rounded-xl shadow-md border border-teal-50 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Sales by Category</h3>
+                    <div className="h-80 w-full text-center">
+                        {data.salesByCategory?.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+                                <PieChart>
+                                    <Pie
+                                        data={data.salesByCategory}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                        animationDuration={1500}
+                                    >
+                                        {data.salesByCategory.map((_: any, index: number) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                                        formatter={(value: any) => [`₹${Number(value).toFixed(2)}`, 'Sales']}
+                                    />
+                                    <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em' }} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="flex items-center justify-center h-full text-gray-400 text-[10px] font-black uppercase tracking-widest">No data available for this period</div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -451,16 +532,70 @@ const CustomerOrdersModal = ({ isOpen, onClose, customer }: { isOpen: boolean, o
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+    const [selectedMonth, setSelectedMonth] = useState<string>('all');
+    const [selectedStatus, setSelectedStatus] = useState<string>('all');
+
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    // Generate month options (only 2026, up to current month)
+    const getMonthOptions = () => {
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const options = [{ value: 'all', label: 'All Months' }];
+
+        for (let month = 0; month <= currentMonth; month++) {
+            options.push({
+                value: `2026-${month}`,
+                label: `${months[month]} 2026`
+            });
+        }
+        return options;
+    };
+
+    const statusOptions = [
+        { value: 'all', label: 'All Status' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'processing', label: 'Processing' },
+        { value: 'delivered', label: 'Delivered' },
+        { value: 'cancelled', label: 'Cancelled' }
+    ];
 
     useEffect(() => {
         if (isOpen && customer) {
             setLoading(true);
+            // Fetch all orders and filter on frontend
             api.get(`/orders/customer/${customer._id}`)
-                .then(res => setOrders(res.data))
+                .then(res => {
+                    let filteredOrders = res.data;
+
+                    // Filter by month
+                    if (selectedMonth !== 'all') {
+                        const [year, month] = selectedMonth.split('-');
+                        filteredOrders = filteredOrders.filter((order: any) => {
+                            const orderDate = new Date(order.createdAt);
+                            return orderDate.getFullYear() === parseInt(year) &&
+                                orderDate.getMonth() === parseInt(month);
+                        });
+                    }
+
+                    // Filter by status
+                    if (selectedStatus !== 'all') {
+                        filteredOrders = filteredOrders.filter((order: any) =>
+                            order.status.toLowerCase() === selectedStatus.toLowerCase()
+                        );
+                    }
+
+                    setOrders(filteredOrders);
+                })
                 .catch(err => console.error(err))
                 .finally(() => setLoading(false));
         }
-    }, [isOpen, customer]);
+    }, [isOpen, customer, selectedMonth, selectedStatus]);
+
+    const totalSpend = orders.reduce((acc, order) => acc + order.totalPrice, 0);
 
     if (!isOpen) return null;
 
@@ -469,17 +604,70 @@ const CustomerOrdersModal = ({ isOpen, onClose, customer }: { isOpen: boolean, o
             <div className="bg-white rounded-[40px] shadow-2xl w-full max-w-4xl overflow-hidden border border-white/20 animate-in zoom-in duration-300 max-h-[90vh] flex flex-col">
                 <div className="p-8 bg-teal-700 text-white flex justify-between items-center relative overflow-hidden flex-shrink-0">
                     <div className="relative z-10 flex items-center gap-4">
-                        <div className="h-12 w-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                        <div className="h-12 w-12 bg-white/20 rounded-2xl flex items-center justify-center shadow-inner">
                             <FaHistory size={24} />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-black">{customer?.name}'s Order History</h2>
-                            <p className="text-xs font-medium opacity-80 uppercase tracking-widest mt-1">{customer?.type} • {orders.length} Total Orders</p>
+                            <h2 className="text-2xl font-black tracking-tight">{customer?.name}'s History</h2>
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className="px-2 py-0.5 bg-white/20 rounded-full text-[8px] font-black uppercase tracking-widest">{customer?.type}</span>
+                                <span className="h-1 w-1 bg-white/40 rounded-full" />
+                                <p className="text-[10px] font-bold opacity-80 uppercase tracking-widest">{orders.length} Orders</p>
+                            </div>
                         </div>
                     </div>
-                    <button onClick={onClose} className="relative z-10 h-10 w-10 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-all"><FaTimes /></button>
-                    <div className="absolute top-0 right-0 h-32 w-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-xl" />
+
+                    <div className="relative z-10 flex items-center gap-3">
+                        <select
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                            className="bg-white/10 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30 cursor-pointer backdrop-blur-md"
+                        >
+                            {getMonthOptions().map(opt => (
+                                <option key={opt.value} value={opt.value} className="bg-teal-700 text-white">
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+
+                        <select
+                            value={selectedStatus}
+                            onChange={(e) => setSelectedStatus(e.target.value)}
+                            className="bg-white/10 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30 cursor-pointer backdrop-blur-md"
+                        >
+                            {statusOptions.map(opt => (
+                                <option key={opt.value} value={opt.value} className="bg-teal-700 text-white">
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+
+                        <button onClick={onClose} className="h-10 w-10 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-all shadow-lg active:scale-95"><FaTimes /></button>
+                    </div>
+                    <div className="absolute top-0 right-0 h-32 w-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl animate-pulse" />
                 </div>
+
+                {/* Filtered Statistics Bar */}
+                {orders.length > 0 && (
+                    <div className="bg-teal-800 px-8 py-3 flex items-center justify-between border-t border-white/5 relative z-10">
+                        <div className="flex items-center gap-8">
+                            <div className="space-y-0.5">
+                                <p className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em]">Filtered Revenue</p>
+                                <p className="text-sm font-black text-white tracking-tighter">₹{totalSpend.toFixed(2)}</p>
+                            </div>
+                            <div className="h-6 w-px bg-white/10" />
+                            <div className="space-y-0.5">
+                                <p className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em]">Avg Order</p>
+                                <p className="text-sm font-black text-white tracking-tighter">₹{(totalSpend / orders.length).toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <p className="text-[8px] font-black text-teal-300 uppercase tracking-widest bg-teal-900/40 px-3 py-1 rounded-full border border-teal-600/30">
+                            {selectedMonth === 'all' && selectedStatus === 'all'
+                                ? 'All Orders'
+                                : `${selectedMonth !== 'all' ? months[parseInt(selectedMonth.split('-')[1])] + ' 2026' : 'All Months'} • ${selectedStatus !== 'all' ? selectedStatus : 'All Status'}`}
+                        </p>
+                    </div>
+                )}
 
                 <div className="p-8 overflow-y-auto custom-scrollbar flex-1 bg-gray-50/50">
                     {loading ? (
@@ -668,6 +856,11 @@ const AdminDashboard = () => {
     const [analyticsData, setAnalyticsData] = useState<any>(null);
     const [activeView, setActiveView] = useState<'medicines' | 'customers' | 'orders' | 'due' | 'analytics' | null>('analytics');
     const [loading, setLoading] = useState(true);
+    const [analyticsFilter, setAnalyticsFilter] = useState<{ type: 'monthly' | 'yearly', year: number, month: number }>({
+        type: 'monthly',
+        year: new Date().getFullYear(),
+        month: new Date().getMonth()
+    });
 
     // Modal States
     const [editModalOpen, setEditModalOpen] = useState(false);
@@ -711,7 +904,7 @@ const AdminDashboard = () => {
             await api.get('/admin/connection-requests');
             const custRes = await api.get('/admin/customers');
             const orderRes = await api.get('/orders');
-            const analyticsRes = await api.get('/admin/analytics');
+            const analyticsRes = await api.get(`/admin/analytics?filterType=${analyticsFilter.type}&year=${analyticsFilter.year}&month=${analyticsFilter.month}`);
 
             setAnalyticsData(analyticsRes.data);
 
@@ -737,7 +930,7 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [analyticsFilter]);
 
     // Handlers
     const openEditModal = (item: any) => {
@@ -869,7 +1062,7 @@ const AdminDashboard = () => {
 
             {activeView === 'analytics' && (
                 <div className="bg-white rounded-xl shadow-lg border border-teal-100 overflow-hidden animate-fade-in-up">
-                    {loading ? <AnalyticsSkeleton /> : <AnalyticsView data={analyticsData} />}
+                    {loading ? <AnalyticsSkeleton /> : <AnalyticsView data={analyticsData} filter={analyticsFilter} onFilterChange={setAnalyticsFilter} />}
                 </div>
             )}
 
