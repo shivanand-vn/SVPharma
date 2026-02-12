@@ -10,9 +10,7 @@ It provides a powerful admin dashboard, automated due tracking system, order sta
 ## 🌐 Live Application
 
 🔗 **Access the App:**  
-https://your-app-link.com
-
-> Replace the above link with your actual deployed application URL.
+https://sv-pharma.vercel.app/
 
 **Description:**  
 SV Pharma enables pharmacy businesses to manage customer orders, monitor outstanding dues, and track payments in real time. The system ensures accurate financial calculations (no rounding errors), automated due adjustments, and seamless administrative control.
