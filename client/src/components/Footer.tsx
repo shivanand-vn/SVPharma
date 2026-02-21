@@ -10,7 +10,6 @@ import Logo from '../assets/Logo.png';
 const Footer = () => {
     const { user } = useContext(AuthContext);
     const [settings, setSettings] = useState<SiteSettings | null>(null);
-    const [loading, setLoading] = useState(true);
     const [showShopModal, setShowShopModal] = useState(false);
     const [showDevModal, setShowDevModal] = useState(false);
 
@@ -26,8 +25,6 @@ const Footer = () => {
             if (data) setSettings(data);
         } catch (error) {
             console.error("Failed to load footer settings", error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -40,6 +37,7 @@ const Footer = () => {
         email: 'shreeveerabhadreswarpharma25@gmail.com',
         phone: '9019843253',
         address: {
+            floor: '',
             building: '2nd Floor, Ganagi Complex',
             area: 'Munavalli Road',
             city: 'Yaragatti',
