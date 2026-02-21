@@ -10,7 +10,6 @@ import {
 } from 'react-icons/fa';
 import Logo from '../assets/Logo.png';
 import api from '../utils/api';
-import Footer from '../components/Footer';
 
 const Home = () => {
     const [scrolled, setScrolled] = useState(false);
@@ -255,10 +254,7 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Footer */}
-            <div id="contact">
-                <Footer />
-            </div>
+            {/* Footer removed as it is now globally rendered in App.tsx */}
         </div>
     );
 };

@@ -7,7 +7,6 @@ import {
     FaUserCircle, FaMobileAlt, FaAt, FaTimes,
     FaTrash, FaPlus, FaMinus, FaReceipt
 } from 'react-icons/fa';
-import Footer from '../components/Footer';
 import api from '../utils/api';
 import StructuredAddressForm from '../components/StructuredAddressForm';
 import { normalizeAddress, formatAddress } from '../types/address';
@@ -432,8 +431,6 @@ const CustomerLayout = () => {
             <main className="flex-1 w-full relative">
                 <Outlet />
             </main>
-
-            <Footer />
 
             {/* Profile Edit Modal */}
             {

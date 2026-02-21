@@ -3,7 +3,6 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
 import { FaSignOutAlt, FaChartPie, FaPlus, FaUserPlus, FaBox, FaCreditCard } from 'react-icons/fa';
-import Footer from '../components/Footer';
 import Logo from '../assets/Logo.png';
 
 
@@ -125,15 +124,8 @@ const AdminLayout = () => {
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-auto p-8 relative flex flex-col">
-                    <div className="flex-1">
-                        <Outlet />
-                    </div>
-
-                    {/* Global Footer */}
-                    <div className="mt-auto pt-10">
-                        <Footer />
-                    </div>
+                <main className="flex-1 w-full bg-slate-50 relative pb-10">
+                    <Outlet />
                 </main>
             </div>
         </div>

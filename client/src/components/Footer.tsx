@@ -35,7 +35,32 @@ const Footer = () => {
         fetchSettings();
     }, []);
 
-    if (loading || !settings) return null;
+    const safeSettings = settings || {
+        appName: 'Shree Veerabhadreshwara Pharma',
+        email: 'shreeveerabhadreswarpharma25@gmail.com',
+        phone: '9019843253',
+        address: {
+            building: '2nd Floor, Ganagi Complex',
+            area: 'Munavalli Road',
+            city: 'Yaragatti',
+            pincode: '591129',
+            taluk: 'Savadatti',
+            district: 'Belagavi',
+            state: 'Karnataka',
+            landmark: 'Opp. to Bus Stop'
+        },
+        facebook: '',
+        instagram: '',
+        whatsapp: '',
+        contacts: [],
+        developerName: 'Shivanand VN',
+        developerDescription: 'Full-stack developer with modern tech stacks.',
+        developerRoleName: 'Technical Partner',
+        developerLink: '',
+        developerProfileLink: '',
+        shopLocationLink: '',
+        shopImage: ''
+    };
 
     const isAdmin = user?.role === 'admin';
     const isDeveloper = user?.role === 'developer';
@@ -92,7 +117,7 @@ const Footer = () => {
                             </div>
                             <div className="relative group">
                                 <h3 className="text-2xl font-black tracking-tight font-serif leading-tight">
-                                    {settings.appName}
+                                    {safeSettings.appName}
                                 </h3>
                                 {isAdmin && (
                                     <button
@@ -109,10 +134,10 @@ const Footer = () => {
                         </p>
                         <div className="flex gap-4">
                             {[
-                                { icon: <FaInstagram />, link: settings.instagram, color: 'hover:bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600' },
-                                { icon: <FaWhatsapp />, link: settings.whatsapp, color: 'hover:bg-green-500' },
-                                { icon: <FaEnvelope />, link: `mailto:${settings.email}`, color: 'hover:bg-blue-500' },
-                                { icon: <FaFacebook />, link: settings.facebook, color: 'hover:bg-blue-600' }
+                                { icon: <FaInstagram />, link: safeSettings.instagram, color: 'hover:bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600' },
+                                { icon: <FaWhatsapp />, link: safeSettings.whatsapp, color: 'hover:bg-green-500' },
+                                { icon: <FaEnvelope />, link: `mailto:${safeSettings.email}`, color: 'hover:bg-blue-500' },
+                                { icon: <FaFacebook />, link: safeSettings.facebook, color: 'hover:bg-blue-600' }
                             ].map((social, idx) => (
                                 social.link && (
                                     <a
@@ -150,9 +175,9 @@ const Footer = () => {
                         </div>
                         <ul className="space-y-6">
                             <li className="flex items-start gap-4 group cursor-default">
-                                {settings.shopLocationLink ? (
+                                {safeSettings.shopLocationLink ? (
                                     <a
-                                        href={settings.shopLocationLink}
+                                        href={safeSettings.shopLocationLink}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-800/50 text-teal-500 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 relative overflow-hidden hover:scale-110 shadow-lg cursor-pointer"
@@ -170,12 +195,12 @@ const Footer = () => {
                                     <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Address</p>
                                     <div className="text-gray-300 font-medium leading-relaxed text-sm">
                                         {[
-                                            [settings.address.floor, settings.address.building].filter(Boolean).join(', '),
-                                            settings.address.area,
-                                            [settings.address.city, settings.address.pincode].filter(Boolean).join(' - '),
-                                            [settings.address.taluk && `Taluk: ${settings.address.taluk}`, settings.address.district && `District: ${settings.address.district}`].filter(Boolean).join(', '),
-                                            settings.address.state,
-                                            settings.address.landmark && `Landmark: ${settings.address.landmark}`
+                                            [safeSettings.address.floor, safeSettings.address.building].filter(Boolean).join(', '),
+                                            safeSettings.address.area,
+                                            [safeSettings.address.city, safeSettings.address.pincode].filter(Boolean).join(' - '),
+                                            [safeSettings.address.taluk && `Taluk: ${safeSettings.address.taluk}`, safeSettings.address.district && `District: ${safeSettings.address.district}`].filter(Boolean).join(', '),
+                                            safeSettings.address.state,
+                                            safeSettings.address.landmark && `Landmark: ${safeSettings.address.landmark}`
                                         ].filter(Boolean).map((line, i) => (
                                             <div key={i}>{line}</div>
                                         ))}
@@ -191,7 +216,7 @@ const Footer = () => {
                                     <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Phone Numbers</p>
                                     <div className="flex flex-col gap-1">
                                         {/* Contacts Loop */}
-                                        {settings.contacts?.map((contact, idx) => (
+                                        {safeSettings.contacts?.map((contact, idx) => (
                                             <a key={idx} href={`tel:${contact.phone}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors flex items-center gap-2 group/link">
                                                 {contact.name && (
                                                     <span className="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-400 font-bold uppercase group-hover/link:bg-teal-900 group-hover/link:text-teal-400 transition-colors">{contact.name}</span>
@@ -200,10 +225,10 @@ const Footer = () => {
                                             </a>
                                         ))}
                                         {/* Fallback for legacy phone if contacts empty (though backend should migrate) */}
-                                        {(!settings.contacts || settings.contacts.length === 0) && settings.phone && (
-                                            <a href={`tel:${settings.phone}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors flex items-center gap-2">
+                                        {(!safeSettings.contacts || safeSettings.contacts.length === 0) && safeSettings.phone && (
+                                            <a href={`tel:${safeSettings.phone}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors flex items-center gap-2">
                                                 <span className="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-400 font-bold uppercase">Main</span>
-                                                {settings.phone}
+                                                {safeSettings.phone}
                                             </a>
                                         )}
                                     </div>
@@ -216,7 +241,7 @@ const Footer = () => {
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Email Address</p>
-                                    <a href={`mailto:${settings.email}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors lowercase">{settings.email}</a>
+                                    <a href={`mailto:${safeSettings.email}`} className="text-gray-300 font-medium hover:text-teal-400 transition-colors lowercase">{safeSettings.email}</a>
                                 </div>
                             </li>
                         </ul>
@@ -232,18 +257,18 @@ const Footer = () => {
 
                                 <div className="relative z-10">
                                     <p className="text-[10px] font-black text-teal-400 uppercase tracking-[0.3em] mb-4 opacity-70">
-                                        {settings.developerRoleName || 'Technical Partner'}
+                                        {safeSettings.developerRoleName || 'Technical Partner'}
                                     </p>
                                     <a
-                                        href={settings.developerProfileLink || '#'}
+                                        href={safeSettings.developerProfileLink || '#'}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="text-2xl font-black text-white mb-3 tracking-tight hover:text-teal-400 transition-colors block"
                                     >
-                                        {settings.developerName}
+                                        {safeSettings.developerName}
                                     </a>
                                     <p className="text-sm text-gray-400 leading-relaxed font-medium mb-6">
-                                        {settings.developerDescription || 'Specializing in pharmaceutical and healthcare fintech ecosystems.'}
+                                        {safeSettings.developerDescription || 'Specializing in pharmaceutical and healthcare fintech ecosystems.'}
                                     </p>
                                     <div className="flex items-center gap-2">
                                         <div className="h-2 w-2 rounded-full bg-teal-500 animate-pulse"></div>
@@ -267,7 +292,7 @@ const Footer = () => {
                 {/* Bottom Bar */}
                 <div className="mt-20 pt-10 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-6">
                     <p className="text-gray-500 text-sm font-medium">
-                        &copy; {new Date().getFullYear()} <span className="text-gray-300">{settings.appName}</span>. All rights reserved.
+                        &copy; {new Date().getFullYear()} <span className="text-gray-300">{safeSettings.appName}</span>. All rights reserved.
                     </p>
                     <div className="flex gap-8 text-xs font-black text-gray-500 uppercase tracking-[0.2em]">
                         <Link to="/privacy-policy" className="hover:text-teal-500 transition-colors">Privacy Policy</Link>

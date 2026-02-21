@@ -5,6 +5,7 @@ import { NotificationProvider } from './context/NotificationContext';
 // Layouts
 import AdminLayout from './layouts/AdminLayout';
 import CustomerLayout from './layouts/CustomerLayout';
+import Footer from './components/Footer';
 // Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -49,45 +50,50 @@ function App() {
       <NotificationProvider>
         <CartProvider>
           <Router>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-username" element={<ForgotUsername />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-of-service" element={<TermsOfService />} />
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-grow">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-username" element={<ForgotUsername />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-of-service" element={<TermsOfService />} />
 
-              {/* Admin Routes */}
-              <Route path="/admin" element={
-                <PrivateRoute role="admin">
-                  <AdminLayout />
-                </PrivateRoute>
-              }>
-                <Route index element={<AdminDashboard />} />
-                <Route path="profile" element={<AdminProfile />} />
-                <Route path="requests" element={<ConnectionRequests />} />
-                <Route path="inventory" element={<Inventory />} />
-                <Route path="payments" element={<Payments />} />
-                <Route path="orders" element={<AdminOrders />} />
-              </Route>
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={
+                    <PrivateRoute role="admin">
+                      <AdminLayout />
+                    </PrivateRoute>
+                  }>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="profile" element={<AdminProfile />} />
+                    <Route path="requests" element={<ConnectionRequests />} />
+                    <Route path="inventory" element={<Inventory />} />
+                    <Route path="payments" element={<Payments />} />
+                    <Route path="orders" element={<AdminOrders />} />
+                  </Route>
 
-              {/* Customer Routes */}
-              <Route path="/customer" element={
-                <PrivateRoute role="customer">
-                  <CustomerLayout />
-                </PrivateRoute>
-              }>
-                <Route index element={<CustomerDashboard />} />
-                <Route path="cart" element={<Cart />} />
-                <Route path="orders" element={<CustomerOrders />} />
-                <Route path="payment" element={<CustomerPayment />} />
-                {/* Add other customer routes */}
-              </Route>
+                  {/* Customer Routes */}
+                  <Route path="/customer" element={
+                    <PrivateRoute role="customer">
+                      <CustomerLayout />
+                    </PrivateRoute>
+                  }>
+                    <Route index element={<CustomerDashboard />} />
+                    <Route path="cart" element={<Cart />} />
+                    <Route path="orders" element={<CustomerOrders />} />
+                    <Route path="payment" element={<CustomerPayment />} />
+                    {/* Add other customer routes */}
+                  </Route>
 
-              {/* Fallback route */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                  {/* Fallback route */}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
           </Router>
         </CartProvider>
       </NotificationProvider>
