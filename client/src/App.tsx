@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 // Layouts
@@ -42,6 +42,15 @@ const PrivateRoute = ({ children, role }: { children: React.ReactNode, role: str
   }
 
   return children;
+};
+
+const GlobalFooter = () => {
+  const location = useLocation();
+  // Hide global footer on admin routes to preserve admin layout UI
+  if (location.pathname.startsWith('/admin')) {
+    return null;
+  }
+  return <Footer />;
 };
 
 function App() {
@@ -92,7 +101,7 @@ function App() {
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </main>
-              <Footer />
+              <GlobalFooter />
             </div>
           </Router>
         </CartProvider>
