@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebook, FaInstagram, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaEdit, FaPills, FaHeartbeat, FaPlus } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaEdit, FaPills, FaHeartbeat, FaPlus, FaLinkedin, FaGithub, FaTwitter, FaGlobe, FaLink } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
 import { ShopEditModal, DeveloperEditModal } from './FooterEditModals';
@@ -56,6 +56,7 @@ const Footer = () => {
         developerRoleName: 'Technical Partner',
         developerLink: '',
         developerProfileLink: '',
+        developerSocialLinks: [],
         shopLocationLink: '',
         shopImage: ''
     };
@@ -268,6 +269,44 @@ const Footer = () => {
                                     <p className="text-sm text-gray-400 leading-relaxed font-medium mb-6">
                                         {safeSettings.developerDescription || 'Specializing in pharmaceutical and healthcare fintech ecosystems.'}
                                     </p>
+
+                                    {safeSettings.developerSocialLinks && safeSettings.developerSocialLinks.length > 0 && (
+                                        <div className="flex items-center gap-3 mb-6 flex-wrap relative z-20">
+                                            {safeSettings.developerSocialLinks.map((link: { name: string, url: string }, idx: number) => {
+                                                const platform = String(link.name).toLowerCase();
+                                                let Icon = FaLink;
+                                                let colorClass = "hover:bg-gray-600 hover:text-white hover:border-gray-500";
+
+                                                if (platform.includes('linkedin')) {
+                                                    Icon = FaLinkedin;
+                                                    colorClass = "hover:bg-[#0077b5] hover:text-white hover:border-[#0077b5]";
+                                                } else if (platform.includes('github') || platform.includes('git')) {
+                                                    Icon = FaGithub;
+                                                    colorClass = "hover:bg-white hover:text-black hover:border-white";
+                                                } else if (platform.includes('twitter') || platform.includes('x')) {
+                                                    Icon = FaTwitter;
+                                                    colorClass = "hover:bg-[#1DA1F2] hover:text-white hover:border-[#1DA1F2]";
+                                                } else if (platform.includes('portfolio') || platform.includes('website') || platform.includes('web')) {
+                                                    Icon = FaGlobe;
+                                                    colorClass = "hover:bg-teal-500 hover:text-white hover:border-teal-500";
+                                                }
+
+                                                return (
+                                                    <a
+                                                        key={idx}
+                                                        href={link.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        title={link.name}
+                                                        className={`h-8 w-8 flex items-center justify-center rounded-full bg-[#0f172a] text-gray-400 transition-all duration-300 transform hover:-translate-y-1 shadow-lg border border-gray-700 ${colorClass}`}
+                                                    >
+                                                        <Icon size={14} />
+                                                    </a>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+
                                     <div className="flex items-center gap-2">
                                         <div className="h-2 w-2 rounded-full bg-teal-500 animate-pulse"></div>
                                         <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Active Partner</span>

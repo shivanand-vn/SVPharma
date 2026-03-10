@@ -22,6 +22,10 @@ export interface SiteSettings {
     developerRoleName: string;
     developerLink: string;
     developerProfileLink: string;
+    developerSocialLinks: {
+        name: string;
+        url: string;
+    }[];
     shopLocationLink: string;
     shopImage: string;
 }
@@ -286,11 +290,32 @@ export const DeveloperEditModal = ({ isOpen, onClose, settings, onSuccess }: Mod
         developerDescription: settings.developerDescription,
         developerRoleName: settings.developerRoleName,
         developerLink: settings.developerLink,
-        developerProfileLink: settings.developerProfileLink || ''
+        developerProfileLink: settings.developerProfileLink || '',
+        developerSocialLinks: settings.developerSocialLinks || []
     });
     const [loading, setLoading] = useState(false);
 
     if (!isOpen) return null;
+
+    const handleAddSocialLink = () => {
+        setFormData({
+            ...formData,
+            developerSocialLinks: [...formData.developerSocialLinks, { name: '', url: '' }]
+        });
+    };
+
+    const handleUpdateSocialLink = (index: number, field: 'name' | 'url', value: string) => {
+        const newLinks = [...formData.developerSocialLinks];
+        newLinks[index][field] = value;
+        setFormData({ ...formData, developerSocialLinks: newLinks });
+    };
+
+    const handleRemoveSocialLink = (index: number) => {
+        setFormData({
+            ...formData,
+            developerSocialLinks: formData.developerSocialLinks.filter((_, i) => i !== index)
+        });
+    };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -309,7 +334,7 @@ export const DeveloperEditModal = ({ isOpen, onClose, settings, onSuccess }: Mod
 
     return (
         <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
-            <div className="bg-[#0f172a] rounded-[32px] w-full max-w-xl shadow-2xl overflow-hidden border border-gray-800 animate-in slide-in-from-bottom-10 duration-500">
+            <div className="bg-[#0f172a] rounded-[32px] w-full max-w-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-gray-800 animate-in slide-in-from-bottom-10 duration-500">
                 <div className="bg-gradient-to-r from-blue-600 to-teal-600 p-8 text-white">
                     <div className="flex items-center gap-4">
                         <div className="h-14 w-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
@@ -322,7 +347,7 @@ export const DeveloperEditModal = ({ isOpen, onClose, settings, onSuccess }: Mod
                     </div>
                 </div>
 
-                <form onSubmit={handleSave} className="p-8 space-y-6">
+                <form onSubmit={handleSave} className="p-8 space-y-6 overflow-y-auto custom-scrollbar">
                     <div className="space-y-2">
                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                             <FaInfoCircle className="text-blue-500" /> Professional Identity
@@ -367,6 +392,53 @@ export const DeveloperEditModal = ({ isOpen, onClose, settings, onSuccess }: Mod
                             className="w-full bg-[#1e293b] border border-gray-700 rounded-2xl px-6 py-4 text-sm font-bold text-white focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                             placeholder="https://yourportfolio.com"
                         />
+                    </div>
+
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                <FaStore className="text-blue-500" /> Dynamic Social Links
+                            </label>
+                            <button
+                                type="button"
+                                onClick={handleAddSocialLink}
+                                className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-widest bg-blue-500/10 px-3 py-1.5 rounded-lg"
+                            >
+                                + Add Link
+                            </button>
+                        </div>
+                        <div className="space-y-3 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar">
+                            {formData.developerSocialLinks.map((link, idx) => (
+                                <div key={idx} className="flex items-center gap-2 animate-in slide-in-from-left-2 duration-300">
+                                    <input
+                                        type="text"
+                                        value={link.name}
+                                        onChange={e => handleUpdateSocialLink(idx, 'name', e.target.value)}
+                                        placeholder="Platform (e.g., GitHub)"
+                                        className="w-1/3 bg-[#1e293b] border border-gray-700 rounded-xl px-4 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                        required
+                                    />
+                                    <input
+                                        type="text"
+                                        value={link.url}
+                                        onChange={e => handleUpdateSocialLink(idx, 'url', e.target.value)}
+                                        placeholder="https://..."
+                                        className="flex-1 bg-[#1e293b] border border-gray-700 rounded-xl px-4 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveSocialLink(idx)}
+                                        className="p-3 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all"
+                                    >
+                                        <FaTimes size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                            {formData.developerSocialLinks.length === 0 && (
+                                <p className="text-xs text-gray-500 italic text-center py-4 bg-[#1e293b]/50 rounded-xl border border-gray-800 border-dashed">No social links added yet.</p>
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex gap-4 pt-6">
