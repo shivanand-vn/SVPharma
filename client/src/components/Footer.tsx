@@ -10,6 +10,7 @@ import Logo from '../assets/Logo.png';
 const Footer = () => {
     const { user } = useContext(AuthContext);
     const [settings, setSettings] = useState<SiteSettings | null>(null);
+    const [loading, setLoading] = useState(true);
     const [showShopModal, setShowShopModal] = useState(false);
     const [showDevModal, setShowDevModal] = useState(false);
 
@@ -25,6 +26,8 @@ const Footer = () => {
             if (data) setSettings(data);
         } catch (error) {
             console.error("Failed to load footer settings", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -32,34 +35,19 @@ const Footer = () => {
         fetchSettings();
     }, []);
 
-    const safeSettings = settings || {
-        appName: 'Shree Veerabhadreshwara Pharma',
-        email: 'shreeveerabhadreswarpharma25@gmail.com',
-        phone: '9019843253',
-        address: {
-            floor: '',
-            building: '2nd Floor, Ganagi Complex',
-            area: 'Munavalli Road',
-            city: 'Yaragatti',
-            pincode: '591129',
-            taluk: 'Savadatti',
-            district: 'Belagavi',
-            state: 'Karnataka',
-            landmark: 'Opp. to Bus Stop'
-        },
-        facebook: '',
-        instagram: '',
-        whatsapp: '',
-        contacts: [],
-        developerName: 'Shivanand VN',
-        developerDescription: 'Full-stack developer with modern tech stacks.',
-        developerRoleName: 'Technical Partner',
-        developerLink: '',
-        developerProfileLink: '',
-        developerSocialLinks: [],
-        shopLocationLink: '',
-        shopImage: ''
-    };
+    if (loading || !settings) {
+        return (
+            <div className="bg-[#0f172a] h-64 flex flex-col items-center justify-center border-t border-gray-800 w-full mt-auto text-center opacity-80 backdrop-blur-sm">
+                <div className="animate-pulse flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-[10px] font-black text-teal-400 uppercase tracking-[0.2em] mt-2">Loading ecosystem...</span>
+                </div>
+            </div>
+        );
+    }
+
+    // Alias required for existing code references
+    const safeSettings = settings;
 
     const isAdmin = user?.role === 'admin';
     const isDeveloper = user?.role === 'developer';
