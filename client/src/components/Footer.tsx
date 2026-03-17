@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebook, FaInstagram, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaEdit, FaPills, FaHeartbeat, FaPlus, FaLinkedin, FaGithub, FaTwitter, FaGlobe, FaLink } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaEdit, FaPills, FaHeartbeat, FaPlus, FaLinkedin, FaGlobe } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
 import { ShopEditModal } from './FooterEditModals';
@@ -10,7 +10,6 @@ import Logo from '../assets/Logo.png';
 const Footer = () => {
     const { user } = useContext(AuthContext);
     const [settings, setSettings] = useState<SiteSettings | null>(null);
-    const [loading, setLoading] = useState(true);
     const [showShopModal, setShowShopModal] = useState(false);
 
     // Initial Animation State
@@ -25,8 +24,6 @@ const Footer = () => {
             if (data) setSettings(data);
         } catch (error) {
             console.error("Failed to load footer settings", error);
-        } finally {
-            setLoading(false);
         }
     };
 
