@@ -107,6 +107,7 @@ const Home = () => {
                 {/* Mobile Nav */}
                 <div id="mobile-nav" className="hidden lg:hidden bg-white border-t border-gray-100 shadow-2xl p-6 absolute top-full left-0 right-0 flex flex-col gap-4 animate-in slide-in-from-top duration-300">
                     <a href="#how-it-works" className="font-bold text-teal-900 py-2 border-b border-gray-50">How it works</a>
+                    <a href="#contact" className="font-bold text-teal-900 py-2 border-b border-gray-50">Contact</a>
                     {user && user.role === 'developer' ? (
                         <button onClick={handleLogout} className="bg-red-500 text-white py-4 rounded-2xl font-bold">Logout</button>
                     ) : (

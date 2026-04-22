@@ -50,7 +50,7 @@ const Footer = () => {
     };
 
     return (
-        <footer className={`bg-[#0f172a] text-white pt-20 pb-10 border-t border-gray-800 transition-all duration-1000 transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} relative overflow-hidden`}>
+        <footer id="contact" className={`bg-[#0f172a] text-white pt-20 pb-10 border-t border-gray-800 transition-all duration-1000 transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} relative overflow-hidden`}>
             {/* Medical Animations / Decorations */}
             {/* Background Pattern - Hex Mesh */}
             <div className="absolute inset-0 opacity-[0.03]"
