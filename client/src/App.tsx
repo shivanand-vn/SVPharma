@@ -25,6 +25,10 @@ import Cart from './pages/customer/Cart';
 import CustomerOrders from './pages/customer/Orders';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import Settings from './pages/admin/Settings';
+import ShopProfile from './pages/admin/ShopProfile';
+
+const Reports = React.lazy(() => import('./pages/admin/Reports'));
 
 const PrivateRoute = ({ children, role }: { children: React.ReactNode, role: string }) => {
   const { user, loading } = React.useContext(AuthContext);
@@ -82,6 +86,13 @@ function App() {
                     <Route path="inventory" element={<Inventory />} />
                     <Route path="payments" element={<Payments />} />
                     <Route path="orders" element={<AdminOrders />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="shop-profile" element={<ShopProfile />} />
+                    <Route path="reports" element={
+                      <React.Suspense fallback={<div className="p-8 text-center text-teal-600 font-bold font-sans animate-pulse">Loading Reports...</div>}>
+                        <Reports />
+                      </React.Suspense>
+                    } />
                   </Route>
 
                   {/* Customer Routes */}
