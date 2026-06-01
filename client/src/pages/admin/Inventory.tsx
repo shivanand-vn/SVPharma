@@ -2,25 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
 import { FaCloudUploadAlt, FaPlus, FaTimes } from 'react-icons/fa';
 
-// Reuse Toast from ConnectionRequests (Ideally should be in components/Common)
-const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
-    useEffect(() => {
-        const timer = setTimeout(onClose, 3000);
-        return () => clearTimeout(timer);
-    }, [onClose]);
-
-    return (
-        <div className="fixed bottom-4 right-4 z-[100] animate-fade-in-up">
-            <div className={`flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl border-2 ${type === 'success'
-                ? 'bg-green-50 border-green-500 text-green-800'
-                : 'bg-red-50 border-red-500 text-red-800'
-                }`}>
-                <p className="font-bold text-sm">{message}</p>
-                <button onClick={onClose} className="ml-4 hover:opacity-70"><FaTimes /></button>
-            </div>
-        </div>
-    );
-};
+import { Toast } from '../../components/common/Toast';
 
 const Inventory = () => {
     const [formData, setFormData] = useState({

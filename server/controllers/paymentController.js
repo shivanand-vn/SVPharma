@@ -114,15 +114,51 @@ const getWallet = asyncHandler(async (req, res) => {
 // @route   GET /api/payments/admin
 // @access  Private (Admin)
 const getAllPayments = asyncHandler(async (req, res) => {
-    const { status } = req.query;
+    const { status, page, limit, search } = req.query;
     let query = {};
     if (status) query.status = status;
 
-    const payments = await Payment.find(query)
-        .populate('customer', 'name email phone username dueAmount')
-        .sort({ createdAt: -1 });
+    if (search) {
+        const customers = await Customer.find({
+            $or: [
+                { name: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } },
+                { phone: { $regex: search, $options: 'i' } }
+            ]
+        }).select('_id');
+        const customerIds = customers.map(c => c._id);
+        
+        query.$or = [
+            { customer: { $in: customerIds } },
+            { transactionId: { $regex: search, $options: 'i' } }
+        ];
+    }
 
-    res.json(payments);
+    if (page || limit) {
+        const pageNum = parseInt(page) || 1;
+        const limitNum = parseInt(limit) || 10;
+        const skip = (pageNum - 1) * limitNum;
+
+        const count = await Payment.countDocuments(query);
+        const payments = await Payment.find(query)
+            .populate('customer', 'name email phone username dueAmount')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limitNum);
+
+        res.json({
+            payments,
+            page: pageNum,
+            pages: Math.ceil(count / limitNum),
+            total: count
+        });
+    } else {
+        const payments = await Payment.find(query)
+            .populate('customer', 'name email phone username dueAmount')
+            .sort({ createdAt: -1 });
+
+        res.json(payments);
+    }
 });
 
 // @desc    Submit offline payment (Admin)

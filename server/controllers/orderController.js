@@ -104,8 +104,71 @@ const getMyOrders = asyncHandler(async (req, res) => {
 // @route   GET /api/orders
 // @access  Private/Admin
 const getOrders = asyncHandler(async (req, res) => {
-    const orders = await Order.find({}).populate('customer', 'id name type email phone').sort({ createdAt: -1 });
-    res.json(orders);
+    const { page, limit, status, search } = req.query;
+
+    let query = {};
+    if (status && status !== 'all') {
+        query.status = status;
+    }
+
+    if (search) {
+        const customers = await Customer.find({ name: { $regex: search, $options: 'i' } }).select('_id');
+        const customerIds = customers.map(c => c._id);
+        
+        const orConditions = [
+            { customer: { $in: customerIds } }
+        ];
+
+        if (/^[0-9a-fA-F]{24}$/.test(search)) {
+            orConditions.push({ _id: search });
+        }
+
+        query.$or = orConditions;
+    }
+
+    if (page || limit) {
+        const pageNum = parseInt(page) || 1;
+        const limitNum = parseInt(limit) || 10;
+        const skip = (pageNum - 1) * limitNum;
+
+        const count = await Order.countDocuments(query);
+        const orders = await Order.find(query)
+            .populate('customer', 'id name type email phone')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limitNum);
+
+        // Calculate status counts for stats cards
+        const counts = {
+            all: await Order.countDocuments({}),
+            pending: 0,
+            processing: 0,
+            shipped: 0,
+            delivered: 0,
+            cancelled: 0
+        };
+
+        const statusCounts = await Order.aggregate([
+            { $group: { _id: "$status", count: { $sum: 1 } } }
+        ]);
+
+        statusCounts.forEach(item => {
+            if (counts[item._id] !== undefined) {
+                counts[item._id] = item.count;
+            }
+        });
+
+        res.json({
+            orders,
+            page: pageNum,
+            pages: Math.ceil(count / limitNum),
+            total: count,
+            counts
+        });
+    } else {
+        const orders = await Order.find(query).populate('customer', 'id name type email phone').sort({ createdAt: -1 });
+        res.json(orders);
+    }
 });
 
 // @desc    Update order status
