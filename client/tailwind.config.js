@@ -4,6 +4,14 @@ export default {
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
     ],
+    safelist: [
+        {
+            pattern: /(bg|text|border)-(primary|teal|amber|blue|purple|red|green)(-500|-100|-200|-600|-700)?/,
+        },
+        {
+            pattern: /bg-(primary|teal|amber|blue|purple|red|green)(-500|-100|-200|-600|-700)?\/10/,
+        }
+    ],
     theme: {
         extend: {
             fontFamily: {
