@@ -13,9 +13,13 @@ import {
     FaUser,
     FaFileInvoiceDollar,
     FaArrowRight,
-    FaRegClock
+    FaRegClock,
+    FaChevronDown
 } from 'react-icons/fa';
 import { useNotification } from '../../context/NotificationContext';
+import { Skeleton } from '../../components/common/Skeleton';
+import { StatusBadge } from '../../components/common/StatusBadge';
+import { Pagination } from '../../components/common/Pagination';
 
 interface Payment {
     _id: string;
@@ -45,6 +49,10 @@ const AdminPayments = () => {
     const [loading, setLoading] = useState(false);
     const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
     const [actionLoading, setActionLoading] = useState(false);
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     // Dialog States
     const [showApproveDialog, setShowApproveDialog] = useState(false);
@@ -95,21 +103,33 @@ const AdminPayments = () => {
         }
     };
 
-    useEffect(() => {
-        fetchPayments();
-    }, [filter]);
-
-    const fetchPayments = async () => {
+    const fetchPayments = async (page: number = 1) => {
         setLoading(true);
         try {
-            const res = await api.get(`/payments/admin?status=${filter === 'all' ? '' : filter}`);
-            setPayments(res.data);
+            const res = await api.get('/payments/admin', {
+                params: {
+                    status: filter === 'all' ? '' : filter,
+                    page,
+                    limit: 10
+                }
+            });
+            setPayments(res.data.payments || []);
+            setTotalPages(res.data.pages || 1);
+            setCurrentPage(res.data.page || 1);
         } catch (error) {
             console.error('Error fetching payments:', error);
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filter]);
+
+    useEffect(() => {
+        fetchPayments(currentPage);
+    }, [filter, currentPage]);
 
     const handleApprove = async () => {
         if (!selectedPayment) return;
@@ -280,135 +300,171 @@ const AdminPayments = () => {
                 </div>
             </div>
 
-            {loading ? (
-                <div className="text-center py-20 text-gray-400">Loading payments...</div>
-            ) : (
-                <div className="bg-white rounded-[32px] shadow-sm border border-teal-50 overflow-hidden">
-                    <div className="overflow-x-auto custom-scrollbar">
-                        <table className="w-full border-collapse">
-                            <thead className="bg-slate-50 border-b border-slate-100">
-                                <tr>
-                                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Date & Time</th>
-                                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Customer Details</th>
-                                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Amount</th>
-                                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Proof of Payment</th>
-                                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Status</th>
-                                    <th className="px-6 py-5 text-right"></th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-50">
-                                {payments.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={6} className="px-6 py-20 text-center">
-                                            <div className="flex flex-col items-center gap-3 text-slate-300">
-                                                <FaRegClock size={48} className="opacity-20" />
-                                                <p className="text-sm font-bold">No payment records found</p>
+            <div className="bg-white rounded-[32px] shadow-sm border border-teal-50 overflow-hidden">
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full border-collapse">
+                        <thead className="bg-slate-50 border-b border-slate-100">
+                            <tr>
+                                <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Date & Time</th>
+                                <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Customer Details</th>
+                                <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Amount</th>
+                                <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Proof of Payment</th>
+                                <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Status</th>
+                                <th className="px-6 py-5 text-right"></th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            {loading ? (
+                                Array(5).fill(0).map((_, i) => (
+                                    <tr key={i} className="animate-pulse">
+                                        <td className="px-6 py-6 whitespace-nowrap">
+                                            <div className="flex items-center gap-3">
+                                                <Skeleton className="h-8 w-8 rounded-xl" />
+                                                <div className="space-y-2">
+                                                    <Skeleton className="h-4 w-20 rounded" />
+                                                    <Skeleton className="h-3 w-14 rounded" />
+                                                </div>
                                             </div>
                                         </td>
+                                        <td className="px-6 py-6">
+                                            <div className="flex items-center gap-3">
+                                                <Skeleton className="h-10 w-10 rounded-full" />
+                                                <div className="space-y-2">
+                                                    <Skeleton className="h-4 w-24 rounded" />
+                                                    <Skeleton className="h-3 w-32 rounded" />
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6 whitespace-nowrap">
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-5 w-16 rounded" />
+                                                <Skeleton className="h-3.5 w-24 rounded" />
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6 whitespace-nowrap">
+                                            <Skeleton className="h-8 w-28 rounded-xl" />
+                                        </td>
+                                        <td className="px-6 py-6 whitespace-nowrap">
+                                            <Skeleton className="h-6 w-16 rounded-full" />
+                                        </td>
+                                        <td className="px-6 py-6"></td>
                                     </tr>
-                                ) : (
-                                    payments.map((payment) => (
-                                        <tr key={payment._id} className="group hover:bg-teal-50/30 transition-all duration-300">
-                                            <td className="px-6 py-6 whitespace-nowrap">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-slate-100 rounded-xl text-slate-400 group-hover:bg-teal-100 group-hover:text-teal-600 transition-colors">
-                                                        <FaCalendarAlt size={14} />
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-sm font-black text-slate-700">{new Date(payment.createdAt).toLocaleDateString()}</div>
-                                                        <div className="text-[10px] font-bold text-slate-400 uppercase">{new Date(payment.createdAt).toLocaleTimeString()}</div>
+                                ))
+                            ) : payments.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="px-6 py-20 text-center">
+                                        <div className="flex flex-col items-center gap-3 text-slate-300">
+                                            <FaRegClock size={48} className="opacity-20" />
+                                            <p className="text-sm font-bold">No payment records found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                payments.map((payment) => (
+                                    <tr key={payment._id} className="group hover:bg-teal-50/30 transition-all duration-300">
+                                        <td className="px-6 py-6 whitespace-nowrap">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-slate-100 rounded-xl text-slate-400 group-hover:bg-teal-100 group-hover:text-teal-600 transition-colors">
+                                                    <FaCalendarAlt size={14} />
+                                                </div>
+                                                <div>
+                                                    <div className="text-sm font-black text-slate-700">{new Date(payment.createdAt).toLocaleDateString()}</div>
+                                                    <div className="text-[10px] font-bold text-slate-400 uppercase">{new Date(payment.createdAt).toLocaleTimeString()}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 bg-teal-50 rounded-full flex items-center justify-center text-teal-600 font-black text-xs">
+                                                    {payment.customer?.name?.charAt(0) || '?'}
+                                                </div>
+                                                <div>
+                                                    <div className="text-sm font-black text-slate-800 tracking-tight">{payment.customer?.name || 'Unknown'}</div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] text-teal-600 font-bold uppercase tracking-wider">{payment.customer?.username}</span>
+                                                        <span className="h-1 w-1 rounded-full bg-slate-200"></span>
+                                                        <span className="text-[10px] text-slate-400 font-medium">{payment.customer?.phone}</span>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-10 w-10 bg-teal-50 rounded-full flex items-center justify-center text-teal-600 font-black text-xs">
-                                                        {payment.customer?.name?.charAt(0) || '?'}
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-sm font-black text-slate-800 tracking-tight">{payment.customer?.name || 'Unknown'}</div>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-[10px] text-teal-600 font-bold uppercase tracking-wider">{payment.customer?.username}</span>
-                                                            <span className="h-1 w-1 rounded-full bg-slate-200"></span>
-                                                            <span className="text-[10px] text-slate-400 font-medium">{payment.customer?.phone}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-6 whitespace-nowrap">
-                                                <div className="flex flex-col">
-                                                    <span className={`text-lg font-black tracking-tighter ${payment.status === 'approved' ? 'text-green-600' : 'text-slate-900'}`}>
-                                                        ₹{payment.amount.toFixed(2)}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6 whitespace-nowrap">
+                                            <div className="flex flex-col">
+                                                <span className={`text-lg font-black tracking-tighter ${payment.status === 'approved' ? 'text-green-600' : 'text-slate-900'}`}>
+                                                    ₹{payment.amount.toFixed(2)}
+                                                </span>
+                                                {payment.transactionId && (
+                                                    <span className="text-[9px] font-mono text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 w-fit mt-1">
+                                                        ID: {payment.transactionId}
                                                     </span>
-                                                    {payment.transactionId && (
-                                                        <span className="text-[9px] font-mono text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 w-fit mt-1">
-                                                            ID: {payment.transactionId}
-                                                        </span>
-                                                    )}
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6 whitespace-nowrap">
+                                            {payment.proofUrl === 'offline_payment' || payment.paymentMethod === 'CASH' ? (
+                                                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-wider border border-slate-200">
+                                                    <FaMoneyBillWave size={12} /> Cash Payment
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-6 whitespace-nowrap">
-                                                {payment.proofUrl === 'offline_payment' || payment.paymentMethod === 'CASH' ? (
-                                                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-wider border border-slate-200">
-                                                        <FaMoneyBillWave size={12} /> Cash Payment
-                                                    </div>
-                                                ) : (
+                                            ) : (
+                                                <button
+                                                    onClick={() => openProof(payment)}
+                                                    className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-black hover:bg-indigo-600 hover:text-white transition-all group/proof shadow-sm hover:shadow-indigo-200"
+                                                >
+                                                    <FaEye size={12} className="group-hover/proof:scale-110 transition-transform" />
+                                                    Verify Proof
+                                                </button>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-6 whitespace-nowrap">
+                                            <div className="flex flex-col gap-1.5">
+                                                <StatusBadge status={payment.status} />
+                                                {payment.status === 'rejected' && (
+                                                    <p className="text-[10px] text-red-400 font-bold max-w-[150px] truncate italic" title={payment.adminComment || payment.rejectionReason}>
+                                                        "{payment.adminComment || payment.rejectionReason}"
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6 text-right whitespace-nowrap">
+                                            {payment.status === 'pending' ? (
+                                                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0">
                                                     <button
-                                                        onClick={() => openProof(payment)}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-black hover:bg-indigo-600 hover:text-white transition-all group/proof shadow-sm hover:shadow-indigo-200"
+                                                        onClick={() => openApprove(payment)}
+                                                        className="h-10 w-10 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 transition-all shadow-lg shadow-green-200 active:scale-95"
+                                                        title="Approve"
                                                     >
-                                                        <FaEye size={12} className="group-hover/proof:scale-110 transition-transform" />
-                                                        Verify Proof
+                                                        <FaCheck size={14} />
                                                     </button>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-6 whitespace-nowrap">
-                                                <div className="flex flex-col gap-1.5">
-                                                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border w-fit ${payment.status === 'approved' ? 'bg-green-100 text-green-700 border-green-200 shadow-sm shadow-green-100' :
-                                                        payment.status === 'rejected' ? 'bg-red-100 text-red-700 border-red-200 shadow-sm shadow-red-100' :
-                                                            'bg-amber-100 text-amber-700 border-amber-200 shadow-sm shadow-amber-100'
-                                                        }`}>
-                                                        {payment.status}
-                                                    </span>
-                                                    {payment.status === 'rejected' && (
-                                                        <p className="text-[10px] text-red-400 font-bold max-w-[150px] truncate italic" title={payment.adminComment || payment.rejectionReason}>
-                                                            "{payment.adminComment || payment.rejectionReason}"
-                                                        </p>
-                                                    )}
+                                                    <button
+                                                        onClick={() => openReject(payment)}
+                                                        className="h-10 w-10 flex items-center justify-center bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-200 active:scale-95"
+                                                        title="Reject"
+                                                    >
+                                                        <FaTimes size={14} />
+                                                    </button>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-6 text-right whitespace-nowrap">
-                                                {payment.status === 'pending' ? (
-                                                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0">
-                                                        <button
-                                                            onClick={() => openApprove(payment)}
-                                                            className="h-10 w-10 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 transition-all shadow-lg shadow-green-200 active:scale-95"
-                                                            title="Approve"
-                                                        >
-                                                            <FaCheck size={14} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => openReject(payment)}
-                                                            className="h-10 w-10 flex items-center justify-center bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-200 active:scale-95"
-                                                            title="Reject"
-                                                        >
-                                                            <FaTimes size={14} />
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-300 border border-slate-100">
-                                                        <FaCheck size={12} className="opacity-50" />
-                                                    </div>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                            ) : (
+                                                <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-300 border border-slate-100">
+                                                    <FaCheck size={12} className="opacity-50" />
+                                                </div>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
-            )}
+                {!loading && totalPages > 1 && (
+                    <div className="mt-6 border-t border-slate-50 px-6 py-4 flex justify-center bg-slate-50/50">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    </div>
+                )}
+            </div>
 
             {/* Premium Approve Dialog */}
             {showApproveDialog && selectedPayment && (
@@ -632,18 +688,23 @@ const AdminPayments = () => {
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Customer</label>
-                                <select
-                                    value={offlineForm.customerId}
-                                    onChange={(e) => setOfflineForm({ ...offlineForm, customerId: e.target.value, amount: '' })}
-                                    className="w-full p-4 bg-gray-50 rounded-2xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 font-bold text-gray-700 appearance-none"
-                                >
-                                    <option value="">Start typing name...</option>
-                                    {customers.map(c => (
-                                        <option key={c._id} value={c._id}>
-                                            {c.name} ({c.phone})
-                                        </option>
-                                    ))}
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        value={offlineForm.customerId}
+                                        onChange={(e) => setOfflineForm({ ...offlineForm, customerId: e.target.value, amount: '' })}
+                                        className="w-full p-4 pr-10 bg-gray-50 rounded-2xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 font-bold text-gray-700 appearance-none cursor-pointer hover:border-teal-200 transition-all"
+                                    >
+                                        <option value="">Start typing name...</option>
+                                        {customers.map(c => (
+                                            <option key={c._id} value={c._id}>
+                                                {c.name} ({c.phone})
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400">
+                                        <FaChevronDown className="h-4 w-4" />
+                                    </div>
+                                </div>
                                 {offlineForm.customerId && (
                                     <div className="flex justify-between items-center px-2">
                                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Due Balance</span>

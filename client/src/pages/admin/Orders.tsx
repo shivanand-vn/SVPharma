@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import api from '../../utils/api';
 import {
     FaSearch, FaFilter, FaShoppingBag, FaClock, FaCheckCircle,
@@ -8,54 +8,29 @@ import {
     FaArrowRight, FaUndo, FaMapMarkerAlt
 } from 'react-icons/fa';
 import { formatAddress } from '../../utils/addressHelper';
-
-// --- Skeleton Components ---
-const Skeleton = ({ className }: { className?: string }) => (
-    <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
-);
-
-const StatCardSkeleton = () => (
-    <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex items-center gap-5">
-        <Skeleton className="h-14 w-14 rounded-2xl" />
-        <div className="space-y-2">
-            <Skeleton className="h-2 w-16" />
-            <Skeleton className="h-6 w-10" />
-        </div>
-    </div>
-);
-
-const OrderCardSkeleton = () => (
-    <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm p-8 space-y-6">
-        <div className="flex justify-between items-start">
-            <div className="flex items-center gap-4">
-                <Skeleton className="h-6 w-24 rounded-full" />
-                <Skeleton className="h-4 w-32" />
-            </div>
-        </div>
-        <div className="flex items-start gap-6">
-            <Skeleton className="h-20 w-20 rounded-2xl" />
-            <div className="space-y-3 flex-1">
-                <Skeleton className="h-6 w-48" />
-                <Skeleton className="h-4 w-64" />
-                <div className="flex gap-4">
-                    <Skeleton className="h-6 w-24" />
-                    <Skeleton className="h-6 w-24" />
-                </div>
-            </div>
-        </div>
-        <div className="flex gap-3 overflow-hidden">
-            {[1, 2, 3].map(i => (
-                <Skeleton key={i} className="h-14 w-32 rounded-2xl flex-shrink-0" />
-            ))}
-        </div>
-    </div>
-);
+import { Skeleton, StatCardSkeleton, OrderCardSkeleton } from '../../components/common/Skeleton';
+import { StatusBadge } from '../../components/common/StatusBadge';
+import { Pagination } from '../../components/common/Pagination';
 
 const AdminOrders = () => {
-    const [orders, setOrders] = useState([]);
+    const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [statusCounts, setStatusCounts] = useState({
+        all: 0,
+        pending: 0,
+        processing: 0,
+        shipped: 0,
+        delivered: 0,
+        cancelled: 0
+    });
+
+    const [debouncedSearch, setDebouncedSearch] = useState('');
 
     // Modal States
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -75,11 +50,35 @@ const AdminOrders = () => {
     const [returnSuccess, setReturnSuccess] = useState(false);
     const [returnProcessing, setReturnProcessing] = useState(false);
 
-    const fetchOrders = async () => {
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    // Reset page on search or filter change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [statusFilter, debouncedSearch]);
+
+    const fetchOrders = async (page: number = 1) => {
         try {
             setLoading(true);
-            const { data } = await api.get('/orders');
-            setOrders(data);
+            const { data } = await api.get('/orders', {
+                params: {
+                    page,
+                    limit: 10,
+                    status: statusFilter,
+                    search: debouncedSearch
+                }
+            });
+            setOrders(data.orders || []);
+            setTotalPages(data.pages || 1);
+            setCurrentPage(data.page || 1);
+            if (data.counts) {
+                setStatusCounts(data.counts);
+            }
         } catch (error) {
             console.error('Error fetching orders:', error);
         } finally {
@@ -88,8 +87,8 @@ const AdminOrders = () => {
     };
 
     useEffect(() => {
-        fetchOrders();
-    }, []);
+        fetchOrders(currentPage);
+    }, [currentPage, statusFilter, debouncedSearch]);
 
     const handleReturnItems = async (orderId: string, returnedItems: any[]) => {
         try {
@@ -158,12 +157,7 @@ const AdminOrders = () => {
         }
     };
 
-    const filteredOrders = orders.filter((order: any) => {
-        const matchesSearch = order.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order._id.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-        return matchesSearch && matchesStatus;
-    });
+    const filteredOrders = useMemo(() => orders, [orders]);
 
     const getStatusStyle = (status: string) => {
         switch (status) {
@@ -224,13 +218,13 @@ const AdminOrders = () => {
                 {loading ? (
                     Array(6).fill(0).map((_, i) => <StatCardSkeleton key={i} />)
                 ) : (
-                    [
-                        { id: 'all', label: 'Total Orders', value: orders.length, icon: <FaShoppingBag />, color: 'primary' },
-                        { id: 'pending', label: 'Pending', value: orders.filter((o: any) => o.status === 'pending').length, icon: <FaClock />, color: 'amber-500' },
-                        { id: 'processing', label: 'Processing', value: orders.filter((o: any) => o.status === 'processing').length, icon: <FaTruck />, color: 'blue-500' },
-                        { id: 'shipped', label: 'Shipped', value: orders.filter((o: any) => o.status === 'shipped').length, icon: <FaTruck />, color: 'purple-500' },
-                        { id: 'delivered', label: 'Completed', value: orders.filter((o: any) => o.status === 'delivered').length, icon: <FaCheckCircle />, color: 'teal-500' },
-                        { id: 'cancelled', label: 'Cancelled', value: orders.filter((o: any) => o.status === 'cancelled').length, icon: <FaTimesCircle />, color: 'red-500' },
+                     [
+                        { id: 'all', label: 'Total Orders', value: statusCounts.all, icon: <FaShoppingBag />, color: 'primary' },
+                        { id: 'pending', label: 'Pending', value: statusCounts.pending, icon: <FaClock />, color: 'amber-500' },
+                        { id: 'processing', label: 'Processing', value: statusCounts.processing, icon: <FaTruck />, color: 'blue-500' },
+                        { id: 'shipped', label: 'Shipped', value: statusCounts.shipped, icon: <FaTruck />, color: 'purple-500' },
+                        { id: 'delivered', label: 'Completed', value: statusCounts.delivered, icon: <FaCheckCircle />, color: 'teal-500' },
+                        { id: 'cancelled', label: 'Cancelled', value: statusCounts.cancelled, icon: <FaTimesCircle />, color: 'red-500' },
                     ].map((stat) => (
                         <button
                             key={stat.id}
@@ -267,10 +261,7 @@ const AdminOrders = () => {
                                 {/* Left Side: Order Info */}
                                 <div className="flex-1 space-y-6">
                                     <div className="flex items-center gap-4">
-                                        <div className={`px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-tighter flex items-center gap-2 ${getStatusStyle(order.status)}`}>
-                                            {getStatusIcon(order.status)}
-                                            {order.status}
-                                        </div>
+                                        <StatusBadge status={order.status} />
                                         {order.returns?.length > 0 && (
                                             <div className="px-3 py-1.5 rounded-full bg-amber-100 border border-amber-200 text-[9px] font-black text-amber-600 uppercase tracking-widest flex items-center gap-1.5">
                                                 <FaUndo size={8} /> Returned
@@ -422,6 +413,16 @@ const AdminOrders = () => {
                     </div>
                 )}
             </div>
+
+            {totalPages > 1 && (
+                <div className="mt-8">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
+            )}
 
             {/* --- Modals --- */}
 
@@ -579,10 +580,7 @@ const AdminOrders = () => {
                                 {/* Modal Header */}
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-tighter mb-4 ${getStatusStyle(selectedOrder.status)}`}>
-                                            {getStatusIcon(selectedOrder.status)}
-                                            {selectedOrder.status}
-                                        </div>
+                                        <StatusBadge status={selectedOrder.status} />
                                         <h2 className="text-4xl font-black text-gray-800 tracking-tighter">Order Summary</h2>
                                         <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mt-2">Transaction ID: #{selectedOrder._id.toUpperCase()}</p>
                                     </div>
