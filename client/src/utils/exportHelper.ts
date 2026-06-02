@@ -157,7 +157,7 @@ export class ExportHelper {
             margin: { left: marginX, right: marginX },
             didDrawPage: () => {
                 // Multi-page Pagination Footer
-                const str = `Page ${doc.internal.getCurrentPageInfo().pageNumber} of ${doc.internal.getNumberOfPages()}`;
+                const str = `Page ${(doc as any).internal.getCurrentPageInfo().pageNumber} of ${(doc as any).internal.getNumberOfPages()}`;
                 doc.setFontSize(8);
                 doc.setFont('Helvetica', 'normal');
                 doc.setTextColor(lightTextColor[0], lightTextColor[1], lightTextColor[2]);
