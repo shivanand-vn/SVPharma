@@ -1,4 +1,3 @@
-import React from 'react';
 
 /** Base skeleton primitive */
 export const Skeleton = ({ className }: { className?: string }) => (
