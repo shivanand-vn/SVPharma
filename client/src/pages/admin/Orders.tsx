@@ -8,7 +8,7 @@ import {
     FaArrowRight, FaUndo, FaMapMarkerAlt
 } from 'react-icons/fa';
 import { formatAddress } from '../../utils/addressHelper';
-import { Skeleton, StatCardSkeleton, OrderCardSkeleton } from '../../components/common/Skeleton';
+import { StatCardSkeleton, OrderCardSkeleton } from '../../components/common/Skeleton';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { Pagination } from '../../components/common/Pagination';
 
@@ -159,26 +159,6 @@ const AdminOrders = () => {
 
     const filteredOrders = useMemo(() => orders, [orders]);
 
-    const getStatusStyle = (status: string) => {
-        switch (status) {
-            case 'pending': return 'bg-amber-50 text-amber-600 border-amber-100';
-            case 'processing': return 'bg-blue-50 text-blue-600 border-blue-100';
-            case 'shipped': return 'bg-purple-50 text-purple-600 border-purple-100';
-            case 'delivered': return 'bg-teal-50 text-teal-600 border-teal-100';
-            case 'cancelled': return 'bg-red-50 text-red-500 border-red-100';
-            default: return 'bg-gray-50 text-gray-500 border-gray-100';
-        }
-    };
-
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'pending': return <FaClock />;
-            case 'processing': return <FaTruck />;
-            case 'delivered': return <FaCheckCircle />;
-            case 'cancelled': return <FaTimesCircle />;
-            default: return <FaShoppingBag />;
-        }
-    };
 
     return (
         <div className="p-8 pb-20 max-w-7xl mx-auto animate-in fade-in duration-500">
