@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
-import { FaCloudUploadAlt, FaPlus, FaTimes } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaPlus } from 'react-icons/fa';
 
 import { Toast } from '../../components/common/Toast';
 
