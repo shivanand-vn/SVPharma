@@ -1,7 +1,11 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://svpharma.onrender.com/api',
+    baseURL: import.meta.env.VITE_API_URL || (
+        typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? 'http://localhost:5000/api'
+            : 'https://svpharma.onrender.com/api'
+    ),
     headers: {
         'Content-Type': 'application/json',
     },
