@@ -331,7 +331,7 @@ async function seed() {
                 email: 'apollomedicalagency@gmail.com',
                 phone: '9876543218',
                 type: 'Medical',
-                username: 'apollo_agencies',
+                username: 'shree_guru_krupa',
                 password: 'password123',
                 address: {
                     shopName: 'Shree Guru Krupa Medical',
