@@ -10,7 +10,9 @@ interface SkeletonProps {
 }
 
 export const Skeleton: React.FC<SkeletonProps> = ({ className, style }) => (
-    <div className={`animate-pulse bg-slate-200/80 rounded-2xl ${className}`} style={style} />
+    <div className={`relative overflow-hidden bg-slate-200/80 rounded-2xl ${className}`} style={style}>
+        <div className="absolute inset-0 animate-shimmer"></div>
+    </div>
 );
 
 export const StatsSkeleton: React.FC<{ cardsCount?: number }> = ({ cardsCount = 5 }) => (

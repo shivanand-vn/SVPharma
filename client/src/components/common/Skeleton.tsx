@@ -1,7 +1,9 @@
 
 /** Base skeleton primitive */
 export const Skeleton = ({ className }: { className?: string }) => (
-  <div className={`animate-pulse bg-gray-200 rounded ${className ?? ''}`} />
+  <div className={`relative overflow-hidden bg-gray-200 rounded ${className ?? ''}`}>
+    <div className="absolute inset-0 animate-shimmer" />
+  </div>
 );
 
 /** Stat card skeleton used on dashboard and other pages */

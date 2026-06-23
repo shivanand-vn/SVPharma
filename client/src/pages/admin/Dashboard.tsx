@@ -8,7 +8,9 @@ import RecordPaymentModal from '../../components/admin/RecordPaymentModal';
 
 // --- Skeleton Components ---
 const Skeleton = ({ className }: { className?: string }) => (
-    <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
+    <div className={`relative overflow-hidden bg-gray-200 rounded ${className}`}>
+        <div className="absolute inset-0 animate-shimmer"></div>
+    </div>
 );
 
 const StatCardSkeleton = () => (
