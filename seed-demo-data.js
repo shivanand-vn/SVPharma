@@ -327,14 +327,14 @@ async function seed() {
                 dateOffsetDays: 16
             },
             {
-                name: 'Apollo Medical Agencies',
+                name: 'Shree Guru Krupa Medical',
                 email: 'apollomedicalagency@gmail.com',
                 phone: '9876543218',
                 type: 'Medical',
                 username: 'apollo_agencies',
                 password: 'password123',
                 address: {
-                    shopName: 'Apollo Medical Agencies',
+                    shopName: 'Shree Guru Krupa Medical',
                     line1: 'Plot 78, Phase 2',
                     line2: 'Gachibowli Road',
                     area: 'Gachibowli',
