@@ -129,10 +129,10 @@ const Register = () => {
 
     return (
         <div className="min-h-screen bg-teal-50 flex flex-col justify-center items-center p-4">
-            <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col lg:flex-row min-h-0 lg:min-h-[600px] animate-fade-in-up">
+            <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-6xl overflow-hidden flex flex-col lg:flex-row min-h-0 lg:min-h-[580px] animate-fade-in-up">
 
                 {/* 1. Left Panel (Join Us) - Stacked on Mobile, Left on Desktop */}
-                <div className="bg-teal-800 lg:w-5/12 p-8 lg:p-12 text-white flex flex-col justify-center items-center text-center relative overflow-hidden shrink-0">
+                <div className="bg-teal-800 lg:w-[360px] p-8 text-white flex flex-col justify-center items-center text-center relative overflow-hidden shrink-0">
                     <div className="absolute inset-0 bg-pattern opacity-10 pointer-events-none"></div>
                     <div className="bg-white/10 p-4 rounded-2xl mb-6 backdrop-blur-sm transform transition hover:scale-105 duration-300">
                         <img src={Logo} alt="Logo" className="h-20 lg:h-28 w-auto drop-shadow-md" />
@@ -161,14 +161,14 @@ const Register = () => {
                 </div>
 
                 {/* 2. Right Panel (Form) - Scrollable */}
-                <div className="flex-1 p-6 lg:p-12 overflow-y-auto custom-scrollbar bg-white">
-                    <div className="max-w-lg mx-auto">
-                        <h2 className="text-3xl font-bold text-gray-800 mb-2 font-serif">Request Account</h2>
-                        <p className="text-gray-500 mb-8 text-sm">Fill in your details to get started.</p>
+                <div className="flex-1 p-6 lg:p-8 lg:py-6 overflow-y-auto custom-scrollbar bg-white">
+                    <div className="max-w-4xl mx-auto w-full">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-1 font-serif">Request Account</h2>
+                        <p className="text-gray-500 mb-4 text-xs">Fill in your details to get started.</p>
 
                         {generalError && (
-                            <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm border border-red-100 flex items-center gap-3 animate-shake">
-                                <FaExclamationTriangle className="text-lg shrink-0" />
+                            <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-4 text-xs border border-red-100 flex items-center gap-3 animate-shake">
+                                <FaExclamationTriangle className="text-base shrink-0" />
                                 <span className="font-medium">{generalError}</span>
                             </div>
                         )}
@@ -184,92 +184,102 @@ const Register = () => {
                         )}
 
                         {!success && (
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* Name Input */}
-                                <div>
-                                    <label className="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2 ml-1">Full Name / Store Name</label>
-                                    <div className="relative">
-                                        <input
-                                            name="name"
-                                            placeholder="e.g. City Pharmacy or Dr. Smith"
-                                            value={form.name}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            className={`w-full px-5 py-3.5 rounded-xl border-2 ${errors.name ? 'border-red-300 bg-red-50 focus:ring-red-200' : 'border-gray-100 bg-gray-50 focus:border-teal-500 focus:bg-white focus:ring-teal-100'} outline-none focus:ring-4 transition-all font-medium text-gray-700 placeholder-gray-400`}
-                                        />
-                                        {errors.name && <p className="text-red-500 text-xs font-bold mt-1.5 ml-1 flex items-center gap-1"><FaTimes size={10} /> {errors.name}</p>}
-                                    </div>
-                                </div>
-
-                                {/* Account Type Selection */}
-                                <div>
-                                    <label className="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2 ml-1">Account Type</label>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <label className={`cursor-pointer border-2 rounded-2xl p-4 flex flex-col items-center justify-center gap-3 transition-all duration-200 relative overflow-hidden ${form.type === 'medical' ? 'border-teal-500 bg-teal-50/50 text-teal-800 ring-4 ring-teal-500/10' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-gray-50'}`}>
-                                            <input type="radio" name="type" value="medical" checked={form.type === 'medical'} onChange={handleChange} className="hidden" />
-                                            <div className={`p-3 rounded-full ${form.type === 'medical' ? 'bg-teal-100 text-teal-600' : 'bg-gray-100'}`}>
-                                                <FaClinicMedical size={20} />
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                {/* Form content split in two columns on desktop */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                                    
+                                    {/* Left Column: Account Details */}
+                                    <div className="space-y-4">
+                                        {/* Name Input */}
+                                        <div>
+                                            <label className="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2 ml-1">Full Name / Store Name</label>
+                                            <div className="relative">
+                                                <input
+                                                    name="name"
+                                                    placeholder="e.g. City Pharmacy or Dr. Smith"
+                                                    value={form.name}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    className={`w-full px-3 py-2 rounded-lg border-2 ${errors.name ? 'border-red-300 bg-red-50 focus:ring-red-200' : 'border-gray-100 bg-gray-50 focus:border-teal-500 focus:bg-white focus:ring-teal-100'} outline-none focus:ring-4 transition-all font-medium text-gray-700 placeholder-gray-400 text-xs`}
+                                                />
+                                                {errors.name && <p className="text-red-500 text-xs font-bold mt-1.5 ml-1 flex items-center gap-1"><FaTimes size={10} /> {errors.name}</p>}
                                             </div>
-                                            <span className="font-bold text-sm">Medical Store</span>
-                                            {form.type === 'medical' && <div className="absolute top-3 right-3 text-teal-600"><FaCheck size={12} /></div>}
-                                        </label>
+                                        </div>
 
-                                        <label className={`cursor-pointer border-2 rounded-2xl p-4 flex flex-col items-center justify-center gap-3 transition-all duration-200 relative overflow-hidden ${form.type === 'doctor' ? 'border-teal-500 bg-teal-50/50 text-teal-800 ring-4 ring-teal-500/10' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-gray-50'}`}>
-                                            <input type="radio" name="type" value="doctor" checked={form.type === 'doctor'} onChange={handleChange} className="hidden" />
-                                            <div className={`p-3 rounded-full ${form.type === 'doctor' ? 'bg-teal-100 text-teal-600' : 'bg-gray-100'}`}>
-                                                <FaUserMd size={20} />
+                                        {/* Account Type Selection */}
+                                        <div>
+                                            <label className="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2 ml-1">Account Type</label>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <label className={`cursor-pointer border-2 rounded-xl p-2.5 flex flex-col items-center justify-center gap-1.5 transition-all duration-200 relative overflow-hidden ${form.type === 'medical' ? 'border-teal-500 bg-teal-50/50 text-teal-800 ring-4 ring-teal-500/10' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-gray-50'}`}>
+                                                    <input type="radio" name="type" value="medical" checked={form.type === 'medical'} onChange={handleChange} className="hidden" />
+                                                    <div className={`p-1.5 rounded-full ${form.type === 'medical' ? 'bg-teal-100 text-teal-600' : 'bg-gray-100'}`}>
+                                                        <FaClinicMedical size={14} />
+                                                    </div>
+                                                    <span className="font-bold text-xs">Medical Store</span>
+                                                    {form.type === 'medical' && <div className="absolute top-2 right-2 text-teal-600"><FaCheck size={8} /></div>}
+                                                </label>
+
+                                                <label className={`cursor-pointer border-2 rounded-xl p-2.5 flex flex-col items-center justify-center gap-1.5 transition-all duration-200 relative overflow-hidden ${form.type === 'doctor' ? 'border-teal-500 bg-teal-50/50 text-teal-800 ring-4 ring-teal-500/10' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-gray-50'}`}>
+                                                    <input type="radio" name="type" value="doctor" checked={form.type === 'doctor'} onChange={handleChange} className="hidden" />
+                                                    <div className={`p-1.5 rounded-full ${form.type === 'doctor' ? 'bg-teal-100 text-teal-600' : 'bg-gray-100'}`}>
+                                                        <FaUserMd size={14} />
+                                                    </div>
+                                                    <span className="font-bold text-xs">Doctor</span>
+                                                    {form.type === 'doctor' && <div className="absolute top-2 right-2 text-teal-600"><FaCheck size={8} /></div>}
+                                                </label>
                                             </div>
-                                            <span className="font-bold text-sm">Doctor</span>
-                                            {form.type === 'doctor' && <div className="absolute top-3 right-3 text-teal-600"><FaCheck size={12} /></div>}
-                                        </label>
-                                    </div>
-                                </div>
+                                        </div>
 
-                                {/* Contact Details */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div>
-                                        <label className="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2 ml-1">Mobile Number</label>
-                                        <input
-                                            name="phone"
-                                            type="tel"
-                                            placeholder="Mobile Number"
-                                            value={form.phone}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            className={`w-full px-5 py-3.5 rounded-xl border-2 ${errors.phone ? 'border-red-300 bg-red-50 focus:ring-red-200 error-shake' : 'border-gray-100 bg-gray-50 focus:border-teal-500 focus:bg-white focus:ring-teal-100'} outline-none focus:ring-4 transition-all font-medium text-gray-700 placeholder-gray-400`}
+                                        {/* Contact Details */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2 ml-1">Mobile Number</label>
+                                                <input
+                                                    name="phone"
+                                                    type="tel"
+                                                    placeholder="Mobile Number"
+                                                    value={form.phone}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    className={`w-full px-3 py-2 rounded-lg border-2 ${errors.phone ? 'border-red-300 bg-red-50 focus:ring-red-200 error-shake' : 'border-gray-100 bg-gray-50 focus:border-teal-500 focus:bg-white focus:ring-teal-100'} outline-none focus:ring-4 transition-all font-medium text-gray-700 placeholder-gray-400 text-xs`}
+                                                />
+                                                {errors.phone ? (
+                                                    <p className="text-red-500 text-xs font-bold mt-1.5 ml-1 flex items-center gap-1"><FaTimes size={10} /> {errors.phone}</p>
+                                                ) : (
+                                                    <p className="text-gray-400 text-[10px] mt-1.5 ml-1 font-medium tracking-wide">10 digits starting with 6-9</p>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <label className="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2 ml-1">Email Address</label>
+                                                <input
+                                                    name="email"
+                                                    type="email"
+                                                    placeholder="your@email.com"
+                                                    value={form.email}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    className={`w-full px-3 py-2 rounded-lg border-2 ${errors.email ? 'border-red-300 bg-red-50 focus:ring-red-200' : 'border-gray-100 bg-gray-50 focus:border-teal-500 focus:bg-white focus:ring-teal-100'} outline-none focus:ring-4 transition-all font-medium text-gray-700 placeholder-gray-400 text-xs`}
+                                                />
+                                                {errors.email && <p className="text-red-500 text-xs font-bold mt-1.5 ml-1 flex items-center gap-1"><FaTimes size={10} /> {errors.email}</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Right Column: Address (Compact) */}
+                                    <div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
+                                        <StructuredAddressForm
+                                            address={form.address}
+                                            onChange={(address) => setForm({ ...form, address })}
+                                            title="Delivery Address"
+                                            showShopName={false}
+                                            compact={true}
                                         />
-                                        {errors.phone ? (
-                                            <p className="text-red-500 text-xs font-bold mt-1.5 ml-1 flex items-center gap-1"><FaTimes size={10} /> {errors.phone}</p>
-                                        ) : (
-                                            <p className="text-gray-400 text-[10px] mt-1.5 ml-1 font-medium tracking-wide">10 digits starting with 6-9</p>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <label className="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2 ml-1">Email Address</label>
-                                        <input
-                                            name="email"
-                                            type="email"
-                                            placeholder="your@email.com"
-                                            value={form.email}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            className={`w-full px-5 py-3.5 rounded-xl border-2 ${errors.email ? 'border-red-300 bg-red-50 focus:ring-red-200' : 'border-gray-100 bg-gray-50 focus:border-teal-500 focus:bg-white focus:ring-teal-100'} outline-none focus:ring-4 transition-all font-medium text-gray-700 placeholder-gray-400`}
-                                        />
-                                        {errors.email && <p className="text-red-500 text-xs font-bold mt-1.5 ml-1 flex items-center gap-1"><FaTimes size={10} /> {errors.email}</p>}
                                     </div>
                                 </div>
 
-                                <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                                    <StructuredAddressForm
-                                        address={form.address}
-                                        onChange={(address) => setForm({ ...form, address })}
-                                        title="Delivery Address"
-                                        showShopName={false}
-                                    />
-                                </div>
-
-                                <div className="space-y-4">
-                                    <label className="flex items-start gap-3 cursor-pointer group">
+                                {/* Terms Checkbox & Submit Button */}
+                                <div className="pt-4 border-t border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <label className="flex items-start gap-3 cursor-pointer group max-w-md">
                                         <input
                                             type="checkbox"
                                             checked={acceptedTerms}
@@ -284,7 +294,7 @@ const Register = () => {
                                     <button
                                         type="submit"
                                         disabled={submitting || !isFormValid}
-                                        className={`w-full text-white font-bold py-4 rounded-xl shadow-lg transition-all transform flex items-center justify-center gap-2 ${submitting || !isFormValid ? 'bg-gray-300 cursor-not-allowed shadow-none' : 'bg-teal-600 hover:bg-teal-700 hover:shadow-xl hover:-translate-y-0.5'}`}
+                                        className={`w-full md:w-64 text-white font-bold py-3.5 rounded-xl shadow-md transition-all transform flex items-center justify-center gap-2 ${submitting || !isFormValid ? 'bg-gray-300 cursor-not-allowed shadow-none' : 'bg-teal-600 hover:bg-teal-700 hover:shadow-lg hover:-translate-y-0.5'}`}
                                     >
                                         {submitting ? 'Sending Request...' : 'Submit Request'}
                                     </button>
@@ -292,7 +302,7 @@ const Register = () => {
                             </form>
                         )}
 
-                        <div className="mt-8 text-center border-t border-gray-100 pt-6">
+                        <div className="mt-4 text-center border-t border-gray-100 pt-4">
                             <p className="text-gray-400 text-sm font-medium">Already have an account?</p>
                             <Link to="/login" className="text-teal-600 hover:text-teal-800 font-bold text-sm inline-block mt-1 hover:underline transition-all">Login to Dashboard</Link>
                         </div>
