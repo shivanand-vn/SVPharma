@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { FaPlus, FaMinus, FaSearch, FaTimes, FaChevronDown, FaBuilding } from 'react-icons/fa';
+import { QuantityInput } from '../../components/common/QuantityInput';
 
 const MedicineSkeleton = ({ isCompact }: { isCompact?: boolean }) => (
     <div className={`bg-white rounded-2xl md:rounded-3xl border border-gray-100 p-3 sm:p-5 flex flex-col h-full animate-pulse transition-all ${isCompact ? 'w-48 sm:w-64 flex-shrink-0' : 'w-full'}`}>
@@ -75,7 +76,16 @@ const MedicineDetailsModal = ({ med, onClose, cartItems, addToCart, updateQuanti
                                 <span className="text-xs font-bold text-gray-500 ml-4 uppercase tracking-wider">Quantity in Cart</span>
                                 <div className="flex items-center bg-white rounded-xl shadow-sm border border-gray-100">
                                     <button onClick={() => updateQuantity(med._id, -1)} className="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-teal-600 transition-colors"><FaMinus /></button>
-                                    <span className="w-8 text-center font-black text-teal-600 text-lg">{cartItems.find((i: any) => i._id === med._id)?.quantity}</span>
+                                    <QuantityInput
+                                        quantity={cartItems.find((i: any) => i._id === med._id)?.quantity || 1}
+                                        onChange={(qty) => {
+                                            const item = cartItems.find((i: any) => i._id === med._id);
+                                            if (item) {
+                                                updateQuantity(med._id, qty - item.quantity);
+                                            }
+                                        }}
+                                        className="w-8 text-teal-600 text-lg font-black text-center"
+                                    />
                                     <button onClick={() => updateQuantity(med._id, 1)} className="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-teal-600 transition-colors"><FaPlus /></button>
                                 </div>
                             </div>
@@ -145,7 +155,16 @@ const MedicineCard = ({ med, cartItems, addToCart, updateQuantity, isCompact = f
                         {cartItems.find((i: any) => i._id === med._id) ? (
                             <div className="flex items-center bg-gray-50 rounded-xl overflow-hidden border border-gray-100 shadow-sm scale-90 sm:scale-100 origin-right">
                                 <button onClick={() => updateQuantity(med._id, -1)} className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white transition-colors border-r border-gray-100"><FaMinus size={10} /></button>
-                                <span className="w-8 sm:w-10 text-center font-black text-primary text-[10px] sm:text-sm">{cartItems.find((i: any) => i._id === med._id)?.quantity}</span>
+                                <QuantityInput
+                                    quantity={cartItems.find((i: any) => i._id === med._id)?.quantity || 1}
+                                    onChange={(qty) => {
+                                        const item = cartItems.find((i: any) => i._id === med._id);
+                                        if (item) {
+                                            updateQuantity(med._id, qty - item.quantity);
+                                        }
+                                    }}
+                                    className="w-8 sm:w-10 text-primary text-[10px] sm:text-sm font-black text-center"
+                                />
                                 <button onClick={() => updateQuantity(med._id, 1)} className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white transition-colors border-l border-gray-100"><FaPlus size={10} /></button>
                             </div>
                         ) : (

@@ -4,6 +4,7 @@ import api from '../../utils/api';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaTrash, FaArrowLeft, FaCreditCard, FaCheckCircle, FaShoppingBag, FaPlus, FaMinus, FaSpinner } from 'react-icons/fa';
 import { useNotification } from '../../context/NotificationContext';
+import { QuantityInput } from '../../components/common/QuantityInput';
 
 const Cart = () => {
     const { cartItems, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart();
@@ -102,7 +103,10 @@ const Cart = () => {
                                         >
                                             <FaMinus size={10} />
                                         </button>
-                                        <span className="px-2 font-black text-primary min-w-[30px] text-center text-sm">{item.quantity}</span>
+                                        <QuantityInput
+                                            quantity={item.quantity}
+                                            onChange={(qty) => updateQuantity(item._id, qty - item.quantity)}
+                                        />
                                         <button
                                             onClick={() => updateQuantity(item._id, 1)}
                                             className="px-3 py-2 hover:bg-white text-gray-400 hover:text-primary transition-colors"
