@@ -34,7 +34,7 @@ const AdminLayout = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/');
+        navigate('/', { replace: true });
     };
 
     // Notification State

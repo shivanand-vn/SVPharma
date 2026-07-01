@@ -166,7 +166,7 @@ const CustomerLayout = () => {
         // Wait for animation to complete
         await new Promise(resolve => setTimeout(resolve, 800));
         logout();
-        navigate('/');
+        navigate('/', { replace: true });
     };
 
     return (

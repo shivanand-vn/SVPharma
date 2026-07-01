@@ -34,7 +34,7 @@ const Home = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/');
+        navigate('/', { replace: true });
     };
 
     useEffect(() => {

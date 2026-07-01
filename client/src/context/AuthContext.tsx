@@ -35,9 +35,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const logout = () => {
+        setUser(null);
+        sessionStorage.clear();
+        localStorage.clear();
+    };
+
     useEffect(() => {
         const initAuth = async () => {
-            const storedUser = sessionStorage.getItem('user');
+            const storedUser = sessionStorage.getItem('user') || localStorage.getItem('user');
             if (storedUser) {
                 const parsedUser = JSON.parse(storedUser);
                 setUser(parsedUser);
@@ -82,18 +88,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         setUser(finalUser);
         sessionStorage.setItem('user', JSON.stringify(finalUser));
+        localStorage.setItem('user', JSON.stringify(finalUser));
         return finalUser;
     };
 
     const updateUser = (userData: User) => {
         setUser(userData);
         sessionStorage.setItem('user', JSON.stringify(userData));
-    };
-
-    const logout = () => {
-        setUser(null);
-        sessionStorage.removeItem('user');
-        localStorage.removeItem('user'); // Also clear localStorage just in case of transition
+        localStorage.setItem('user', JSON.stringify(userData));
     };
 
     return (
