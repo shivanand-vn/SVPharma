@@ -32,7 +32,8 @@ const genUsername = (name, phone, type, existingCount = 0) => {
 // Helper to generate password
 const genPassword = (name, phone) => {
     const last4 = (phone || "0000").slice(-4);
-    const namePart = (name || "user").toLowerCase().slice(0, 4);
+    const cleanedName = (name || "user").replace(/\s+/g, "");
+    const namePart = cleanedName.toLowerCase().slice(0, 4);
     return `SVP${last4}${namePart}`;
 };
 
