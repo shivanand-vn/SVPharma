@@ -28,6 +28,12 @@ const medicineSchema = new mongoose.Schema({
         min: 0,
         default: function () { return this.trp; } // Auto-migrate if creating new from old data pattern
     },
+    gst: {
+        type: Number,
+        required: true,
+        min: 0,
+        default: 0
+    },
     trp: { // Legacy field support
         type: Number,
         min: 0

@@ -21,6 +21,7 @@ const protect = asyncHandler(async (req, res, next) => {
                 req.user = req.admin;
                 // Use the role from the database
                 req.user.role = req.admin.role || 'admin';
+                req.role = req.admin.role || 'admin';
             }
 
             // If not Admin, check if Customer
@@ -29,6 +30,7 @@ const protect = asyncHandler(async (req, res, next) => {
                 if (req.customer) {
                     req.user = req.customer;
                     req.user.role = 'customer';
+                    req.role = 'customer';
                 }
             }
 

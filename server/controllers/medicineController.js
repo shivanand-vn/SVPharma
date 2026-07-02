@@ -11,6 +11,30 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const transformMedicineForRole = (med, role) => {
+    const costVal = med.cost !== undefined ? med.cost : (med.trp !== undefined ? med.trp : 0);
+    const gstVal = med.gst !== undefined ? med.gst : 0;
+    const finalPrice = costVal + (costVal * gstVal / 100);
+
+    if (role === 'admin') {
+        return {
+            ...med,
+            cost: costVal,
+            gst: gstVal,
+            price: finalPrice
+        };
+    } else {
+        // Customer or developer view: do not expose gst or base cost
+        const transformed = {
+            ...med,
+            cost: finalPrice,
+            price: finalPrice
+        };
+        delete transformed.gst;
+        return transformed;
+    }
+};
+
 // @desc    Get all medicines
 // @route   GET /api/medicines
 // @access  Public (or Private?) - Usually Private for Shop Apps but maybe public catalog
@@ -22,11 +46,8 @@ const getMedicines = asyncHandler(async (req, res) => {
     }
     const medicines = await Medicine.find(filter).lean(); // Use lean for performance and easier modification
 
-    // Map legacy 'trp' to 'cost' if 'cost' is missing
-    const mappedMedicines = medicines.map(med => ({
-        ...med,
-        cost: med.cost !== undefined ? med.cost : med.trp
-    }));
+    const role = req.role || (req.user ? req.user.role : 'customer');
+    const mappedMedicines = medicines.map(med => transformMedicineForRole(med, role));
 
     res.json(mappedMedicines);
 });
@@ -137,6 +158,7 @@ const getFastMovingMedicines = asyncHandler(async (req, res) => {
                 mrp: "$details.mrp",
                 cost: { $ifNull: ["$details.cost", "$details.price", "$details.trp", "$details.mrp", 0] },
                 price: { $ifNull: ["$details.price", "$details.cost", "$details.trp", "$details.mrp", 0] },
+                gst: { $ifNull: ["$details.gst", 0] },
                 image: "$details.imageUrl",
                 imageUrl: "$details.imageUrl",
                 category: "$details.category",
@@ -147,16 +169,19 @@ const getFastMovingMedicines = asyncHandler(async (req, res) => {
         }
     ]);
 
-    res.json(fastMoving);
+    const role = req.role || (req.user ? req.user.role : 'customer');
+    const mappedFastMoving = fastMoving.map(med => transformMedicineForRole(med, role));
+    res.json(mappedFastMoving);
 });
 
 // @desc    Get single medicine
 // @route   GET /api/medicines/:id
 // @access  Public
 const getMedicineById = asyncHandler(async (req, res) => {
-    const medicine = await Medicine.findById(req.params.id);
+    const medicine = await Medicine.findById(req.params.id).lean();
     if (medicine) {
-        res.json(medicine);
+        const role = req.role || (req.user ? req.user.role : 'customer');
+        res.json(transformMedicineForRole(medicine, role));
     } else {
         res.status(404);
         throw new Error('Medicine not found');
@@ -167,13 +192,21 @@ const getMedicineById = asyncHandler(async (req, res) => {
 // @route   POST /api/medicines
 // @access  Private/Admin
 const createMedicine = asyncHandler(async (req, res) => {
-    const { name, description, company, mrp, cost, category, type, packing } = req.body;
+    const { name, description, company, mrp, cost, category, type, packing, gst } = req.body;
 
     // 1. Validation for Required Fields
     if (!name || !description || !company || !mrp || !cost || !category || !type || !packing || !req.file) {
         if (req.file) fs.unlinkSync(req.file.path); // Cleanup if uploaded
         res.status(400);
         throw new Error('All primary fields and image are mandatory');
+    }
+
+    // Parse and validate GST
+    const gstNum = gst !== undefined && String(gst).trim() !== '' ? Number(String(gst).trim()) : 0;
+    if (isNaN(gstNum) || gstNum < 0) {
+        if (req.file) fs.unlinkSync(req.file.path);
+        res.status(400);
+        throw new Error('GST must be a positive number');
     }
 
     // 2. Check for Duplicate Name (Case-Insensitive)
@@ -205,13 +238,17 @@ const createMedicine = asyncHandler(async (req, res) => {
     }
 
     // 4. Create Medicine
+    const costNum = Number(cost);
+    const calculatedPrice = costNum + (costNum * gstNum / 100);
+
     const medicine = new Medicine({
         name,
         description,
         company,
         mrp: Number(mrp),
-        cost: Number(cost),
-        price: Number(cost),
+        cost: costNum,
+        gst: gstNum,
+        price: calculatedPrice,
         category,
         type,
         packing,
@@ -219,14 +256,14 @@ const createMedicine = asyncHandler(async (req, res) => {
     });
 
     const createdMedicine = await medicine.save();
-    res.status(201).json(createdMedicine);
+    res.status(201).json(transformMedicineForRole(createdMedicine.toObject(), 'admin'));
 });
 
 // @desc    Update a medicine
 // @route   PUT /api/medicines/:id
 // @access  Private/Admin
 const updateMedicine = asyncHandler(async (req, res) => {
-    const { name, description, company, mrp, cost, category, type, packing } = req.body;
+    const { name, description, company, mrp, cost, category, type, packing, gst } = req.body;
 
     const medicine = await Medicine.findById(req.params.id);
 
@@ -262,18 +299,29 @@ const updateMedicine = asyncHandler(async (req, res) => {
             }
         }
 
+        const currentCost = cost !== undefined ? Number(cost) : medicine.cost;
+        const currentGst = gst !== undefined && String(gst).trim() !== '' ? Number(String(gst).trim()) : (medicine.gst !== undefined ? medicine.gst : 0);
+
+        if (isNaN(currentGst) || currentGst < 0) {
+            res.status(400);
+            throw new Error('GST must be a positive number');
+        }
+
+        const calculatedPrice = currentCost + (currentCost * currentGst / 100);
+
         medicine.name = name || medicine.name;
         medicine.description = description || medicine.description;
         medicine.company = company || medicine.company;
         medicine.mrp = mrp !== undefined ? Number(mrp) : medicine.mrp;
-        medicine.cost = cost !== undefined ? Number(cost) : medicine.cost;
-        medicine.price = cost !== undefined ? Number(cost) : medicine.price;
+        medicine.cost = currentCost;
+        medicine.gst = currentGst;
+        medicine.price = calculatedPrice;
         medicine.category = category || medicine.category;
         medicine.type = type || medicine.type;
         medicine.packing = packing || medicine.packing;
 
         const updatedMedicine = await medicine.save();
-        res.json(updatedMedicine);
+        res.json(transformMedicineForRole(updatedMedicine.toObject(), 'admin'));
     } else {
         res.status(404);
         throw new Error('Medicine not found');
