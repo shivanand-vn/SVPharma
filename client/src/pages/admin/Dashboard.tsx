@@ -104,6 +104,13 @@ const EditMedicineModal = ({ isOpen, onClose, medicine, onSave }: any) => {
     };
 
     const handleSave = async () => {
+        const gstVal = formData.gst !== undefined ? String(formData.gst).trim() : '0';
+        const parsedGst = gstVal === '' ? 0 : Number(gstVal);
+        if (isNaN(parsedGst) || parsedGst < 0 || gstVal.includes('%') || /[^0-9.]/.test(gstVal)) {
+            alert("GST (%) must be a positive number (digits and decimals only)!");
+            return;
+        }
+
         setUploading(true);
         try {
             let imageUrl = formData.imageUrl;
@@ -119,7 +126,7 @@ const EditMedicineModal = ({ isOpen, onClose, medicine, onSave }: any) => {
                 imageUrl = uploadRes.data.url;
             }
 
-            onSave({ ...formData, imageUrl });
+            onSave({ ...formData, gst: parsedGst, imageUrl });
         } catch (error) {
             console.error('Upload failed', error);
             alert('Failed to upload image');
@@ -151,7 +158,11 @@ const EditMedicineModal = ({ isOpen, onClose, medicine, onSave }: any) => {
                             </select>
                         </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-4 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Packing</label>
+                            <input name="packing" value={formData.packing || ''} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 outline-none" />
+                        </div>
                         <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">MRP</label>
                             <input type="number" name="mrp" value={formData.mrp || ''} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 outline-none no-spinner" />
@@ -161,8 +172,8 @@ const EditMedicineModal = ({ isOpen, onClose, medicine, onSave }: any) => {
                             <input type="number" name="cost" value={formData.cost || ''} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 outline-none no-spinner" />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Packing</label>
-                            <input name="packing" value={formData.packing || ''} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 outline-none" />
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">GST (%)</label>
+                            <input type="number" step="any" min="0" name="gst" placeholder="0%" value={formData.gst !== undefined ? formData.gst : '0'} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 outline-none no-spinner" />
                         </div>
                     </div>
 
@@ -1297,14 +1308,15 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory, onRecordPayment }: 
                         <tr>
                             {type === 'medicines' && (
                                 <>
-                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider w-16">S.No.</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Name</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider w-24">Type</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Description</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Cost (₹)</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">MRP (₹)</th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Packing</th>
-                                    <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider sticky right-0 bg-teal-900 z-10">Action</th>
+                                    <th className="px-3 py-4 text-left text-sm font-bold uppercase tracking-wider w-16">S.No.</th>
+                                    <th className="px-3 py-4 text-left text-sm font-bold uppercase tracking-wider">Name</th>
+                                    <th className="px-3 py-4 text-left text-sm font-bold uppercase tracking-wider w-24">Type</th>
+                                    <th className="px-3 py-4 text-left text-sm font-bold uppercase tracking-wider">Description</th>
+                                    <th className="px-3 py-4 text-left text-sm font-bold uppercase tracking-wider">Cost (₹)</th>
+                                    <th className="px-3 py-4 text-left text-sm font-bold uppercase tracking-wider">GST (%)</th>
+                                    <th className="px-3 py-4 text-left text-sm font-bold uppercase tracking-wider">MRP (₹)</th>
+                                    <th className="px-3 py-4 text-left text-sm font-bold uppercase tracking-wider">Packing</th>
+                                    <th className="px-3 py-4 text-center text-sm font-bold uppercase tracking-wider sticky right-0 bg-teal-900 z-10">Action</th>
                                 </>
                             )}
                             {type === 'customers' && (
@@ -1343,17 +1355,18 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory, onRecordPayment }: 
                                 <tr key={i} className="hover:bg-teal-50/50 transition-colors border-b border-gray-100">
                                     {type === 'medicines' && (
                                         <>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono w-16">{i + 1}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-teal-900">{item.name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium w-24">{item.type || 'N/A'}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title={item.description} style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-teal-700 font-bold">₹{item.cost}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-semibold">₹{item.mrp}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.packing}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-center sticky right-0 bg-white z-10 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.1)]">
-                                                <div className="flex justify-center gap-2">
-                                                    <button onClick={() => onEdit(item)} className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm hover:shadow-md">Edit</button>
-                                                    <button onClick={() => onDelete(item)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm hover:shadow-md">Delete</button>
+                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500 font-mono w-16">{i + 1}</td>
+                                            <td className="px-3 py-4 whitespace-nowrap text-sm font-bold text-teal-900">{item.name}</td>
+                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-600 font-medium w-24">{item.type || 'N/A'}</td>
+                                            <td className="px-3 py-4 text-sm text-gray-500 max-w-xs truncate" title={item.description} style={{ maxWidth: '120px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description}</td>
+                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-teal-700 font-bold">₹{item.cost}</td>
+                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-600 font-semibold">{item.gst || 0}%</td>
+                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-600 font-semibold">₹{item.mrp}</td>
+                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-600">{item.packing}</td>
+                                            <td className="px-3 py-4 whitespace-nowrap text-center sticky right-0 bg-white z-10 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.1)]">
+                                                <div className="flex justify-center gap-1.5">
+                                                    <button onClick={() => onEdit(item)} className="bg-blue-500 hover:bg-blue-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm hover:shadow-md">Edit</button>
+                                                    <button onClick={() => onDelete(item)} className="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm hover:shadow-md">Delete</button>
                                                 </div>
                                             </td>
                                         </>
