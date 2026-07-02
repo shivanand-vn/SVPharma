@@ -52,8 +52,8 @@ const MedicineDetailsModal = ({ med, onClose, cartItems, addToCart, updateQuanti
                         <div className="flex justify-between items-start gap-4 mb-2">
                             <h2 className="text-2xl font-black text-gray-900 leading-tight">{med.name}</h2>
                             <div className="flex flex-col items-end">
-                                <span className="text-2xl font-black text-teal-600">₹{(med.cost || med.price).toFixed(2)}</span>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cost</span>
+                                <span className="text-2xl font-black text-teal-600">₹{med.price.toFixed(2)}</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Price</span>
                             </div>
                         </div>
                         <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">{med.company}</p>
@@ -91,7 +91,7 @@ const MedicineDetailsModal = ({ med, onClose, cartItems, addToCart, updateQuanti
                             </div>
                         ) : (
                             <button
-                                onClick={() => addToCart({ ...med, quantity: 1, price: med.cost || med.price })}
+                                onClick={() => addToCart({ ...med, quantity: 1, price: med.price })}
                                 className="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl font-bold uppercase tracking-widest shadow-lg shadow-teal-200 transition-all hover:shadow-xl hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
                             >
                                 <FaPlus className="text-sm" /> Add to Cart
@@ -141,8 +141,8 @@ const MedicineCard = ({ med, cartItems, addToCart, updateQuantity, isCompact = f
                 <div className="flex items-end justify-between gap-2">
                     <div className="flex flex-col">
                         <div className="flex items-baseline gap-1">
-                            <span className="text-[10px] font-bold text-gray-500 uppercase">Cost:</span>
-                            <span className="text-xs sm:text-xl font-black text-teal-600">₹{(med.cost || med.price).toFixed(2)}</span>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase">Price:</span>
+                            <span className="text-xs sm:text-xl font-black text-teal-600">₹{med.price.toFixed(2)}</span>
                         </div>
                         {!hideOffers && med.mrp && (
                             <p className="text-[8px] sm:text-[10px] text-gray-400 font-bold">
@@ -169,7 +169,7 @@ const MedicineCard = ({ med, cartItems, addToCart, updateQuantity, isCompact = f
                             </div>
                         ) : (
                             <button
-                                onClick={() => addToCart({ ...med, quantity: 1, price: med.cost || med.price })}
+                                onClick={() => addToCart({ ...med, quantity: 1, price: med.price })}
                                 className="bg-primary hover:bg-teal-700 text-white w-10 sm:w-12 h-8 sm:h-10 rounded-xl flex items-center justify-center shadow-lg shadow-teal-200 transition-all hover:-translate-y-1 active:scale-95 font-bold text-[10px] sm:text-xs"
                             >
                                 Add
