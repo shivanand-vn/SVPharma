@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useAuth } from './AuthContext';
+import api from '../utils/api';
 
 interface CartItem {
     _id: string; // medicine id
@@ -35,6 +36,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     const { user } = useAuth();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const userRef = useRef(user?._id);
+    const [maxCartQty, setMaxCartQty] = useState(100);
+
+    // Fetch site settings for maxCartQty configuration
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const { data } = await api.get('/settings');
+                if (data && data.maxCartQty !== undefined) {
+                    setMaxCartQty(Number(data.maxCartQty) || 100);
+                }
+            } catch (e) {
+                console.error('Failed to fetch settings for maxCartQty', e);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     // Dynamic key based on logged in user
     const getCartKey = () => user ? `cartItems_${user._id}` : 'cartItems_guest';
@@ -62,9 +79,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         setCartItems(prev => {
             const existing = prev.find(i => i._id === item._id);
             if (existing) {
-                return prev.map(i => i._id === item._id ? { ...i, quantity: i.quantity + item.quantity } : i);
+                const newQty = Math.min(maxCartQty, existing.quantity + item.quantity);
+                return prev.map(i => i._id === item._id ? { ...i, quantity: newQty } : i);
             }
-            return [...prev, item];
+            const newQty = Math.min(maxCartQty, item.quantity);
+            return [...prev, { ...item, quantity: newQty }];
         });
     };
 
@@ -76,7 +95,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         setCartItems(prev => {
             return prev.map(item => {
                 if (item._id === id) {
-                    const newQty = Math.max(0, item.quantity + delta);
+                    const newQty = Math.min(maxCartQty, Math.max(0, item.quantity + delta));
                     return { ...item, quantity: newQty };
                 }
                 return item;

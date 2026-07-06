@@ -37,7 +37,8 @@ const siteSettingsSchema = new mongoose.Schema({
     }],
     upiId: { type: String, default: 'admin@upi' },
     shopLocationLink: { type: String, default: '' },
-    shopImage: { type: String, default: '' }
+    shopImage: { type: String, default: '' },
+    maxCartQty: { type: Number, default: 100 }
 }, { timestamps: true });
 
 const SiteSettings = mongoose.model('SiteSettings', siteSettingsSchema);
