@@ -249,8 +249,8 @@ const Footer = () => {
                     </div>
 
                     {/* Section C: Developed By (STATIC) */}
-                    <div className="space-y-8">
-                        <div className="relative group">
+                    <div className="space-y-8 md:col-span-2 lg:col-span-1 md:flex md:justify-center">
+                        <div className="relative group w-full max-w-md md:max-w-sm lg:max-w-none">
                             <div className="bg-[#1e293b] rounded-[32px] p-8 border border-gray-700 shadow-2xl relative overflow-hidden transition-all duration-500 hover:shadow-teal-900/10 hover:border-teal-900/30">
                                 {/* Decorative elements */}
                                 <div className="absolute -right-8 -top-8 w-24 h-24 bg-teal-500/5 rounded-full blur-2xl"></div>

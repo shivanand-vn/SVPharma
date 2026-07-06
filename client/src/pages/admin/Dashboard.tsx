@@ -6,42 +6,7 @@ import api from '../../utils/api';
 import { formatAddress } from '../../utils/addressHelper';
 import RecordPaymentModal from '../../components/admin/RecordPaymentModal';
 
-// --- Skeleton Components ---
-const Skeleton = ({ className }: { className?: string }) => (
-    <div className={`relative overflow-hidden bg-gray-200 rounded ${className}`}>
-        <div className="absolute inset-0 animate-shimmer"></div>
-    </div>
-);
-
-const StatCardSkeleton = () => (
-    <div className="bg-white rounded-xl shadow-card p-6 flex flex-col items-center justify-center text-center h-48 border border-teal-50">
-        <Skeleton className="h-14 w-14 rounded-full mb-4" />
-        <Skeleton className="h-4 w-24 mb-2" />
-        <Skeleton className="h-10 w-16" />
-    </div>
-);
-
-const AnalyticsSkeleton = () => (
-    <div className="p-8 space-y-8 bg-teal-50/20">
-        <Skeleton className="h-10 w-64 mx-auto mb-8" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-teal-100">
-                    <Skeleton className="h-4 w-24 mb-2" />
-                    <Skeleton className="h-8 w-32" />
-                </div>
-            ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {[1, 2, 3, 4].map(i => (
-                <div key={i} className="bg-white p-6 rounded-xl shadow-md border border-teal-50 h-[400px]">
-                    <Skeleton className="h-6 w-48 mb-6" />
-                    <Skeleton className="h-full w-full" />
-                </div>
-            ))}
-        </div>
-    </div>
-);
+import { DashboardStatSkeleton, AnalyticsSkeleton } from '../../components/common/Skeleton';
 
 // --- Toast Notification Component ---
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
@@ -1039,7 +1004,9 @@ const AdminDashboard = () => {
         <div className="space-y-8 relative">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 {loading ? (
-                    Array(5).fill(0).map((_, i) => <StatCardSkeleton key={i} />)
+                    Array(5).fill(0).map((_, i) => (
+                        <DashboardStatSkeleton key={i} isSpecial={i === 4} className={i === 4 ? 'md:col-span-2 lg:col-span-1' : ''} />
+                    ))
                 ) : (
                     cards.map((card, index) => (
                         <div
@@ -1048,7 +1015,7 @@ const AdminDashboard = () => {
                             className={`bg-white rounded-xl shadow-card p-4 flex flex-col items-center justify-center text-center h-48 border transition-all duration-300 cursor-pointer group hover:shadow-lg transform hover:-translate-y-1 ${activeView === card.view
                                 ? 'ring-2 ring-teal-500 bg-teal-50 border-teal-200'
                                 : 'border-teal-50'
-                                } ${card.isSpecial ? 'border-l-4 border-l-red-500 shadow-sm' : ''}`}
+                                } ${card.isSpecial ? 'border-l-4 border-l-red-500 shadow-sm md:col-span-2 lg:col-span-1' : ''}`}
                         >
                             <div className={`mb-3 ${card.isSpecial ? 'bg-red-50 text-red-500 group-hover:bg-red-100' : 'bg-teal-50 text-teal-600'} p-3 rounded-full transition-colors`}>
                                 {card.icon}
@@ -1302,7 +1269,7 @@ const ListView = ({ type, data, onEdit, onDelete, onHistory, onRecordPayment }: 
                 )}
             </div>
 
-            <div className="overflow-hidden rounded-xl shadow-lg border border-teal-100 bg-white mt-4">
+            <div className="overflow-x-auto rounded-xl shadow-lg border border-teal-100 bg-white mt-4">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-teal-900 text-white">
                         <tr>
