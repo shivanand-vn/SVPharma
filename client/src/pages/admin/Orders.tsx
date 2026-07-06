@@ -8,7 +8,7 @@ import {
     FaArrowRight, FaUndo, FaMapMarkerAlt
 } from 'react-icons/fa';
 import { formatAddress } from '../../utils/addressHelper';
-import { StatCardSkeleton, OrderCardSkeleton } from '../../components/common/Skeleton';
+import { FilterCardSkeleton, OrderCardSkeleton } from '../../components/common/Skeleton';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { Pagination } from '../../components/common/Pagination';
 
@@ -196,7 +196,7 @@ const AdminOrders = () => {
             {/* Dashboard Filter Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-12">
                 {loading ? (
-                    Array(6).fill(0).map((_, i) => <StatCardSkeleton key={i} />)
+                    Array(6).fill(0).map((_, i) => <FilterCardSkeleton key={i} />)
                 ) : (
                      [
                         { id: 'all', label: 'Total Orders', value: statusCounts.all, icon: <FaShoppingBag />, color: 'primary' },
