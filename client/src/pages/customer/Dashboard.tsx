@@ -3,18 +3,19 @@ import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import { FaPlus, FaMinus, FaSearch, FaTimes, FaChevronDown, FaBuilding } from 'react-icons/fa';
 import { QuantityInput } from '../../components/common/QuantityInput';
+import { Skeleton } from '../../components/common/Skeleton';
 
 const MedicineSkeleton = ({ isCompact }: { isCompact?: boolean }) => (
-    <div className={`bg-white rounded-2xl md:rounded-3xl border border-gray-100 p-3 sm:p-5 flex flex-col h-full animate-pulse transition-all ${isCompact ? 'w-48 sm:w-64 flex-shrink-0' : 'w-full'}`}>
-        <div className="h-28 sm:h-44 bg-gray-50 rounded-xl sm:rounded-2xl mb-4 sm:mb-6" />
-        <div className="h-4 bg-gray-50 rounded-lg w-3/4 mb-2" />
-        <div className="h-3 bg-gray-50 rounded-lg w-full mb-4" />
+    <div className={`bg-white rounded-2xl md:rounded-3xl border border-gray-100 p-3 sm:p-5 flex flex-col h-full transition-all ${isCompact ? 'w-48 sm:w-64 flex-shrink-0' : 'w-full'}`}>
+        <Skeleton className="h-28 sm:h-44 rounded-xl sm:rounded-2xl mb-4 sm:mb-6" />
+        <Skeleton className="h-4 w-3/4 mb-2 bg-slate-100" />
+        <Skeleton className="h-3 w-full mb-4 bg-slate-100" />
         <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-end gap-4">
             <div className="space-y-2 flex-1">
-                <div className="h-4 bg-gray-50 rounded-lg w-16" />
-                <div className="h-2 bg-gray-50 rounded-lg w-12" />
+                <Skeleton className="h-4 w-16 bg-slate-100" />
+                <Skeleton className="h-2.5 w-12 bg-slate-100" />
             </div>
-            <div className="h-8 w-10 bg-gray-50 rounded-xl" />
+            <Skeleton className="h-8 w-10 rounded-xl bg-slate-100" />
         </div>
     </div>
 );
@@ -153,8 +154,8 @@ const MedicineCard = ({ med, cartItems, addToCart, updateQuantity, isCompact = f
 
                     <div onClick={(e) => e.stopPropagation()}>
                         {cartItems.find((i: any) => i._id === med._id) ? (
-                            <div className="flex items-center bg-gray-50 rounded-xl overflow-hidden border border-gray-100 shadow-sm scale-90 sm:scale-100 origin-right">
-                                <button onClick={() => updateQuantity(med._id, -1)} className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white transition-colors border-r border-gray-100"><FaMinus size={10} /></button>
+                            <div className="flex items-center bg-gray-50 rounded-xl overflow-hidden border border-gray-100 shadow-sm flex-shrink-0">
+                                <button onClick={() => updateQuantity(med._id, -1)} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white transition-colors border-r border-gray-100"><FaMinus size={10} /></button>
                                 <QuantityInput
                                     quantity={cartItems.find((i: any) => i._id === med._id)?.quantity || 1}
                                     onChange={(qty) => {
@@ -163,9 +164,9 @@ const MedicineCard = ({ med, cartItems, addToCart, updateQuantity, isCompact = f
                                             updateQuantity(med._id, qty - item.quantity);
                                         }
                                     }}
-                                    className="w-8 sm:w-10 text-primary text-[10px] sm:text-sm font-black text-center"
+                                    className="w-8 text-primary text-xs font-black text-center"
                                 />
-                                <button onClick={() => updateQuantity(med._id, 1)} className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white transition-colors border-l border-gray-100"><FaPlus size={10} /></button>
+                                <button onClick={() => updateQuantity(med._id, 1)} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white transition-colors border-l border-gray-100"><FaPlus size={10} /></button>
                             </div>
                         ) : (
                             <button

@@ -44,6 +44,8 @@ export const QuantityInput = ({ quantity, onChange, className = '' }: QuantityIn
         }
     };
 
+    const widthClass = className.split(' ').some(c => c.startsWith('w-')) ? '' : 'w-12';
+
     return (
         <input
             type="text"
@@ -51,7 +53,7 @@ export const QuantityInput = ({ quantity, onChange, className = '' }: QuantityIn
             onChange={handleChange}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            className={`w-12 text-center bg-transparent font-black text-primary text-sm focus:outline-none focus:ring-1 focus:ring-primary rounded p-1 ${className}`}
+            className={`text-center bg-transparent font-black text-primary text-sm focus:outline-none focus:ring-1 focus:ring-primary rounded p-1 ${widthClass} ${className}`}
         />
     );
 };
