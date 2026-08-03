@@ -353,8 +353,8 @@ const AnalyticsView = ({ data, filter, onFilterChange }: { data: any, filter: { 
                                 const currentMonth = currentDate.getMonth();
                                 const options = [];
 
-                                // Only show 2026 months from current month down to January
-                                for (let month = currentMonth; month >= 0; month--) {
+                                // Only show 2026 months from current month down to May (index 4)
+                                for (let month = currentMonth; month >= 4; month--) {
                                     options.push(
                                         <option key={`2026-${month}`} value={`2026-${month}`}>
                                             {months[month]} 2026
@@ -524,7 +524,7 @@ const CustomerOrdersModal = ({ isOpen, onClose, customer }: { isOpen: boolean, o
         const currentMonth = currentDate.getMonth();
         const options = [{ value: 'all', label: 'All Months' }];
 
-        for (let month = 0; month <= currentMonth; month++) {
+        for (let month = 4; month <= currentMonth; month++) {
             options.push({
                 value: `2026-${month}`,
                 label: `${months[month]} 2026`
