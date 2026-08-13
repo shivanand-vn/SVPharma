@@ -81,7 +81,9 @@ const loginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
 
     // Check Admin
-    const admin = await Admin.findOne({ username });
+    const admin = await Admin.findOne({
+        $or: [{ username }, { email: username }]
+    });
     if (admin && (await admin.matchPassword(password))) {
         res.json({
             _id: admin._id,
@@ -94,7 +96,9 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     // Check Customer
-    const customer = await Customer.findOne({ username });
+    const customer = await Customer.findOne({
+        $or: [{ username }, { email: username }]
+    });
     if (customer && (await customer.matchPassword(password))) {
         if (customer.status !== 'approved') {
             res.status(401);

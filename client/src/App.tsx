@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import ScrollToTop from './components/ScrollToTop';
 // Layouts
 import AdminLayout from './layouts/AdminLayout';
 import CustomerLayout from './layouts/CustomerLayout';
@@ -105,6 +106,7 @@ function App() {
       <NotificationProvider>
         <CartProvider>
           <Router>
+            <ScrollToTop />
             <div className="flex flex-col min-h-screen">
               <main className="flex-grow">
                 <Routes>
