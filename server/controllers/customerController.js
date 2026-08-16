@@ -1,9 +1,9 @@
 const asyncHandler = require('express-async-handler');
 const Customer = require('../models/Customer');
 
-// @desc    Get customer profile
-// @route   GET /api/customers/profile
-// @access  Private (Customer)
+// Get customer profile
+// GET /api/customers/profile
+// Private (Customer)
 const getProfile = asyncHandler(async (req, res) => {
     const customer = await Customer.findById(req.user._id);
     if (customer) {
@@ -24,9 +24,10 @@ const getProfile = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Update customer profile
-// @route   PUT /api/customers/profile
-// @access  Private (Customer)
+
+// Update customer profile
+// PUT /api/customers/profile
+// Private (Customer)
 const updateProfile = asyncHandler(async (req, res) => {
     // GUARD: Check authentication
     if (!req.user || req.user.role !== 'customer') {
