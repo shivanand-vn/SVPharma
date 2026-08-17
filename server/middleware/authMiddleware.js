@@ -80,4 +80,40 @@ const adminOrDeveloper = (req, res, next) => {
     }
 };
 
-module.exports = { protect, adminOnly, developerOnly, adminOrDeveloper };
+const optionalProtect = asyncHandler(async (req, res, next) => {
+    let token;
+
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')
+    ) {
+        try {
+            token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            req.admin = await Admin.findById(decoded.id).select('-password');
+            if (req.admin) {
+                req.user = req.admin;
+                req.user.role = req.admin.role || 'admin';
+                req.role = req.admin.role || 'admin';
+            }
+
+            if (!req.admin) {
+                req.customer = await Customer.findById(decoded.id).select('-password');
+                if (req.customer) {
+                    req.user = req.customer;
+                    req.user.role = 'customer';
+                    req.role = 'customer';
+                }
+            }
+        } catch (error) {
+            // Token invalid, clear user info and continue as unauthenticated
+            req.user = null;
+            req.role = null;
+        }
+    }
+    next();
+});
+
+module.exports = { protect, adminOnly, developerOnly, adminOrDeveloper, optionalProtect };
+

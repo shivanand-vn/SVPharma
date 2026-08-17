@@ -236,8 +236,17 @@ const CustomerDashboard = () => {
                 // Populate companies list only on initial load (when showing All)
                 // This ensures the dropdown options don't disappear when filtering
                 if (selectedCompany === 'All Companies') {
-                    const uniqueCompanies = Array.from(new Set(data.map((m: any) => m.company))).filter(Boolean) as string[];
-                    setAllCompanies(['All Companies', ...uniqueCompanies]);
+                    const uniqueCompaniesMap = new Map<string, string>();
+                    data.forEach((m: any) => {
+                        if (m.company && typeof m.company === 'string') {
+                            const trimmed = m.company.trim();
+                            if (trimmed && !uniqueCompaniesMap.has(trimmed.toLowerCase())) {
+                                uniqueCompaniesMap.set(trimmed.toLowerCase(), trimmed);
+                            }
+                        }
+                    });
+                    const sortedCompanies = Array.from(uniqueCompaniesMap.values()).sort((a, b) => a.localeCompare(b));
+                    setAllCompanies(['All Companies', ...sortedCompanies]);
                 }
             } catch (e) {
                 console.error(e);
@@ -254,7 +263,8 @@ const CustomerDashboard = () => {
     const filteredMedicines = medicines.filter((med: any) => {
         const matchesCategory = activeTab === 'All' || med.category === activeTab;
         const matchesType = activeType === 'ALL' || med.type === activeType;
-        const matchesCompany = selectedCompany === 'All Companies' || med.company === selectedCompany;
+        const matchesCompany = selectedCompany === 'All Companies' ||
+            (med.company && med.company.trim().toLowerCase() === selectedCompany.trim().toLowerCase());
         const matchesSearch = !searchQuery ||
             med.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             med.description?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -441,11 +451,11 @@ const CustomerDashboard = () => {
                     </div>
 
                     {loading ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
                             {[...Array(10)].map((_, i) => <MedicineSkeleton key={i} />)}
                         </div>
                     ) : filteredMedicines.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
                             {filteredMedicines.map((med: any) => (
                                 <MedicineCard
                                     key={med._id}

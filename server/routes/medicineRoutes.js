@@ -8,17 +8,17 @@ const {
     updateMedicine,
     deleteMedicine
 } = require('../controllers/medicineController');
-const { protect, adminOnly } = require('../middleware/authMiddleware');
+const { protect, adminOnly, optionalProtect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 
 router.route('/')
-    .get(protect, getMedicines)
+    .get(optionalProtect, getMedicines)
     .post(protect, adminOnly, upload.single('image'), createMedicine);
 
-router.get('/fast-moving', protect, getFastMovingMedicines);
+router.get('/fast-moving', optionalProtect, getFastMovingMedicines);
 
 router.route('/:id')
-    .get(protect, getMedicineById)
+    .get(optionalProtect, getMedicineById)
     .put(protect, adminOnly, upload.single('image'), updateMedicine)
     .delete(protect, adminOnly, deleteMedicine);
 
