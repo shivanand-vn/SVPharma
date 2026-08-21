@@ -18,7 +18,8 @@ const Settings = () => {
         instagram: '',
         linkedin: '',
         developerName: '',
-        developerLink: ''
+        developerLink: '',
+        maxCartQty: 100
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -154,6 +155,18 @@ const Settings = () => {
                                     placeholder="admin@example.com"
                                 />
                             </div>
+                        </div>
+                        <div className="md:col-span-2 space-y-2">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Max Cart Item Quantity</label>
+                            <input
+                                type="number"
+                                name="maxCartQty"
+                                value={settings.maxCartQty}
+                                onChange={handleChange}
+                                className="w-full px-5 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-teal-500/20 outline-none transition-all font-bold text-gray-700"
+                                placeholder="e.g. 100"
+                                min={1}
+                            />
                         </div>
                     </div>
 

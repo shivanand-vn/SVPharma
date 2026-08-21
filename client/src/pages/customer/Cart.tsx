@@ -4,6 +4,7 @@ import api from '../../utils/api';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaTrash, FaArrowLeft, FaCreditCard, FaCheckCircle, FaShoppingBag, FaPlus, FaMinus, FaSpinner } from 'react-icons/fa';
 import { useNotification } from '../../context/NotificationContext';
+import { QuantityInput } from '../../components/common/QuantityInput';
 
 const Cart = () => {
     const { cartItems, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart();
@@ -35,7 +36,7 @@ const Cart = () => {
                 medicine: item._id,
                 name: item.name,
                 quantity: item.quantity,
-                price: item.cost || item.price,
+                price: item.price,
                 image: item.imageUrl
             }));
 
@@ -89,7 +90,7 @@ const Cart = () => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h3 className="font-black text-lg md:text-xl text-gray-800 mb-1 truncate">{item.name}</h3>
-                                        <p className="text-sm text-primary font-black tracking-tight">₹{item.cost || item.price}</p>
+                                        <p className="text-sm text-primary font-black tracking-tight">₹{item.price.toFixed(2)}</p>
                                     </div>
                                 </div>
 
@@ -102,7 +103,10 @@ const Cart = () => {
                                         >
                                             <FaMinus size={10} />
                                         </button>
-                                        <span className="px-2 font-black text-primary min-w-[30px] text-center text-sm">{item.quantity}</span>
+                                        <QuantityInput
+                                            quantity={item.quantity}
+                                            onChange={(qty) => updateQuantity(item._id, qty - item.quantity)}
+                                        />
                                         <button
                                             onClick={() => updateQuantity(item._id, 1)}
                                             className="px-3 py-2 hover:bg-white text-gray-400 hover:text-primary transition-colors"
@@ -110,7 +114,7 @@ const Cart = () => {
                                             <FaPlus size={10} />
                                         </button>
                                     </div>
-                                    <div className="font-black text-xl md:text-2xl text-gray-800 md:w-24 text-right tracking-tight">₹{((item.cost || item.price) * item.quantity).toFixed(0)}</div>
+                                    <div className="font-black text-xl md:text-2xl text-gray-800 md:w-24 text-right tracking-tight">₹{(item.price * item.quantity).toFixed(2)}</div>
                                     <button
                                         onClick={() => removeFromCart(item._id)}
                                         className="p-2 md:p-3 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl md:rounded-2xl transition-all active:scale-95"
@@ -131,7 +135,7 @@ const Cart = () => {
                                 <div className="space-y-4 md:space-y-5 mb-8 md:mb-10">
                                     <div className="flex justify-between text-gray-400 font-bold uppercase text-[10px] md:text-xs tracking-widest">
                                         <span>Subtotal</span>
-                                        <span className="text-gray-800">₹{cartTotal.toFixed(0)}</span>
+                                        <span className="text-gray-800">₹{cartTotal.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between text-gray-400 font-bold uppercase text-[10px] md:text-xs tracking-widest">
                                         <span>Tax estimate</span>
@@ -139,7 +143,7 @@ const Cart = () => {
                                     </div>
                                     <div className="pt-6 border-t border-gray-100 flex justify-between items-end">
                                         <span className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-widest pb-1">Order Total</span>
-                                        <span className="text-3xl md:text-4xl font-black text-primary tracking-tight">₹{cartTotal.toFixed(0)}</span>
+                                        <span className="text-3xl md:text-4xl font-black text-primary tracking-tight">₹{cartTotal.toFixed(2)}</span>
                                     </div>
                                 </div>
 
@@ -191,7 +195,7 @@ const Cart = () => {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[10px] font-black text-teal-600 uppercase tracking-[0.2em] mb-1">Total Amount</p>
-                                    <p className="text-2xl font-black text-primary">₹{orderData?.totalPrice?.toFixed(0) || cartTotal.toFixed(0)}</p>
+                                    <p className="text-2xl font-black text-primary">₹{(orderData?.totalPrice !== undefined ? orderData.totalPrice : cartTotal).toFixed(2)}</p>
                                 </div>
                             </div>
 

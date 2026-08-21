@@ -50,6 +50,7 @@ const updateShopSettings = asyncHandler(async (req, res) => {
     settings.linkedin = req.body.linkedin || settings.linkedin;
     settings.shopLocationLink = req.body.shopLocationLink || settings.shopLocationLink;
     settings.shopImage = req.body.shopImage || settings.shopImage;
+    settings.maxCartQty = req.body.maxCartQty !== undefined ? Number(req.body.maxCartQty) : settings.maxCartQty;
 
     const updatedSettings = await settings.save();
     res.json(updatedSettings);
@@ -80,7 +81,7 @@ const updateSettings = asyncHandler(async (req, res) => {
     let settings = await SiteSettings.findOne();
     if (!settings) settings = await SiteSettings.create({});
 
-    const adminFields = ['appName', 'email', 'phone', 'contacts', 'address', 'facebook', 'twitter', 'instagram', 'whatsapp', 'linkedin', 'shopLocationLink', 'shopImage'];
+    const adminFields = ['appName', 'email', 'phone', 'contacts', 'address', 'facebook', 'twitter', 'instagram', 'whatsapp', 'linkedin', 'shopLocationLink', 'shopImage', 'maxCartQty'];
 
     adminFields.forEach(field => {
         if (req.body[field] !== undefined) {

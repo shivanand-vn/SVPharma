@@ -19,6 +19,19 @@ body {
 }
 
 @layer utilities {
+  .font-brand {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+  .font-cinzel {
+    font-family: 'Cinzel', serif;
+  }
+  .font-cormorant {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+  }
+  .font-montserrat {
+    font-family: 'Montserrat', sans-serif;
+  }
+
   .animate-shimmer {
     background: linear-gradient(90deg,
         rgba(255, 255, 255, 0) 0%,

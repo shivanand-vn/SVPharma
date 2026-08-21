@@ -31,9 +31,14 @@ const siteSettingsSchema = new mongoose.Schema({
     developerRoleName: { type: String, default: 'Technical Partner' },
     developerLink: { type: String, default: '#' },
     developerProfileLink: { type: String, default: '#' },
+    developerSocialLinks: [{
+        name: { type: String, required: true },
+        url: { type: String, required: true }
+    }],
     upiId: { type: String, default: 'admin@upi' },
     shopLocationLink: { type: String, default: '' },
-    shopImage: { type: String, default: '' }
+    shopImage: { type: String, default: '' },
+    maxCartQty: { type: Number, default: 100 }
 }, { timestamps: true });
 
 const SiteSettings = mongoose.model('SiteSettings', siteSettingsSchema);

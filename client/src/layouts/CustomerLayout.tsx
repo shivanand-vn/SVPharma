@@ -7,10 +7,10 @@ import {
     FaUserCircle, FaMobileAlt, FaAt, FaTimes,
     FaTrash, FaPlus, FaMinus, FaReceipt
 } from 'react-icons/fa';
-import Footer from '../components/Footer';
 import api from '../utils/api';
 import StructuredAddressForm from '../components/StructuredAddressForm';
 import { normalizeAddress, formatAddress } from '../types/address';
+import Logo from '../assets/Logo.png';
 
 const CustomerLayout = () => {
     const { logout, user, updateUser } = useContext(AuthContext);
@@ -166,7 +166,7 @@ const CustomerLayout = () => {
         // Wait for animation to complete
         await new Promise(resolve => setTimeout(resolve, 800));
         logout();
-        navigate('/');
+        navigate('/', { replace: true });
     };
 
     return (
@@ -200,7 +200,7 @@ const CustomerLayout = () => {
                         <div className="hidden md:flex flex-1 items-center gap-6 relative">
                             <div className="flex items-center">
                                 <Link to="/customer" className="flex items-center gap-3">
-                                    <img src="/logo.png" alt="Logo" className="h-12 w-auto drop-shadow-sm transform hover:scale-105 transition-transform" />
+                                    <img src={Logo} alt="Logo" className="h-12 w-auto drop-shadow-sm transform hover:scale-105 transition-transform" />
                                 </Link>
                             </div>
                             <div className="flex-1 text-center pr-20">
@@ -214,7 +214,7 @@ const CustomerLayout = () => {
                         {/* Mobile Row 2: (Logo, SearchBar, Actions) */}
                         <div className="flex flex-1 items-center gap-2 md:hidden">
                             <Link to="/customer" className="flex items-center">
-                                <img src="/logo.png" alt="Logo" className="h-7 w-auto drop-shadow-sm" />
+                                <img src={Logo} alt="Logo" className="h-7 w-auto drop-shadow-sm" />
                             </Link>
 
                             <div className="flex-1 min-w-0">
@@ -234,7 +234,7 @@ const CustomerLayout = () => {
                                         <FaWallet className={`text-sm sm:text-lg ${walletCredit > 0 ? 'text-amber-500' : 'text-teal-600'}`} />
                                         {(displayDue > 0 || walletCredit > 0) && (
                                             <span className={`absolute -top-1.5 -right-1.5 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full border border-white ${walletCredit > 0 ? 'bg-amber-500' : 'bg-orange-500'}`}>
-                                                ₹{(walletCredit > 0 ? walletCredit : displayDue).toFixed(0)}
+                                                ₹{walletCredit > 0 ? walletCredit.toFixed(2) : displayDue.toFixed(2)}
                                             </span>
                                         )}
                                     </div>
@@ -256,12 +256,12 @@ const CustomerLayout = () => {
                                                 <div className="bg-white rounded-[20px] p-4 text-center border border-white shadow-lg shadow-teal-900/5 relative overflow-hidden group flex-1">
                                                     <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8 blur-lg group-hover:bg-primary/10 transition-colors" />
                                                     <p className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5 relative z-10">Outstanding Due</p>
-                                                    <p className="text-2xl font-black text-primary tracking-tighter relative z-10">₹{displayDue.toFixed(0)}</p>
+                                                    <p className="text-2xl font-black text-primary tracking-tighter relative z-10">₹{displayDue.toFixed(2)}</p>
                                                 </div>
                                                 {walletCredit > 0 && (
                                                     <div className="bg-amber-50 rounded-[20px] p-4 text-center border border-amber-100 shadow-sm relative overflow-hidden group flex-1">
                                                         <p className="text-[8px] font-black text-amber-600 uppercase tracking-[0.2em] mb-0.5 relative z-10">Credit Balance</p>
-                                                        <p className="text-2xl font-black text-amber-600 tracking-tighter relative z-10">₹{walletCredit.toFixed(0)}</p>
+                                                        <p className="text-2xl font-black text-amber-600 tracking-tighter relative z-10">₹{walletCredit.toFixed(2)}</p>
                                                     </div>
                                                 )}
                                                 <Link
@@ -312,7 +312,7 @@ const CustomerLayout = () => {
                                                                 <span className="px-2 font-bold text-primary min-w-[15px] text-center text-[10px]">{item.quantity}</span>
                                                                 <button onClick={() => updateQuantity(item._id, 1)} className="px-2 py-1 hover:bg-white text-gray-400 hover:text-primary"><FaPlus size={10} /></button>
                                                             </div>
-                                                            <span className="text-[10px] text-gray-400">₹{item.cost || item.price}</span>
+                                                            <span className="text-[10px] text-gray-400">₹{item.price}</span>
                                                         </div>
                                                     </div>
                                                     <button onClick={() => removeFromCart(item._id)} className="text-gray-300 hover:text-red-500 shrink-0 self-center"><FaTrash size={12} /></button>
@@ -321,7 +321,7 @@ const CustomerLayout = () => {
                                         </div>
                                         {cartItems.length > 0 && (
                                             <button onClick={() => { navigate('/customer/cart'); setCartOpen(false); }} className="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl font-black shadow-lg shadow-teal-100 transition-all text-sm uppercase tracking-widest">
-                                                Checkout ₹{cartTotal.toFixed(0)}
+                                                Checkout ₹{cartTotal.toFixed(2)}
                                             </button>
                                         )}
                                     </div>
@@ -431,8 +431,6 @@ const CustomerLayout = () => {
             <main className="flex-1 w-full relative">
                 <Outlet />
             </main>
-
-            <Footer />
 
             {/* Profile Edit Modal */}
             {

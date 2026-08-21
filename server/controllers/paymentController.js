@@ -114,15 +114,51 @@ const getWallet = asyncHandler(async (req, res) => {
 // @route   GET /api/payments/admin
 // @access  Private (Admin)
 const getAllPayments = asyncHandler(async (req, res) => {
-    const { status } = req.query;
+    const { status, page, limit, search } = req.query;
     let query = {};
     if (status) query.status = status;
 
-    const payments = await Payment.find(query)
-        .populate('customer', 'name email phone username dueAmount')
-        .sort({ createdAt: -1 });
+    if (search) {
+        const customers = await Customer.find({
+            $or: [
+                { name: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } },
+                { phone: { $regex: search, $options: 'i' } }
+            ]
+        }).select('_id');
+        const customerIds = customers.map(c => c._id);
+        
+        query.$or = [
+            { customer: { $in: customerIds } },
+            { transactionId: { $regex: search, $options: 'i' } }
+        ];
+    }
 
-    res.json(payments);
+    if (page || limit) {
+        const pageNum = parseInt(page) || 1;
+        const limitNum = parseInt(limit) || 10;
+        const skip = (pageNum - 1) * limitNum;
+
+        const count = await Payment.countDocuments(query);
+        const payments = await Payment.find(query)
+            .populate('customer', 'name email phone username dueAmount')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limitNum);
+
+        res.json({
+            payments,
+            page: pageNum,
+            pages: Math.ceil(count / limitNum),
+            total: count
+        });
+    } else {
+        const payments = await Payment.find(query)
+            .populate('customer', 'name email phone username dueAmount')
+            .sort({ createdAt: -1 });
+
+        res.json(payments);
+    }
 });
 
 // @desc    Submit offline payment (Admin)
@@ -157,7 +193,7 @@ const submitOfflinePayment = asyncHandler(async (req, res) => {
         status: 'approved',
         proofUrl: 'offline_payment',
         originalDueAmount: originalDue,
-        remainingDueAmount: originalDue - amount,
+        remainingDueAmount: Math.round((originalDue - amount) * 100) / 100,
         auditLogs: [{
             action: 'created_offline',
             performerModel: 'Admin',
@@ -167,7 +203,7 @@ const submitOfflinePayment = asyncHandler(async (req, res) => {
     });
 
     // 1. Reduce Customer Due Amount
-    customer.dueAmount = Math.max(0, (customer.dueAmount || 0) - amount);
+    customer.dueAmount = Math.max(0, Math.round(((customer.dueAmount || 0) - amount) * 100) / 100);
     await customer.save();
 
     // 2. Sync Wallet & History
@@ -214,7 +250,7 @@ const approvePayment = asyncHandler(async (req, res) => {
     // 1. Update Payment
     payment.status = 'approved';
     payment.originalDueAmount = originalDue;
-    payment.remainingDueAmount = Math.max(0, originalDue - payment.amount);
+    payment.remainingDueAmount = Math.max(0, Math.round((originalDue - payment.amount) * 100) / 100);
     payment.auditLogs.push({
         action: 'approved',
         performerModel: 'Admin',
@@ -224,7 +260,7 @@ const approvePayment = asyncHandler(async (req, res) => {
     await payment.save();
 
     // 2. Update Customer Balance
-    customer.dueAmount = Math.max(0, (customer.dueAmount || 0) - payment.amount);
+    customer.dueAmount = Math.max(0, Math.round(((customer.dueAmount || 0) - payment.amount) * 100) / 100);
     await customer.save();
 
     // 3. Sync Wallet

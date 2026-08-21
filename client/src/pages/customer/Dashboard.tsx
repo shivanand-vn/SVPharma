@@ -1,19 +1,21 @@
 import { useEffect, useState, useRef } from 'react';
 import api from '../../utils/api';
 import { useCart } from '../../context/CartContext';
-import { FaPlus, FaMinus, FaAngleRight, FaSearch, FaTimes, FaChevronDown, FaBuilding } from 'react-icons/fa';
+import { FaPlus, FaMinus, FaSearch, FaTimes, FaChevronDown, FaBuilding } from 'react-icons/fa';
+import { QuantityInput } from '../../components/common/QuantityInput';
+import { Skeleton } from '../../components/common/Skeleton';
 
 const MedicineSkeleton = ({ isCompact }: { isCompact?: boolean }) => (
-    <div className={`bg-white rounded-2xl md:rounded-3xl border border-gray-100 p-3 sm:p-5 flex flex-col h-full animate-pulse transition-all ${isCompact ? 'w-48 sm:w-64 flex-shrink-0' : 'w-full'}`}>
-        <div className="h-28 sm:h-44 bg-gray-50 rounded-xl sm:rounded-2xl mb-4 sm:mb-6" />
-        <div className="h-4 bg-gray-50 rounded-lg w-3/4 mb-2" />
-        <div className="h-3 bg-gray-50 rounded-lg w-full mb-4" />
+    <div className={`bg-white rounded-2xl md:rounded-3xl border border-gray-100 p-3 sm:p-5 flex flex-col h-full transition-all ${isCompact ? 'w-48 sm:w-64 flex-shrink-0' : 'w-full'}`}>
+        <Skeleton className="h-28 sm:h-44 rounded-xl sm:rounded-2xl mb-4 sm:mb-6" />
+        <Skeleton className="h-4 w-3/4 mb-2 bg-slate-100" />
+        <Skeleton className="h-3 w-full mb-4 bg-slate-100" />
         <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-end gap-4">
             <div className="space-y-2 flex-1">
-                <div className="h-4 bg-gray-50 rounded-lg w-16" />
-                <div className="h-2 bg-gray-50 rounded-lg w-12" />
+                <Skeleton className="h-4 w-16 bg-slate-100" />
+                <Skeleton className="h-2.5 w-12 bg-slate-100" />
             </div>
-            <div className="h-8 w-10 bg-gray-50 rounded-xl" />
+            <Skeleton className="h-8 w-10 rounded-xl bg-slate-100" />
         </div>
     </div>
 );
@@ -51,8 +53,8 @@ const MedicineDetailsModal = ({ med, onClose, cartItems, addToCart, updateQuanti
                         <div className="flex justify-between items-start gap-4 mb-2">
                             <h2 className="text-2xl font-black text-gray-900 leading-tight">{med.name}</h2>
                             <div className="flex flex-col items-end">
-                                <span className="text-2xl font-black text-teal-600">₹{med.cost || med.price}</span>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cost</span>
+                                <span className="text-2xl font-black text-teal-600">₹{med.price.toFixed(2)}</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Price</span>
                             </div>
                         </div>
                         <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">{med.company}</p>
@@ -75,13 +77,22 @@ const MedicineDetailsModal = ({ med, onClose, cartItems, addToCart, updateQuanti
                                 <span className="text-xs font-bold text-gray-500 ml-4 uppercase tracking-wider">Quantity in Cart</span>
                                 <div className="flex items-center bg-white rounded-xl shadow-sm border border-gray-100">
                                     <button onClick={() => updateQuantity(med._id, -1)} className="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-teal-600 transition-colors"><FaMinus /></button>
-                                    <span className="w-8 text-center font-black text-teal-600 text-lg">{cartItems.find((i: any) => i._id === med._id)?.quantity}</span>
+                                    <QuantityInput
+                                        quantity={cartItems.find((i: any) => i._id === med._id)?.quantity || 1}
+                                        onChange={(qty) => {
+                                            const item = cartItems.find((i: any) => i._id === med._id);
+                                            if (item) {
+                                                updateQuantity(med._id, qty - item.quantity);
+                                            }
+                                        }}
+                                        className="w-8 text-teal-600 text-lg font-black text-center"
+                                    />
                                     <button onClick={() => updateQuantity(med._id, 1)} className="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-teal-600 transition-colors"><FaPlus /></button>
                                 </div>
                             </div>
                         ) : (
                             <button
-                                onClick={() => addToCart({ ...med, quantity: 1, price: med.cost || med.price })}
+                                onClick={() => addToCart({ ...med, quantity: 1, price: med.price })}
                                 className="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl font-bold uppercase tracking-widest shadow-lg shadow-teal-200 transition-all hover:shadow-xl hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
                             >
                                 <FaPlus className="text-sm" /> Add to Cart
@@ -131,26 +142,35 @@ const MedicineCard = ({ med, cartItems, addToCart, updateQuantity, isCompact = f
                 <div className="flex items-end justify-between gap-2">
                     <div className="flex flex-col">
                         <div className="flex items-baseline gap-1">
-                            <span className="text-[10px] font-bold text-gray-500 uppercase">Cost:</span>
-                            <span className="text-xs sm:text-xl font-black text-teal-600">₹{med.cost || med.price}</span>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase">Price:</span>
+                            <span className="text-xs sm:text-xl font-black text-teal-600">₹{med.price.toFixed(2)}</span>
                         </div>
                         {!hideOffers && med.mrp && (
                             <p className="text-[8px] sm:text-[10px] text-gray-400 font-bold">
-                                MRP: <span>₹{med.mrp}</span>
+                                MRP: <span>₹{med.mrp.toFixed(2)}</span>
                             </p>
                         )}
                     </div>
 
                     <div onClick={(e) => e.stopPropagation()}>
                         {cartItems.find((i: any) => i._id === med._id) ? (
-                            <div className="flex items-center bg-gray-50 rounded-xl overflow-hidden border border-gray-100 shadow-sm scale-90 sm:scale-100 origin-right">
-                                <button onClick={() => updateQuantity(med._id, -1)} className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white transition-colors border-r border-gray-100"><FaMinus size={10} /></button>
-                                <span className="w-8 sm:w-10 text-center font-black text-primary text-[10px] sm:text-sm">{cartItems.find((i: any) => i._id === med._id)?.quantity}</span>
-                                <button onClick={() => updateQuantity(med._id, 1)} className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white transition-colors border-l border-gray-100"><FaPlus size={10} /></button>
+                            <div className="flex items-center bg-gray-50 rounded-xl overflow-hidden border border-gray-100 shadow-sm flex-shrink-0">
+                                <button onClick={() => updateQuantity(med._id, -1)} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white transition-colors border-r border-gray-100"><FaMinus size={10} /></button>
+                                <QuantityInput
+                                    quantity={cartItems.find((i: any) => i._id === med._id)?.quantity || 1}
+                                    onChange={(qty) => {
+                                        const item = cartItems.find((i: any) => i._id === med._id);
+                                        if (item) {
+                                            updateQuantity(med._id, qty - item.quantity);
+                                        }
+                                    }}
+                                    className="w-8 text-primary text-xs font-black text-center"
+                                />
+                                <button onClick={() => updateQuantity(med._id, 1)} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-white transition-colors border-l border-gray-100"><FaPlus size={10} /></button>
                             </div>
                         ) : (
                             <button
-                                onClick={() => addToCart({ ...med, quantity: 1, price: med.cost || med.price })}
+                                onClick={() => addToCart({ ...med, quantity: 1, price: med.price })}
                                 className="bg-primary hover:bg-teal-700 text-white w-10 sm:w-12 h-8 sm:h-10 rounded-xl flex items-center justify-center shadow-lg shadow-teal-200 transition-all hover:-translate-y-1 active:scale-95 font-bold text-[10px] sm:text-xs"
                             >
                                 Add
@@ -216,8 +236,17 @@ const CustomerDashboard = () => {
                 // Populate companies list only on initial load (when showing All)
                 // This ensures the dropdown options don't disappear when filtering
                 if (selectedCompany === 'All Companies') {
-                    const uniqueCompanies = Array.from(new Set(data.map((m: any) => m.company))).filter(Boolean) as string[];
-                    setAllCompanies(['All Companies', ...uniqueCompanies]);
+                    const uniqueCompaniesMap = new Map<string, string>();
+                    data.forEach((m: any) => {
+                        if (m.company && typeof m.company === 'string') {
+                            const trimmed = m.company.trim();
+                            if (trimmed && !uniqueCompaniesMap.has(trimmed.toLowerCase())) {
+                                uniqueCompaniesMap.set(trimmed.toLowerCase(), trimmed);
+                            }
+                        }
+                    });
+                    const sortedCompanies = Array.from(uniqueCompaniesMap.values()).sort((a, b) => a.localeCompare(b));
+                    setAllCompanies(['All Companies', ...sortedCompanies]);
                 }
             } catch (e) {
                 console.error(e);
@@ -234,7 +263,8 @@ const CustomerDashboard = () => {
     const filteredMedicines = medicines.filter((med: any) => {
         const matchesCategory = activeTab === 'All' || med.category === activeTab;
         const matchesType = activeType === 'ALL' || med.type === activeType;
-        const matchesCompany = selectedCompany === 'All Companies' || med.company === selectedCompany;
+        const matchesCompany = selectedCompany === 'All Companies' ||
+            (med.company && med.company.trim().toLowerCase() === selectedCompany.trim().toLowerCase());
         const matchesSearch = !searchQuery ||
             med.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             med.description?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -421,11 +451,11 @@ const CustomerDashboard = () => {
                     </div>
 
                     {loading ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
                             {[...Array(10)].map((_, i) => <MedicineSkeleton key={i} />)}
                         </div>
                     ) : filteredMedicines.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
                             {filteredMedicines.map((med: any) => (
                                 <MedicineCard
                                     key={med._id}

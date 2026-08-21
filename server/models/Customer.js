@@ -48,6 +48,9 @@ const customerSchema = new mongoose.Schema({
     dueAmount: {
         type: Number,
         default: 0
+    },
+    termsAcceptedAt: {
+        type: Date
     }
 }, { timestamps: true });
 

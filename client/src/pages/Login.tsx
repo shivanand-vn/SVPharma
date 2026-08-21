@@ -10,19 +10,23 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const { login, user } = useContext(AuthContext); // Destructure user
+    const { login, user, logout } = useContext(AuthContext); // Destructure user and logout
     const navigate = useNavigate();
     const { showNotification } = useNotification();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = React.useState(false);
 
     // Redirect if already logged in
     React.useEffect(() => {
         if (user) {
-            if (user.role === 'admin') navigate('/admin');
-            else if (user.role === 'developer') navigate('/');
-            else navigate('/customer');
+            const roleDashboard = user.role === 'admin' ? '/admin/dashboard' : (user.role === 'customer' ? '/customer/dashboard' : null);
+            if (roleDashboard) {
+                navigate(roleDashboard, { replace: true });
+            } else {
+                logout();
+                navigate('/', { replace: true });
+            }
         }
-    }, [user, navigate]);
+    }, [user, navigate, logout]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,10 +34,15 @@ const Login = () => {
         try {
             const user = await login(username, password);
             if (user) {
-                showNotification(`Welcome back, ${user.username}!`, 'success');
-                if (user.role === 'admin') navigate('/admin');
-                else if (user.role === 'developer') navigate('/');
-                else navigate('/customer');
+                const roleDashboard = user.role === 'admin' ? '/admin/dashboard' : (user.role === 'customer' ? '/customer/dashboard' : null);
+                if (roleDashboard) {
+                    showNotification(`Welcome back, ${user.username}!`, 'success');
+                    navigate(roleDashboard, { replace: true });
+                } else {
+                    showNotification('Unable to determine your account role. Please contact support or sign in again.', 'error');
+                    logout();
+                    navigate('/', { replace: true });
+                }
             }
         } catch (err: any) {
             showNotification(err.response?.data?.message || 'Login failed', 'error');
@@ -113,6 +122,11 @@ const Login = () => {
                     <div className="mt-8 text-center text-sm text-gray-600">
                         <p>New Pharmacy?</p>
                         <Link to="/register" className="text-primary font-bold hover:underline mt-1 inline-block">Request Connection</Link>
+                    </div>
+
+                    <div className="mt-6 pt-6 border-t border-gray-100 flex justify-center gap-6 text-[10px] uppercase font-black tracking-widest text-gray-400">
+                        <Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+                        <Link to="/terms-of-service" className="hover:text-primary transition-colors">Terms of Service</Link>
                     </div>
                 </div>
             </div>

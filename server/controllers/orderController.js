@@ -34,10 +34,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
 
     const createdOrder = await order.save();
 
-    // 1. Increment Customer Due Amount
-    customer.dueAmount = (customer.dueAmount || 0) + Number(totalPrice);
-
-    // 2. Wallet Credit Logic (Keep for backward compatibility/loyalty)
+    // 1. Wallet Credit Logic (Keep for backward compatibility/loyalty)
     const wallet = await Wallet.findOne({ customer: req.user._id });
     if (wallet) {
         if (wallet.walletBalance > 0) {
@@ -45,8 +42,11 @@ const addOrderItems = asyncHandler(async (req, res) => {
             wallet.walletBalance -= walletUsed;
             wallet.totalPaid += walletUsed;
 
-            // If wallet credits are used, they reduce the due amount immediately
-            customer.dueAmount = Math.max(0, (customer.dueAmount || 0) - walletUsed);
+            // Store wallet usage in order
+            createdOrder.walletAmountUsed = walletUsed;
+
+            // Note: We do NOT update dueAmount here anymore. 
+            // It will be updated when order is processed/accepted.
 
             wallet.walletHistory.push({
                 type: 'order_usage',
@@ -58,16 +58,16 @@ const addOrderItems = asyncHandler(async (req, res) => {
 
             if (walletUsed === totalPrice) {
                 createdOrder.paymentStatus = 'paid';
-                await createdOrder.save();
             }
+            // Save updated order with wallet info
+            await createdOrder.save();
         }
-        // Sync wallet totalDue for logging/audit
-        wallet.totalDue += Number(totalPrice);
-        wallet.pendingBalance = customer.dueAmount;
         await wallet.save();
     }
 
-    await customer.save();
+    // Note: We do NOT increment customer.dueAmount here anymore.
+    // It is deferred until admin approval.
+
     res.status(201).json(createdOrder);
 });
 
@@ -104,8 +104,71 @@ const getMyOrders = asyncHandler(async (req, res) => {
 // @route   GET /api/orders
 // @access  Private/Admin
 const getOrders = asyncHandler(async (req, res) => {
-    const orders = await Order.find({}).populate('customer', 'id name type email phone').sort({ createdAt: -1 });
-    res.json(orders);
+    const { page, limit, status, search } = req.query;
+
+    let query = {};
+    if (status && status !== 'all') {
+        query.status = status;
+    }
+
+    if (search) {
+        const customers = await Customer.find({ name: { $regex: search, $options: 'i' } }).select('_id');
+        const customerIds = customers.map(c => c._id);
+        
+        const orConditions = [
+            { customer: { $in: customerIds } }
+        ];
+
+        if (/^[0-9a-fA-F]{24}$/.test(search)) {
+            orConditions.push({ _id: search });
+        }
+
+        query.$or = orConditions;
+    }
+
+    if (page || limit) {
+        const pageNum = parseInt(page) || 1;
+        const limitNum = parseInt(limit) || 10;
+        const skip = (pageNum - 1) * limitNum;
+
+        const count = await Order.countDocuments(query);
+        const orders = await Order.find(query)
+            .populate('customer', 'id name type email phone')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limitNum);
+
+        // Calculate status counts for stats cards
+        const counts = {
+            all: await Order.countDocuments({}),
+            pending: 0,
+            processing: 0,
+            shipped: 0,
+            delivered: 0,
+            cancelled: 0
+        };
+
+        const statusCounts = await Order.aggregate([
+            { $group: { _id: "$status", count: { $sum: 1 } } }
+        ]);
+
+        statusCounts.forEach(item => {
+            if (counts[item._id] !== undefined) {
+                counts[item._id] = item.count;
+            }
+        });
+
+        res.json({
+            orders,
+            page: pageNum,
+            pages: Math.ceil(count / limitNum),
+            total: count,
+            counts
+        });
+    } else {
+        const orders = await Order.find(query).populate('customer', 'id name type email phone').sort({ createdAt: -1 });
+        res.json(orders);
+    }
 });
 
 // @desc    Update order status
@@ -160,7 +223,6 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
             res.status(400); throw new Error('modifiedItems must be an array');
         }
 
-        // Store original state before first modification
         if (!order.isAdminModified) {
             order.originalItems = order.items.map(item => ({
                 medicine: item.medicine,
@@ -174,30 +236,36 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
         // Update items and recalculate
         order.items = modifiedItems;
-        const newTotal = order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-        const difference = order.originalTotalPrice - newTotal;
+        const newTotal = Math.round(order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0) * 100) / 100;
 
-        // Update Wallet and Customer balance
-        if (difference > 0) {
-            const [wallet, customer] = await Promise.all([
-                Wallet.findOne({ customer: order.customer }),
-                Customer.findById(order.customer)
-            ]);
+        // Update price but DO NOT adjust due amount yet. 
+        // It will be handled in the status transition block below.
+        order.totalPrice = newTotal;
+    }
 
-            if (customer) {
-                customer.dueAmount = Math.max(0, customer.dueAmount - difference);
-                await customer.save();
-            }
+    // --- Update Due Amount on Acceptance (Pending -> Processing) ---
+    if (status === 'processing' && currentStatus === 'pending') {
+        const [wallet, customer] = await Promise.all([
+            Wallet.findOne({ customer: order.customer }),
+            Customer.findById(order.customer)
+        ]);
+
+        if (customer) {
+            // Calculate final amount to add to due
+            // Subtract any amount already paid via wallet
+            const amountToAdd = Math.max(0, order.totalPrice - (order.walletAmountUsed || 0));
+
+            customer.dueAmount = Math.round(((customer.dueAmount || 0) + amountToAdd) * 100) / 100;
+            await customer.save();
 
             if (wallet) {
-                wallet.totalDue -= difference;
-                wallet.pendingBalance = customer ? customer.dueAmount : Math.max(0, wallet.pendingBalance - difference);
+                wallet.totalDue += amountToAdd;
+                wallet.pendingBalance = customer.dueAmount;
                 await wallet.save();
             }
         }
-
-        order.totalPrice = newTotal;
     }
+
 
     // --- Handle Specific Status Actions ---
     if (status === 'cancelled') {
@@ -244,7 +312,23 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 // @route   GET /api/orders/customer/:customerId
 // @access  Private/Admin
 const getOrdersByCustomer = asyncHandler(async (req, res) => {
-    const orders = await Order.find({ customer: req.params.customerId })
+    const { range = 'all' } = req.query;
+    const query = { customer: req.params.customerId };
+
+    if (range !== 'all') {
+        let startDate = new Date();
+        if (range === 'weekly') {
+            startDate.setDate(startDate.getDate() - 7);
+        } else if (range === 'monthly') {
+            startDate.setDate(startDate.getDate() - 30);
+        } else if (range === 'yearly') {
+            startDate.setFullYear(startDate.getFullYear() - 1);
+        }
+        startDate.setHours(0, 0, 0, 0);
+        query.createdAt = { $gte: startDate };
+    }
+
+    const orders = await Order.find(query)
         .populate('customer', 'id name type email phone')
         .sort({ createdAt: -1 });
     res.json(orders);
@@ -323,7 +407,7 @@ const processOrderReturn = asyncHandler(async (req, res) => {
     if (pendingAmount > 0) {
         if (totalReturnValue <= pendingAmount) {
             pendingReduced = totalReturnValue;
-            customer.dueAmount = Math.max(0, (customer.dueAmount || 0) - totalReturnValue);
+            customer.dueAmount = Math.max(0, Math.round(((customer.dueAmount || 0) - totalReturnValue) * 100) / 100);
             wallet.totalDue -= totalReturnValue;
         } else {
             pendingReduced = pendingAmount;

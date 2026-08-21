@@ -1,26 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
-import { FaCloudUploadAlt, FaPlus, FaTimes } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaPlus } from 'react-icons/fa';
 
-// Reuse Toast from ConnectionRequests (Ideally should be in components/Common)
-const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
-    useEffect(() => {
-        const timer = setTimeout(onClose, 3000);
-        return () => clearTimeout(timer);
-    }, [onClose]);
-
-    return (
-        <div className="fixed bottom-4 right-4 z-[100] animate-fade-in-up">
-            <div className={`flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl border-2 ${type === 'success'
-                ? 'bg-green-50 border-green-500 text-green-800'
-                : 'bg-red-50 border-red-500 text-red-800'
-                }`}>
-                <p className="font-bold text-sm">{message}</p>
-                <button onClick={onClose} className="ml-4 hover:opacity-70"><FaTimes /></button>
-            </div>
-        </div>
-    );
-};
+import { Toast } from '../../components/common/Toast';
 
 const Inventory = () => {
     const [formData, setFormData] = useState({
@@ -31,7 +13,8 @@ const Inventory = () => {
         type: '',
         packing: '',
         mrp: '',
-        cost: ''
+        cost: '',
+        gst: '0'
     });
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -92,9 +75,16 @@ const Inventory = () => {
         e.preventDefault();
 
         // Final Frontend Validation
-        const { name, description, company, mrp, cost, category, type, packing } = formData;
+        const { name, description, company, mrp, cost, category, type, packing, gst } = formData;
         if (!name || !description || !company || !mrp || !cost || !category || !type || !packing || !imageFile) {
             showToast("All fields and image are mandatory!", "error");
+            return;
+        }
+
+        const trimmedGst = (gst || '').trim();
+        const parsedGst = trimmedGst === '' ? 0 : Number(trimmedGst);
+        if (isNaN(parsedGst) || parsedGst < 0 || trimmedGst.includes('%') || /[^0-9.]/.test(trimmedGst)) {
+            showToast("GST (%) must be a positive number (digits and decimals only)!", "error");
             return;
         }
 
@@ -107,6 +97,7 @@ const Inventory = () => {
             submissionData.append('company', formData.company);
             submissionData.append('mrp', formData.mrp);
             submissionData.append('cost', formData.cost);
+            submissionData.append('gst', trimmedGst === '' ? '0' : trimmedGst);
             submissionData.append('category', formData.category);
             submissionData.append('type', formData.type);
             submissionData.append('packing', formData.packing);
@@ -130,7 +121,8 @@ const Inventory = () => {
                 type: '',
                 packing: '',
                 mrp: '',
-                cost: ''
+                cost: '',
+                gst: '0'
             });
             setImageFile(null);
             setImagePreview(null);
@@ -242,7 +234,7 @@ const Inventory = () => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         {/* Packing */}
                         <div>
                             <label className="block text-xs font-bold text-teal-700 mb-1 uppercase tracking-wider">Packing</label>
@@ -277,6 +269,21 @@ const Inventory = () => {
                                 name="cost"
                                 placeholder="0.00"
                                 value={formData.cost}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all placeholder-gray-400 bg-gray-50/50 font-medium no-spinner"
+                                required
+                            />
+                        </div>
+                        {/* GST (%) */}
+                        <div>
+                            <label className="block text-xs font-bold text-teal-700 mb-1 uppercase tracking-wider">GST (%)</label>
+                            <input
+                                type="number"
+                                name="gst"
+                                step="any"
+                                min="0"
+                                placeholder="0%"
+                                value={formData.gst}
                                 onChange={handleInputChange}
                                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all placeholder-gray-400 bg-gray-50/50 font-medium no-spinner"
                                 required

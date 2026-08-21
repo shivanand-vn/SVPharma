@@ -6,6 +6,7 @@ import {
     FaRupeeSign, FaCalendarAlt, FaHistory, FaArrowLeft,
     FaArrowRight, FaExclamationTriangle, FaUndo
 } from 'react-icons/fa';
+import { OrderCardSkeleton } from '../../components/common/Skeleton';
 
 const CustomerOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -70,9 +71,8 @@ const CustomerOrders = () => {
             </div>
 
             {loading ? (
-                <div className="py-20 text-center animate-pulse">
-                    <div className="h-16 w-16 bg-gray-100 rounded-full mx-auto mb-4 border-4 border-gray-200 border-t-teal-500 animate-spin" />
-                    <p className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Retrieving your medical records...</p>
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    {Array(4).fill(0).map((_, i) => <OrderCardSkeleton key={i} />)}
                 </div>
             ) : orders.length > 0 ? (
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -170,7 +170,7 @@ const CustomerOrders = () => {
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
-                                                        <p className="text-xs font-black text-gray-800">₹{item.price}</p>
+                                                        <p className="text-xs font-black text-gray-800">₹{item.price.toFixed(2)}</p>
                                                         {isAdjusted && <p className="text-[8px] text-gray-400 font-bold uppercase">Updated rate</p>}
                                                     </div>
                                                 </div>
@@ -192,7 +192,7 @@ const CustomerOrders = () => {
                                                         <p className="text-[9px] text-red-400 font-bold uppercase tracking-widest mt-0.5">Removed by Admin</p>
                                                     </div>
                                                 </div>
-                                                <p className="text-xs font-black text-red-800/30 line-through">₹{removedItem.price}</p>
+                                                <p className="text-xs font-black text-red-800/30 line-through">₹{removedItem.price.toFixed(2)}</p>
                                             </div>
                                         ))}
                                     </div>
