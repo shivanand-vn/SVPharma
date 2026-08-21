@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import ScrollToTop from './components/ScrollToTop';
@@ -106,6 +107,44 @@ function App() {
       <NotificationProvider>
         <CartProvider>
           <Router>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-username" element={<ForgotUsername />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+
+              {/* Admin Routes */}
+              <Route path="/admin" element={
+                <PrivateRoute role="admin">
+                  <AdminLayout />
+                </PrivateRoute>
+              }>
+                <Route index element={<AdminDashboard />} />
+                <Route path="profile" element={<AdminProfile />} />
+                <Route path="requests" element={<ConnectionRequests />} />
+                <Route path="inventory" element={<Inventory />} />
+                <Route path="payments" element={<Payments />} />
+                <Route path="orders" element={<AdminOrders />} />
+              </Route>
+
+              {/* Customer Routes */}
+              <Route path="/customer" element={
+                <PrivateRoute role="customer">
+                  <CustomerLayout />
+                </PrivateRoute>
+              }>
+                <Route index element={<CustomerDashboard />} />
+                <Route path="cart" element={<Cart />} />
+                <Route path="orders" element={<CustomerOrders />} />
+                <Route path="payment" element={<CustomerPayment />} />
+                {/* Add other customer routes */}
+              </Route>
+
+              {/* Fallback route */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+            <Analytics />
             <ScrollToTop />
             <div className="flex flex-col min-h-screen">
               <main className="flex-grow">
