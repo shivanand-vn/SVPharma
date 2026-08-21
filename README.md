@@ -153,9 +153,6 @@ root/
 ## 🎯 Future Enhancements
 
 - Payment gateway integration
-- Email notifications
-- Report export (PDF / Excel)
-- Advanced analytics dashboard
 - Multi-admin support
 - Mobile app integration
 
