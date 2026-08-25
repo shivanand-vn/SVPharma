@@ -1,175 +1,168 @@
-# 💊 SV Pharma  
-### Order & Due Management Web Application
+# 💊 Shree Veerabhadreshwara Pharma (SV Pharma)
+### Enterprise Pharmaceutical Order, Inventory & Due Management System
 
-**SV Pharma** is a modern full-stack web application designed to manage pharmaceutical orders, customer balances, and administrative workflows efficiently.  
-
-It provides a powerful admin dashboard, automated due tracking system, order status management, and secure authentication — all within a clean, responsive interface.
+🌐 **Live Application:** [https://sv-pharma.vercel.app/](https://sv-pharma.vercel.app/)
 
 ---
 
-## 🌐 Live Application
+## 📖 About the Application
 
-🔗 **Access the App:**  
-https://sv-pharma.vercel.app/
+**SV Pharma (Shree Veerabhadreshwara Pharma)** is a modern B2B pharmaceutical sales, order lifecycle, and balance management platform. Designed specifically for wholesale pharmaceutical distributors and retail pharmacy clients, SV Pharma replaces traditional, error-prone manual bookkeeping with a centralized, automated digital hub.
 
-**Description:**  
-SV Pharma enables pharmacy businesses to manage customer orders, monitor outstanding dues, and track payments in real time. The system ensures accurate financial calculations (no rounding errors), automated due adjustments, and seamless administrative control.
+The system ensures exact financial accuracy with a **zero-drift Due Wallet ledger**, streamlines multi-stage order dispatch pipelines, manages batch-level medicine inventory with GST calculation, and delivers real-time business intelligence for executive decision-making.
 
 ---
 
-## 📌 Core Features
+## 🔄 Information Workflow
 
-### 🔐 Authentication
-- Secure Login & Registration
-- JWT-based authentication
-- Role-based access (Admin / User)
-- Public access to:
-  - Privacy Policy
-  - Terms of Service
-- No forced logout when viewing legal pages
+```mermaid
+graph TD
+    subgraph Public Access
+        A[Guest / Visitor] -->|Explore Catalog & Legal Info| B(Landing Page & Public Catalog)
+    end
 
----
+    subgraph Customer Workflow
+        C[Retail Pharmacy Customer] -->|Login via Email or Username| D(Customer Dashboard)
+        D -->|Browse Inventory & Set Quantities| E(Dynamic Cart)
+        E -->|Place Wholesale Order| F[Order Placed - Pending]
+    end
 
-### 📦 Order Management
-- Create and manage orders
-- Order history tracking
-- Status workflow:
-  - Pending
-  - Processing
-  - Shipped
-  - Delivered
-  - Cancelled
-- Time-based filters:
-  - Weekly
-  - Monthly
-  - Yearly
-- Status-based filtering
-- Latest orders shown first
+    subgraph Automated Ledger
+        F -->|Auto-Increment Due Balance| G[(Due Wallet Ledger)]
+        H[Admin Records / Verifies Payment] -->|Auto-Decrement Due Balance| G
+    end
 
----
-
-### 💰 Due Wallet System
-
-- Automatically **increases** when:
-  - A new order is placed
-- Automatically **decreases** when:
-  - A payment is recorded
-- Exact calculation (No rounding applied)
-- Accurate to ordered item totals
-- Displayed with 2 decimal precision
+    subgraph Admin & Operations
+        I[Admin / Distributor] -->|Update Order Lifecycle| J{Order Status}
+        J -->|Processing| K[Stock Allocation]
+        J -->|Shipped| L[Dispatch]
+        J -->|Delivered| M[Fulfilled]
+        I -->|Manage Inventory, GST & Limits| N(Inventory Management)
+        I -->|Export Invoices & Audits| O(PDF & Excel Reports)
+        I -->|Monitor Revenue & Trends| P(Analytics Dashboard)
+    end
+```
 
 ---
 
-### 📊 Admin Dashboard
+## ✨ Core Features & Capabilities
 
-Includes real-time overview cards:
+### 🔐 1. Authentication & Access Control
+- **Dual-Identifier Login:** Supports login using either a registered **Email address** or a unique **Username**.
+- **Role-Based Access (RBAC):** Strict operational segregation between Administrator and Customer accounts.
+- **Self-Service Customer Onboarding:** Structured address registration with real-time password strength validation.
+- **Automated OTP Account Recovery:** Password reset and username recovery powered by **Brevo (Sendinblue) API** with countdown security timers.
+- **Smart Session Handling:** Axios interceptors manage JWT lifecycles and `401 Unauthorized` states without disrupting public legal and catalog routes.
+- **Public Legal Compliance:** Dedicated, publicly accessible **Privacy Policy** and **Terms of Service** pages.
 
-- Total Orders  
-- Total Revenue  
-- Total Customers  
-- **Total Due (Clickable Card)**  
+### 📦 2. Order Management & Cart Controls
+- **Flexible Ordering Pipeline:** Order progression tracking through all operational stages:
+  $$\text{Pending} \longrightarrow \text{Processing} \longrightarrow \text{Shipped} \longrightarrow \text{Delivered} \quad (\text{or } \text{Cancelled})$$
+- **Admin-Configured Safety Limits:** Global item quantity cap (`maxCartQuantityPerItem`) prevents accidental over-ordering.
+- **Manual Numeric Quantity Selector:** Direct numeric quantity inputs for rapid bulk item selection.
+- **Smart Filtering Engine:** Order history filtered by **Weekly**, **Monthly**, **Yearly**, and specific lifecycle statuses.
 
-Clicking the Due card displays:
-- List of customers
-- Individual due amounts
-- Updated balances after payments
+### 💰 3. Automated Due Wallet System
+- **Exact Financial Computation:** Zero floating-point drift or rounding discrepancies; all totals, tax amounts, and balances maintain exact 2-decimal precision.
+- **Real-Time Automated Ledger:**
+  - ➕ **Order Placement:** Automatically increments outstanding customer dues.
+  - ➖ **Payment Verification:** Automatically decrements customer dues upon recorded payment.
+- **Customer-Grouped Outstanding Dues:** Executive overview grouping balances by customer with instant payment entry modals.
+- **Digital & Offline Payments:** Dynamic UPI QR generation with Cloudinary-backed payment receipt upload.
+
+### 💊 4. Inventory & Tax (GST) Management
+- **Batch & Expiry Monitoring:** Full visibility into batch numbers, expiry dates, stock quantities, and status badges (*In Stock*, *Low Stock*, *Out of Stock*).
+- **Integrated GST Taxation:** Per-medicine GST percentage configuration with automated price transformations.
+- **Public Catalog Browsing:** Guests can explore available pharmaceuticals safely via `optionalProtect` middleware.
+- **Deduplicated Company Filters:** Clean, dynamically deduplicated manufacturer dropdowns for swift catalog filtering.
+
+### 📊 5. Analytics & Business Intelligence
+- **Real-Time Operational KPIs:** At-a-glance cards for Total Orders, Revenue, Total Outstanding Dues, and Active Customers.
+- **Interactive Visualizations:** Responsive **Recharts** charts showing chronological monthly revenue trends and volume distributions.
+- **Multi-Format Exporting:**
+  - 📄 **PDF Reports:** Detailed invoices, customer ledgers, and inventory summaries via `jspdf` & `jspdf-autotable`.
+  - 📊 **Excel Workbooks:** `.xlsx` spreadsheets for auditing and accounting workflows.
+
+### ⚙️ 6. Shop Profile & Settings
+- **Customizable Business Profile:** Management of GSTIN, Drug License numbers, registered office address, and contact details.
+- **Dynamic Site Banners & Links:** Live control over customer announcement banners, footer quick links, and social channels.
+
+### 🎨 7. Responsive UI/UX
+- **Shimmer Skeletons:** Custom loading placeholders mirroring actual layout structures for smooth perception.
+- **Mobile & Tablet Optimized:** Full-featured drawer menus and responsive sidebars tailored for all screen sizes.
+- **Scroll Restoration:** Seamless automatic scroll-to-top on page transitions.
 
 ---
 
-### 📜 Legal Pages
-
-- Detailed Privacy Policy
-- Detailed Terms of Service
-- Open in the same window
-- Accessible without login
-- Single back button navigation
-- No redirection issues
-- No automatic logout
-
----
-
-## 🛠 Technology Stack
+## 🛠 Simple Tech Stack
 
 ### Frontend
-- React
-- TypeScript
-- Tailwind CSS
-- React Router
-- Axios
+- **Framework & Language:** React 19, TypeScript
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS
+- **Routing & Motion:** React Router v7, Framer Motion
+- **Data Visualization:** Recharts
+- **Document & Spreadsheet Export:** jsPDF, jsPDF-AutoTable, XLSX (SheetJS)
+- **HTTP Client & Icons:** Axios, React Icons
 
 ### Backend
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- JWT Authentication
+- **Runtime & Server:** Node.js, Express.js (v5)
+- **Database:** MongoDB Atlas with Mongoose ODM
+- **Authentication & Security:** JWT (JSON Web Tokens), Bcryptjs, Helmet, CORS
+- **Email & Notifications:** Brevo (Sendinblue) Transactional Email API
+- **Media & File Storage:** Cloudinary, Multer
+- **Utilities:** QRCode, Morgan
 
 ---
 
 ## 📁 Project Structure
 
+```text
+SV Pharma/
+├── client/              # React 19 + TypeScript Frontend (Vite)
+│   ├── src/
+│   │   ├── components/  # Admin modals, common UI widgets, skeletons, footer
+│   │   ├── context/     # Auth and application global state
+│   │   ├── layouts/     # Admin and customer dashboard layouts
+│   │   ├── pages/       # Admin, Customer, and Public views
+│   │   ├── types/       # TypeScript interfaces
+│   │   └── utils/       # API interceptors, export utilities
+│   ├── .env.example     # Frontend environment template
+│   └── package.json
+│
+├── server/              # Node.js + Express.js REST API
+│   ├── config/          # MongoDB connection configuration
+│   ├── controllers/     # Authentication, Orders, Medicines, Payments, Settings
+│   ├── middleware/      # JWT verification, Role checks, Error handling
+│   ├── models/          # Mongoose database schemas
+│   ├── routes/          # API route definitions
+│   ├── utils/           # Email templates, token helpers
+│   ├── .env.example     # Backend environment template
+│   ├── server.js        # Server entry point
+│   └── package.json
+│
+└── README.md            # Application Documentation
 ```
-root/
-│
-├── client/              # Frontend (React + TypeScript)
-│   ├── pages/
-│   ├── components/
-│   ├── hooks/
-│   └── ...
-│
-├── server/              # Backend (Node + Express)
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   └── middleware/
-│
-└── README.md
-```
 
 ---
 
-## 🔐 Security & Data Protection
+## ⚙️ Environment Configuration
 
-- Password hashing
-- Secure token-based authentication
-- Protected admin routes
-- Role-based access control
-- Public legal compliance pages
-- Accurate financial computation without rounding manipulation
+Environment configuration templates are provided in the repository:
+- **Backend:** Refer to [`server/.env.example`](file:///f:/SV%20Pharma/server/.env.example) for required database, authentication, and service credentials.
+- **Frontend:** Refer to [`client/.env.example`](file:///f:/SV%20Pharma/client/.env.example) for the API endpoint configuration.
 
 ---
 
-## 📈 Business Logic Highlights
+## 📄 License & Intellectual Property
 
-- Due increases on order placement
-- Due decreases on payment confirmation
-- No rounding applied anywhere in the app
-- Real-time balance updates
-- Sorted order history (latest first)
-- Dynamic dashboard statistics
+This project is proprietary software developed for **Shree Veerabhadreshwara Pharma**.  
+All rights reserved © 2026. Unauthorized copying, distribution, or reproduction is strictly prohibited.
 
 ---
 
-## 🎯 Future Enhancements
+## 👨‍💻 Author & Engineering
 
-- Payment gateway integration
-- Email notifications
-- Report export (PDF / Excel)
-- Advanced analytics dashboard
-- Multi-admin support
-- Mobile app integration
-
----
-
-## 📄 License
-
-This software is proprietary and intended for authorized business use only.  
-Unauthorized copying, modification, or redistribution is prohibited.
-
----
-
-## 👨‍💻 Author
-
-Developed for **SV Pharma**  
+Developed for **Shree Veerabhadreshwara Pharma**  
 by **Shivanand VN**  
-All rights reserved © 2026
+- 🌐 **Live Website:** [https://sv-pharma.vercel.app](https://sv-pharma.vercel.app)
